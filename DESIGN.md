@@ -140,8 +140,8 @@ Drag & Dropはカタログの候補に含まれますが、分詞教材の主要
 | LR-PART-004 | 説明対象の名詞を特定 | INT-EXIST-003 | `targetRole: ModifierTarget` として正答を持つ。R0 |
 | LR-PART-005 | 前置修飾 | INT-EXIST-014 | `the smiling baby` などの配置データを登録。R0 |
 | LR-PART-006 | 後置修飾と1語例外 | INT-EXIST-014 + INT-EXIST-027 | 位置・修飾先・意味を配置／関係表示で比較。R0、組み合わせはR2 |
-| LR-PART-007 | 名詞が元動詞をする | INT-EXIST-003 + INT-EXIST-027 | noun選択後にmodifier relationを開き、`the baby → smile` を表示。R1/R2 |
-| LR-PART-008 | 名詞が元動詞をされる | INT-EXIST-003 + INT-EXIST-027 | `the language → speak` を受動関係として表示。R1/R2 |
+| LR-PART-007 | 名詞が元動詞をする | INT-EXIST-003 + INT-EXIST-027 | noun選択後にmodifier relationを開き、既存label / explanationで`the baby → smile`を表示。R0/R2 |
+| LR-PART-008 | 名詞が元動詞をされる | INT-EXIST-003 + INT-EXIST-027 | 既存label / explanationで`the language → speak`を受動関係として表示。R0/R2 |
 | LR-PART-009 | 訳だけで決めない | INT-EXIST-008 + INT-EXIST-009 | 表面的に紛らわしい例と誤答理由をデータで定義。R0 |
 | LR-PART-010 | 自動詞p.p.と完了 | INT-EXIST-004 + INT-EXIST-009 | `受動 / 完了 / 要確認` の分類と誤答訂正。R0 |
 | LR-PART-011 | 感情動詞の基本語義 | INT-EXIST-004 + INT-EXIST-010 | `excite = 〜させる` の分類と場面選択。R0、組み合わせはR2 |
@@ -365,8 +365,6 @@ Why this interaction fits:
 
 感情動詞を辞書訳だけでなく、話し手が感情を与えるのか受けるのかという目的と場面へ結び付けられる。
 
-### R1 — Small Adaptation
-
 #### Modifier Connection Viewer
 
 Related Requirements:
@@ -387,11 +385,11 @@ Existing Component:
 
 Reuse Level:
 
-- R1 — Small Adaptation
+- R0 — Direct Reuse
 
 Required Adaptation:
 
-既存の`modifierId`→`targetId`関係と関係カードを維持し、分詞Problemのrelationへ任意の`semanticRelation`を追加する。例は次の形とする。
+既存の`modifierId`→`targetId`関係と関係カードだけを使う。Hidden S-V、元動詞、能動／受動、結果の形は、既存の`label`と`explanation`へ問題データとして記録する。例は次の形とする。
 
 ```js
 {
@@ -399,22 +397,20 @@ Required Adaptation:
   modifierId: 'smiling-at-her-mother',
   targetId: 'the-baby',
   relationType: 'modifies',
-  label: 'the babyを説明',
-  semanticRelation: {
-    subject: 'the baby',
-    verb: 'smile',
-    voice: 'active',
-    label: 'Hidden S-V: the baby → smile'
-  },
-  explanation: 'the babyがsmileする能動関係なのでsmiling。'
+  label: 'Hidden S-V: active · the baby → smile · result: smiling',
+  explanation: 'The baby smiles. 名詞 baby が smile する関係なので能動。したがって smiling。'
 }
 ```
 
-既存の関係表示へこの任意項目を1行追加し、validatorで`semanticRelation`のID・値を検証する。SVGの新規矢印図、専用Canvas、別Interactionは作らない。`semanticRelation`がない既存Problemは従来どおり表示できることを受入条件にする。
+受動例では、`label`へ`Hidden S-V: passive · the language ← speak · result: spoken`、`explanation`へ`The language is spoken in that country. 名詞 language が speak される関係なので受動。したがって spoken。`を記録する。新しいフィールド、validator、SVG、専用Canvas、別Interactionは作らない。
 
 Why this interaction fits:
 
-既存のmodifier→target表示が、分詞の説明対象を示す。小さな意味関係欄を足すだけで、画面上に見えない`名詞→元動詞`を同じ関係カードで確認できる。
+既存のmodifier→target表示が分詞の説明対象を示し、既存のlabel / explanationが画面上に見えない`名詞→元動詞`と能動／受動を説明できる。
+
+### R1 — Small Adaptation
+
+現時点では採用しません。既存の`label`と`explanation`でHidden S-V、能動／受動、`-ing / p.p.`の根拠を表示できるため、Component APIやProblem schemaの拡張は不要です。
 
 ### R2 — Combination
 
@@ -441,7 +437,7 @@ Reuse Level:
 
 Required Adaptation:
 
-先にMark the Partsで説明対象の名詞を選ばせ、次のStepでModifier Connection Viewerを開き、同じProblem familyのrelationと`semanticRelation`を探索させる。`-ing`用と`p.p.`用を別Problemとして登録し、正答を一つの巨大な専用画面へ集約しない。
+先にMark the Partsで説明対象の名詞を選ばせ、次のStepでModifier Connection Viewerを開き、同じProblem familyのrelationと既存label / explanationを探索させる。`-ing`用と`p.p.`用を別Problemとして登録し、正答を一つの巨大な専用画面へ集約しない。
 
 Why this interaction fits:
 
@@ -456,7 +452,7 @@ Hidden S-Vは単一の派手なUIを必要としない。名詞の特定→修�
 - `-ing / p.p.` の形と意味の差は、既存のSentence Comparisonで左右対応として表示できる。
 - 説明対象の名詞は、既存のMark the Partsで先に選択できる。
 - 前置／後置は、既存のModifier Positionerが配置・修飾先・意味をデータから表示できる。
-- Hidden S-Vは、Mark the PartsとModifier Connection Viewerの組み合わせ、およびR1の任意意味欄で表現できる。
+- Hidden S-Vは、Mark the PartsとModifier Connection Viewerの組み合わせ、および既存label / explanationで表現できる。
 - 感情動詞は、Sentence ComparisonとContext Grammarの組み合わせで、語義・形・場面をつなげられる。
 - 誤答はError Correctorで、候補と`ruleLabel`・説明を分離して返せる。
 
@@ -503,7 +499,7 @@ participle/
 | `grammar-classifier` | 形容詞的用法、能動／受動／完了、感情動詞の分類 | `categories`, `items`, 各`answer`、カテゴリ説明 |
 | `word-order` | 分詞句・文の再構築 | `words`, `acceptedAnswers`, optional `hints` |
 | `modifier-positioner` | 前置・後置と修飾先の比較 | `chunks`, `modifier`, `placements`, `relation`, `meaning` |
-| `modifier-connection-viewer` | 名詞と分詞句の修飾関係、Hidden S-V | `chunks`, `relations`, optional `semanticRelation` |
+| `modifier-connection-viewer` | 名詞と分詞句の修飾関係、Hidden S-V | `chunks`, `relations`, 既存`label` / `explanation` |
 | `sentence-comparison` | `-ing / p.p.`、`exciting / excited`の対照 | 2つの`sentences`, 明示的な`differences` |
 | `error-corrector` | 典型誤答の訂正 | `tokens`, `corrections`, `options`, `acceptedOptionIds`, `ruleLabel` |
 | `context-grammar` | 感情動詞の語義・場面適用 | `scenario`, 順序付き`steps`, `choices`, `acceptedChoiceIds` |
@@ -636,30 +632,29 @@ Next（completion後のみ）
 
 ```text
 Total Interactions: 9
-R0: 7
-R1: 1
+R0: 8
+R1: 0
 R2: 1
 R3: 0
 Reuse coverage (R0 + R1 + R2): 100%
 ```
 
-- R0: Word Order Builder, Mark the Parts, Grammar Classifier, Modifier Positioner, Sentence Comparison, Error Corrector, Context Grammar
-- R1: Modifier Connection Viewerの任意`semanticRelation`表示
+- R0: Word Order Builder, Mark the Parts, Grammar Classifier, Modifier Positioner, Modifier Connection Viewer, Sentence Comparison, Error Corrector, Context Grammar
+- R1: なし
 - R2: Mark the Parts → Modifier Connection ViewerによるHidden S-V discovery sequence
 - R3: なし
 
 ## Next-phase review gates
 
-実装前に、次を確認します。
+次フェーズへ進む前に、次を確認します。
 
 1. `chapter14-ocr.md`のOCR誤認識候補と、教材へ採用する英文・訳を人間が確認する。
 2. `being p.p.`、動名詞＋名詞、代用形容詞を、基本Lessonへ含めるか発展ページへ分けるか決める。
 3. 分詞Problemの安定IDと、各問題の正答が一意か、許容別解があるかを確定する。
-4. `semanticRelation`のR1拡張が本当に必要か確認し、説明欄だけで足りるならR0へ戻す。
+4. 既存の`label` / `explanation`だけでHidden S-Vの理解が成立することを、代表Problemのブラウザ操作で確認する。
 5. 感情動詞の選択肢で、文法的には成立するがGoalに合わない選択をどう扱うか決める。
 6. 参照Atlasの操作契約を実装側へ移す際、外部コード・外部教材・未確認ライセンスを取り込まない。
 7. Problem / Lesson validator、pure logic、browser interaction、keyboard、狭い幅を検証する。
 8. 実装後の受入条件を、`npm test`、`npm run check`、`npm run build`、実ブラウザの主要操作へ分ける。
 
-レビュー完了までは、教材本体の実装、Problem Dataの量産、GitHub Pages公開へ進みません。
-
+Phase 1では、この縦切りだけを実装・検証・公開対象とします。レビュー完了までは、Lesson 1〜3・5・6の実装、Problem Dataの量産、未確認の教材素材の追加へ進みません。
