@@ -5,6 +5,7 @@ import { wordOrderProblems } from './word-order.js';
 import { sentenceComparisonProblems } from './sentence-comparison.js';
 import { errorCorrectorProblems } from './error-corrector.js';
 import { modifierPositionerProblems } from './modifier-positioner.js';
+import { contextGrammarProblems } from './context-grammar.js';
 
 export const problemSets = {
   'mark-parts': markPartsProblems,
@@ -14,6 +15,7 @@ export const problemSets = {
   'sentence-comparison': sentenceComparisonProblems,
   'error-corrector': errorCorrectorProblems,
   'modifier-positioner': modifierPositionerProblems,
+  'context-grammar': contextGrammarProblems,
 };
 
 export const problems = Object.values(problemSets).flat();
@@ -35,4 +37,5 @@ export {
   sentenceComparisonProblems,
   errorCorrectorProblems,
   modifierPositionerProblems,
+  contextGrammarProblems,
 };

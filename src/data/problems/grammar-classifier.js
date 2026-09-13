@@ -52,6 +52,32 @@ export const grammarClassifierProblems = [
     ],
     explanation: '-ing / p.p. の名前や形だけでなく、名詞との意味関係と完了の有無を見ます。',
   },
+  {
+    id: 'PART-L5-P001-CLASS',
+    type: 'grammar-classifier',
+    lessonId: 'PART-L5',
+    requirements: ['LR-PART-011'],
+    sourceEvidence: {
+      source: 'chapter14-ocr.md',
+      section: '14-2 感情動詞の分詞化',
+    },
+    prompt: '語句カードを、感情を起こす動詞かどうかで分類してください。',
+    sentence: 'The science exhibit excites visitors.',
+    classificationAxis: 'Does the verb cause an emotion?',
+    categories: [
+      { id: 'emotion-verb', label: 'Emotion verb · causes a feeling', explanation: '感情動詞は、誰か・何かに感情を起こさせる他動詞です。' },
+      { id: 'other-verb', label: 'Other verb', explanation: '感情を起こすことを中心としない、別の動詞です。' },
+    ],
+    items: [
+      { id: 'l5-surprise', text: 'surprise', answer: 'emotion-verb', explanation: 'surprise は「誰かを驚かせる」。someone/something surprises someone の向きです。' },
+      { id: 'l5-interest', text: 'interest', answer: 'emotion-verb', explanation: 'interest は「誰かに興味を持たせる」。原因から受け手へ感情を起こします。' },
+      { id: 'l5-excite', text: 'excite', answer: 'emotion-verb', explanation: 'excite は「誰かをワクワクさせる」。excites someone の形で原因を表します。' },
+      { id: 'l5-amuse', text: 'amuse', answer: 'emotion-verb', explanation: 'amuse は「誰かを楽しませる」。感情を与える側の動詞です。' },
+      { id: 'l5-arrive', text: 'arrive', answer: 'other-verb', explanation: 'arrive は到着を表す動詞で、感情を起こす他動詞ではありません。' },
+      { id: 'l5-sleep', text: 'sleep', answer: 'other-verb', explanation: 'sleep は眠る動作を表す動詞で、感情を起こす動詞ではありません。' },
+    ],
+    explanation: '感情動詞は「〜する」ではなく「人を〜させる」という方向で捉えます。後で -ing / -ed を選ぶときも、原因と感情を受ける側を分けます。',
+  },
 ];
 
 export const grammarClassifierProblem = grammarClassifierProblems[0];

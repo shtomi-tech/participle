@@ -19,6 +19,7 @@ export function mountErrorCorrector(root, problem, options = {}) {
     <p class="instruction">${escapeHtml(problem.prompt)}</p>
     <div class="demo-stage error-corrector-stage">
       <h3>Sentence</h3>
+      ${problem.context ? `<p class="error-context">${escapeHtml(problem.context)}</p>` : ''}
       <div class="error-token-row" data-error-tokens role="group" aria-label="Sentence tokens"></div>
       <div class="error-selection" data-error-selection role="status" aria-live="polite">語句を選択すると、修正候補が表示されます。</div>
       <div class="error-options" data-error-options></div>

@@ -5,6 +5,7 @@ import { mountWordOrderBuilder } from './wordOrderBuilder.js';
 import { mountSentenceComparison } from './sentenceComparison.js';
 import { mountErrorCorrector } from './errorCorrector.js';
 import { mountModifierPositioner } from './modifierPositioner.js';
+import { mountContextGrammar } from './contextGrammar.js';
 import { getProblemById } from '../../data/problems/index.js';
 
 export const demoRegistry = {
@@ -15,6 +16,7 @@ export const demoRegistry = {
   'sentence-comparison': { mount: mountSentenceComparison, demoProblemId: 'PART-L1-P004-COMPARE' },
   'error-corrector': { mount: mountErrorCorrector, demoProblemId: 'PART-L2-P003-ERROR' },
   'modifier-positioner': { mount: mountModifierPositioner, demoProblemId: 'PART-L3-P001-POSITION' },
+  'context-grammar': { mount: mountContextGrammar, demoProblemId: 'PART-L5-P004-CONTEXT' },
 };
 
 export function getDemoProblem(type, problemId) {

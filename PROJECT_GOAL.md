@@ -2,7 +2,7 @@
 
 ## Status
 
-これは教材設計と実装の正本です。Phase 2まで（Lesson 1〜4、汎用Interaction、Problem Data、validator、CI）は実装済みです。Lesson 5・6とプロジェクト全体の最終受入条件は未完了で、次フェーズで継続します。
+これは教材設計と実装の正本です。Phase 3まで（Lesson 1〜5、汎用Interaction、Problem Data、validator、CI）は実装済みです。Lesson 6とプロジェクト全体の最終受入条件は未完了で、次フェーズで継続します。
 
 ## Source boundary
 

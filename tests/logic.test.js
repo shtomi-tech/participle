@@ -10,6 +10,7 @@ import { checkTokenSelection } from '../src/lib/grammar/parts.js';
 import { buildModifierPlacementSentence, getPlacementRelation, isGoalMatchingPlacement } from '../src/lib/grammar/modifier-placement.js';
 import { getChunkIdsForDifference, getDifferenceByChunkId, hasExploredAllDifferences } from '../src/lib/grammar/sentence-comparison.js';
 import { checkWordOrder } from '../src/lib/grammar/word-order.js';
+import { getScenarioChoice, getScenarioStep, hasCompletedScenario, isAcceptedScenarioChoice } from '../src/lib/grammar/context-grammar.js';
 import { validateLessons } from '../src/lib/validateLessons.js';
 import { validateProblems } from '../src/lib/validateProblems.js';
 import { getLessonProgress, markLessonStepComplete } from '../src/lib/lesson-progress.js';
@@ -61,14 +62,42 @@ test('error correction and modifier placement use declared answers', () => {
   assert.equal(getPlacementRelation(positionProblem, 'l3p1-before-noun').targetId, 'l3p1-lamp');
 });
 
-test('all Phase 2 data has source traceability and valid problem contracts', () => {
+test('all Phase 3 data has source traceability and valid problem contracts', () => {
   const result = validateProblems(problems, { knownRequirementIds: learningRequirementIdSet });
   assert.equal(result.valid, true, result.errors.join('\n'));
-  assert.equal(problems.length, 20);
-  assert.deepEqual(lessons.map((lesson) => lesson.id), ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4']);
+  assert.equal(problems.length, 24);
+  assert.deepEqual(lessons.map((lesson) => lesson.id), ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4', 'PART-L5']);
   assert.ok(problems.every((problem) => problem.lessonId && problem.requirements.length > 0 && problem.sourceEvidence.source === 'chapter14-ocr.md'));
   assert.ok(problems.some((problem) => problem.semanticVoice === 'active'));
   assert.ok(problems.some((problem) => problem.semanticVoice === 'passive'));
+  assert.equal(lessons.at(-1).steps.length, 4);
+  assert.deepEqual(lessons.at(-1).steps.map((step) => step.problemId), [
+    'PART-L5-P001-CLASS',
+    'PART-L5-P002-COMPARE',
+    'PART-L5-P003-ERROR',
+    'PART-L5-P004-CONTEXT',
+  ]);
+  assert.deepEqual(
+    problemRegistry['PART-L5-P002-COMPARE'].comparisonAxes,
+    ['base verb', 'role', 'direction', 'form', 'meaning'],
+  );
+  assert.ok(['PART-L1-P001-MARK', 'PART-L4-P001-MARK', 'PART-L4-P004-REL'].every((id) => problemRegistry[id]));
+});
+
+test('context grammar logic resolves steps, choices, acceptance, and completion', () => {
+  const problem = problemRegistry['PART-L5-P004-CONTEXT'];
+  const first = getScenarioStep(problem.steps, 0);
+  assert.equal(first.id, 'l5-context-step-1');
+  assert.equal(getScenarioStep(problem.steps, first.id), first);
+  assert.equal(getScenarioStep(problem.steps, 'missing-step'), null);
+  const acceptedChoiceId = first.acceptedChoiceIds[0];
+  assert.equal(getScenarioChoice(first, acceptedChoiceId).id, acceptedChoiceId);
+  assert.equal(getScenarioChoice(first, 'missing-choice'), null);
+  assert.equal(isAcceptedScenarioChoice(first, acceptedChoiceId), true);
+  assert.equal(isAcceptedScenarioChoice(first, 'missing-choice'), false);
+  assert.equal(hasCompletedScenario(problem.steps, new Set()), false);
+  assert.equal(hasCompletedScenario(problem.steps, new Set(problem.steps.map((step) => step.id))), true);
+  assert.equal(hasCompletedScenario(problem.steps, problem.steps.map((step) => step.id)), true);
 });
 
 test('problem validator rejects duplicates, unknown types, unknown LR IDs, and broken references', () => {
@@ -86,6 +115,34 @@ test('problem validator rejects duplicates, unknown types, unknown LR IDs, and b
   unknown.type = 'unknown-interaction';
   const unknownResult = validateProblems([unknown], { knownRequirementIds: learningRequirementIdSet });
   assert.ok(unknownResult.errors.some((error) => error.includes('unknown')));
+});
+
+test('context grammar validator rejects broken scenario contracts', () => {
+  const original = problemRegistry['PART-L5-P004-CONTEXT'];
+  const invalidCases = [
+    ['duplicate step ID', (problem) => problem.steps.push(structuredClone(problem.steps[0])), 'duplicate id'],
+    ['duplicate choice ID', (problem) => { problem.steps[1].choices[0].id = problem.steps[0].choices[0].id; }, 'duplicate IDs'],
+    ['unknown accepted choice', (problem) => { problem.steps[0].acceptedChoiceIds = ['missing-choice']; }, 'unknown accepted choice'],
+    ['empty accepted choices', (problem) => { problem.steps[0].acceptedChoiceIds = []; }, 'acceptedChoiceIds'],
+    ['step without choices', (problem) => { problem.steps[0].choices = []; }, 'choices'],
+    ['missing scenario', (problem) => { delete problem.scenario; }, 'scenario'],
+    ['missing explanation', (problem) => { delete problem.explanation; }, 'explanation'],
+    ['unknown LR ID', (problem) => { problem.requirements = ['LR-PART-999']; }, 'unknown LR ID'],
+  ];
+
+  for (const [name, mutate, expectedMessage] of invalidCases) {
+    const problem = structuredClone(original);
+    mutate(problem);
+    const result = validateProblems([problem], { knownRequirementIds: learningRequirementIdSet });
+    assert.equal(result.valid, false, name);
+    assert.ok(result.errors.some((error) => error.includes(expectedMessage)), `${name}: ${result.errors.join('\n')}`);
+  }
+
+  const mismatchedLesson = structuredClone(lessons.at(-1));
+  mismatchedLesson.id = 'PART-LX';
+  const lessonResult = validateLessons([mismatchedLesson], { problemRegistry, problemTypes: new Set(['context-grammar']) });
+  assert.equal(lessonResult.valid, false);
+  assert.ok(lessonResult.errors.some((error) => error.includes('belongs to PART-L5')));
 });
 
 test('lesson validator rejects unknown interaction types and missing problems', () => {

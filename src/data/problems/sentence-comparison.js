@@ -75,6 +75,26 @@ export const sentenceComparisonProblems = [
     ],
     explanation: '位置は語数だけで機械的に決めず、どの名詞を説明するかと合わせて確認します。',
   },
+  {
+    id: 'PART-L5-P002-COMPARE',
+    type: 'sentence-comparison',
+    lessonId: 'PART-L5',
+    requirements: ['LR-PART-012'],
+    sourceEvidence: {
+      source: 'chapter14-ocr.md',
+      section: '14-2 感情動詞の分詞化',
+    },
+    prompt: '感情を与える側と受ける側を比較し、-ing / -ed の意味を確認してください。',
+    comparisonAxes: ['base verb', 'role', 'direction', 'form', 'meaning'],
+    sentences: [
+      { id: 'a', text: 'The science demonstration was exciting.', chunks: [{ id: 'l5c-a-subject', text: 'The science demonstration', matchKey: 'cause' }, { id: 'l5c-a-form', text: 'was exciting', differenceId: 'emotion-direction' }] },
+      { id: 'b', text: 'The visitors were excited.', chunks: [{ id: 'l5c-b-subject', text: 'The visitors', matchKey: 'experiencer' }, { id: 'l5c-b-form', text: 'were excited', differenceId: 'emotion-direction' }] },
+    ],
+    differences: [
+      { id: 'emotion-direction', leftChunkId: 'l5c-a-form', rightChunkId: 'l5c-b-form', label: 'exciting / excited', explanation: 'base verb は excite。demonstration は感情を与える側なので -ing、visitors は感情を受ける側なので -ed です。人か物かではなく、誰・何が感情を起こすかを見ます。', meaningLeft: '科学の実演が人をワクワクさせる。', meaningRight: '訪問者がワクワクしている。' },
+    ],
+    explanation: 'The demonstration excites the visitors. という関係を作ると、原因には exciting、感情を受ける側には excited が対応します。',
+  },
 ];
 
 export const sentenceComparisonProblem = sentenceComparisonProblems[0];

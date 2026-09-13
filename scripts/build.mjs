@@ -10,4 +10,4 @@ await mkdir(dist, { recursive: true });
 await cp(join(root, '..', 'index.html'), join(dist, 'index.html'));
 await cp(join(root, '..', 'styles.css'), join(dist, 'styles.css'));
 await cp(join(root, '..', 'src'), join(dist, 'src'), { recursive: true });
-console.log('Build complete: dist contains the static Lesson 1-4 application.');
+console.log('Build complete: dist contains the static Lesson 1-5 application.');

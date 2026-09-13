@@ -107,6 +107,20 @@ export const lessons = [
       },
     ],
   },
+  {
+    id: 'PART-L5',
+    slug: 'emotion-verbs',
+    label: 'Lesson 5',
+    title: '感情動詞',
+    description: '感情動詞を「〜させる」という元の方向から捉え、-ing / -ed の意味を判断します。',
+    learningGoal: '感情を与える側なら -ing、感情を受ける側なら -ed / p.p. と説明できるようにする。',
+    steps: [
+      { id: 'PART-L5-STEP-01', interactionType: 'grammar-classifier', problemId: 'PART-L5-P001-CLASS', title: '感情を起こす動詞を見つける', instruction: '感情動詞を「人を〜させる」動詞として分類します。' },
+      { id: 'PART-L5-STEP-02', interactionType: 'sentence-comparison', problemId: 'PART-L5-P002-COMPARE', title: '感情を与える側・受ける側を比べる', instruction: '同じ excite から、exciting と excited が分かれる理由を確認します。' },
+      { id: 'PART-L5-STEP-03', interactionType: 'error-corrector', problemId: 'PART-L5-P003-ERROR', title: '感情の向きで形を訂正する', instruction: '人・物ではなく、誰が感情を起こし、誰が感じるかを考えて訂正します。' },
+      { id: 'PART-L5-STEP-04', interactionType: 'context-grammar', problemId: 'PART-L5-P004-CONTEXT', title: '会話の中で感情表現を選ぶ', instruction: '場面と伝えたい意味に合う -ing / -ed を選び、会話を進めます。' },
+    ],
+  },
 ];
 
 export function getLessonBySlug(slug) {

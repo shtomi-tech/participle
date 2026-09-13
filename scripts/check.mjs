@@ -21,6 +21,7 @@ const sourceFiles = [
   'src/data/problems/sentence-comparison.js',
   'src/data/problems/error-corrector.js',
   'src/data/problems/modifier-positioner.js',
+  'src/data/problems/context-grammar.js',
   'src/data/lessons.js',
   'src/lib/dom.js',
   'src/lib/lifecycle.js',
@@ -32,6 +33,7 @@ const sourceFiles = [
   'src/lib/grammar/sentence-comparison.js',
   'src/lib/grammar/error-correction.js',
   'src/lib/grammar/modifier-placement.js',
+  'src/lib/grammar/context-grammar.js',
   'src/lib/validateProblems.js',
   'src/lib/validateLessons.js',
   'src/components/demos/markTheParts.js',
@@ -41,6 +43,7 @@ const sourceFiles = [
   'src/components/demos/sentenceComparison.js',
   'src/components/demos/errorCorrector.js',
   'src/components/demos/modifierPositioner.js',
+  'src/components/demos/contextGrammar.js',
   'src/components/demos/registry.js',
   'scripts/build.mjs',
   'scripts/check.mjs',
@@ -63,6 +66,8 @@ const registryValidation = validateDemoRegistry(demoRegistry, problemRegistry);
 if (!registryValidation.valid) throw new Error(registryValidation.errors.join('\n'));
 const lessonValidation = validateLessons(lessons, { problemRegistry, problemTypes: new Set(Object.keys(demoRegistry)) });
 if (!lessonValidation.valid) throw new Error(lessonValidation.errors.join('\n'));
+if (lessons.length !== 5 || lessons.at(-1)?.id !== 'PART-L5') throw new Error('Phase 3 requires five lessons ending with PART-L5.');
+if (Object.keys(demoRegistry).length !== 8 || !demoRegistry['context-grammar']) throw new Error('Phase 3 requires eight demo types including context-grammar.');
 
 if (existsSync(join(root, '.github/workflows/pages.yml'))) throw new Error('GitHub Pages workflow must not remain in Phase 2.');
 const ciPath = join(root, '.github/workflows/ci.yml');

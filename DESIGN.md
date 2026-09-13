@@ -2,7 +2,7 @@
 
 ## Design status
 
-この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計フェーズの正本です。今回の完了範囲は設計ドキュメントの作成までであり、教材本体の実装は開始しません。
+この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計・実装の正本です。Phase 1でLesson 4、Phase 2でLesson 1〜3、Phase 3でLesson 5を実装済みです。Lesson 6とプロジェクト全体の最終受入は次フェーズです。
 
 調査日は 2026-09-13。参照元 `C:\Users\shtom\dev\english-grammar-interactive-atlas` は調査時点で未コミット変更を含んでいたため、読み取り専用で扱いました。参照元にはGraft graphがなく、`graft check` は `NO GRAPH` でした。以下の記述は実ファイルの確認結果です。
 
@@ -628,18 +628,18 @@ Next（completion後のみ）
 
 ## Reuse metrics
 
-集計単位は、Phase 2で実装した7つのInteraction typeと、1つの複合Lesson戦略です。複合戦略は新Componentではありません。
+集計単位は、Phase 3時点で実装した8つのInteraction typeと、1つの複合Lesson戦略です。複合戦略は新Componentではありません。
 
 ```text
-Total implemented interaction types: 7
-R0: 7
+Total implemented interaction types: 8
+R0: 8
 R1: 0
 R2: 1
 R3: 0
 Reuse coverage (implemented types): 100%
 ```
 
-- R0: Word Order Builder, Mark the Parts, Grammar Classifier, Modifier Positioner, Modifier Connection Viewer, Sentence Comparison, Error Corrector
+- R0: Word Order Builder, Mark the Parts, Grammar Classifier, Modifier Positioner, Modifier Connection Viewer, Sentence Comparison, Error Corrector, Context Grammar
 - R1: なし
 - R2: Mark the Parts → Modifier Connection ViewerによるHidden S-V discovery sequence
 - R3: なし
@@ -657,7 +657,7 @@ Reuse coverage (implemented types): 100%
 7. Problem / Lesson validator、pure logic、browser interaction、keyboard、狭い幅を検証する。
 8. 実装後の受入条件を、`npm test`、`npm run check`、`npm run build`、実ブラウザの主要操作へ分ける。
 
-Phase 1の受入確認を経て、Phase 2ではLesson 1〜3を実装・検証しました。Lesson 5・6、Problem Dataの量産、未確認の教材素材の追加は次フェーズレビューまで保留します。
+Phase 1の受入確認を経て、Phase 2ではLesson 1〜3、Phase 3ではLesson 5を実装・検証しました。Lesson 6、Problem Dataの量産、未確認の教材素材の追加は次フェーズレビューまで保留します。
 
 ## Phase 2 implementation update
 
@@ -689,7 +689,7 @@ Reuse coverage: 100%
 
 ### Known limitations
 
-- Lesson 5・6と、未採用の発展教材は未実装。
+- Lesson 5・6と、未採用の発展教材はPhase 2時点では未実装。
 - 進捗はLesson画面内のmemoryのみで、localStorage・DB・アカウントは追加していない。
 - GitHub Pagesへの公開は行わない。リポジトリの公開範囲も変更しない。
 
@@ -699,3 +699,45 @@ Reuse coverage: 100%
 - `npm run check` — 20 problems、4 lessons、7 demo typesを検証。
 - `npm run build` — static build passed。
 - 実ブラウザでLesson 1〜4の主要操作、キーボード入力、Lesson遷移、誤配置からのリセットを確認済み。390px幅で横スクロールなし、比較カードと関係カードの1列化、コンソールエラーなしを確認した。
+
+## Phase 3 implementation update
+
+### Implemented Lesson
+
+- `PART-L5` — 感情動詞。Grammar Classifier → Sentence Comparison → Error Corrector → Context Grammarの4 steps。
+- 感情動詞を「〜させる」という元動詞から捉え、感情を与える側を`-ing`、受ける側を`-ed / p.p.`として判断する流れをProblem Dataへ定義した。
+
+### Implemented Components and data
+
+- `ContextGrammar`をAtlasの`contextGrammar.js`契約に沿って追加した。
+- `getScenarioStep`、`getScenarioChoice`、`isAcceptedScenarioChoice`、`hasCompletedScenario`を`src/lib/grammar/context-grammar.js`へ分離した。
+- `GrammarClassifier`、`SentenceComparison`、`ErrorCorrector`は既存Generic Componentを再利用し、Lesson 5のProblem Dataだけを追加した。
+- Component APIは変更していない。教材固有の`exciting` / `excited`はComponentへハードコードしていない。
+
+### Problem and Learning Requirement traceability
+
+- `PART-L5-P001-CLASS` — LR-PART-011。感情動詞を「感情を起こす動詞」として分類。
+- `PART-L5-P002-COMPARE` — LR-PART-012。`exciting / excited`をbase verb、役割、方向、形、意味で比較。
+- `PART-L5-P003-ERROR` — LR-PART-009 / LR-PART-012。人・物ではなく、感情の与え手・受け手で訂正。
+- `PART-L5-P004-CONTEXT` — LR-PART-011 / LR-PART-012。3-step会話で文脈から形を選択。
+
+### Reuse levels after Phase 3
+
+```text
+Implemented interaction types: 8
+R0: 8
+R1: 0
+R2: 1 (MarkTheParts → ModifierConnectionViewer Hidden S-V sequence)
+R3: 0
+```
+
+### Validator and verification
+
+- `context-grammar`のscenario、step、choice、`acceptedChoiceIds`、重複ID、参照切れ、空配列、LR ID、lessonIdを検証する。
+- ContextGrammar pure logic、受入・拒否選択、Scenario完了、Lesson 1〜5のRegistry整合性をテストする。
+- `npm test`、`npm run check`、`npm run build`、CI、デスクトップブラウザ、390px幅、キーボード操作、Reset、Lesson 1〜4回帰を確認する。
+
+### Phase 3 known limitations
+
+- Lesson 6「総合判断」と最終Mastery判定は未実装。
+- 進捗はLesson画面内のmemoryのみ。永続化、アカウント、サーバー、外部サービス、デプロイは追加していない。

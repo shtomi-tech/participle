@@ -70,7 +70,10 @@ export function mountSentenceComparison(root, problem, options = {}) {
         : '違いのある語句を選択すると、意味の対応が表示されます。';
     } else {
       const difference = problem.differences.find((entry) => entry.id === selectedDifferenceId);
-      selection.textContent = `Difference: ${difference.label}。Meaning A: ${difference.meaningLeft} Meaning B: ${difference.meaningRight} Why it matters: ${difference.explanation}`;
+      const axes = Array.isArray(problem.comparisonAxes) && problem.comparisonAxes.length
+        ? `Axes: ${problem.comparisonAxes.join(' / ')}。`
+        : '';
+      selection.textContent = `Difference: ${difference.label}。${axes}Meaning A: ${difference.meaningLeft} Meaning B: ${difference.meaningRight} Why it matters: ${difference.explanation}`;
     }
     progress.textContent = completed
       ? 'You explored all sentence differences.'
