@@ -2,7 +2,7 @@
 
 ## Status
 
-これは教材設計と実装の正本です。Phase 4まで（Lesson 1〜6、汎用Interaction、Problem Data、validator、CI）は実装済みです。ローカル実ブラウザで主要操作・キーボード・390px幅・Lesson 1〜5回帰を確認済みで、CIはpush後に確認します。
+これは教材設計と実装の正本です。Phase 4まで（Lesson 1〜6、汎用Interaction、Problem Data、validator、CI）は実装済みです。ローカル実ブラウザで主要操作・キーボード・390px幅・Lesson 1〜5回帰を確認済みで、CIもpush後に成功を確認済みです。
 
 ## Source boundary
 

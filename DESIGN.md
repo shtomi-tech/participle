@@ -2,7 +2,7 @@
 
 ## Design status
 
-この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計・実装の正本です。Phase 1でLesson 4、Phase 2でLesson 1〜3、Phase 3でLesson 5、Phase 4でLesson 6を実装済みです。ローカル実ブラウザで主要操作・キーボード・390px幅・Lesson 1〜5回帰を確認済みで、CIはpush後に確認します。
+この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計・実装の正本です。Phase 1でLesson 4、Phase 2でLesson 1〜3、Phase 3でLesson 5、Phase 4でLesson 6を実装済みです。ローカル実ブラウザで主要操作・キーボード・390px幅・Lesson 1〜5回帰を確認済みで、CIもpush後に成功を確認済みです。
 
 調査日は 2026-09-13。参照元 `C:\Users\shtom\dev\english-grammar-interactive-atlas` は調査時点で未コミット変更を含んでいたため、読み取り専用で扱いました。参照元にはGraft graphがなく、`graft check` は `NO GRAPH` でした。以下の記述は実ファイルの確認結果です。
 
@@ -794,7 +794,7 @@ R3: 0
 
 - `npm test` は12件、`npm run check` は29 Problems・6 Lessons・8 Interaction types、`npm run build`、`git diff --check` が成功した。
 - `validateProblems`、`validateLessons`、LR-PART-001〜013 coverage、Lesson順、Lesson 6全ProblemのLR-PART-013付与を検証した。
-- 実ブラウザで全Lesson経路、Lesson 6の5 Step、keyboard/focus、Reset、390px幅、Lesson 1〜5回帰、コンソールエラーなしを確認した。CIはpush後に確認する。
+- 実ブラウザで全Lesson経路、Lesson 6の5 Step、keyboard/focus、Reset、390px幅、Lesson 1〜5回帰、コンソールエラーなしを確認した。GitHub ActionsのCIも成功した。
 - Lesson 6完了時だけ `All lessons complete — 分詞を見たら、名詞と動詞の関係を見る。` を表示し、Lesson 1〜5ではLesson単位の完了表示に留める。
 
 ### Final known limitations
