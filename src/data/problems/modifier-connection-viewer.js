@@ -6,6 +6,38 @@ const shared = {
 export const modifierConnectionProblems = [
   {
     ...shared,
+    id: 'PART-L3-P003-REL',
+    lessonId: 'PART-L3',
+    requirements: ['LR-PART-004', 'LR-PART-006'],
+    sourceEvidence: {
+      source: 'chapter14-ocr.md',
+      section: '14-1-2 分詞の位置（分詞の前置修飾・後置修飾）',
+    },
+    sentence: 'The lamp glowing near the window lit the desk.',
+    targetNoun: 'the lamp',
+    baseVerb: 'glow',
+    semanticVoice: 'active',
+    participleForm: '-ing',
+    prompt: '後置された分詞句と、説明される名詞の関係を確認してください。',
+    chunks: [
+      { id: 'l3-rel-lamp', text: 'the lamp', kind: 'core' },
+      { id: 'l3-rel-glowing', text: 'glowing near the window', kind: 'modifier' },
+      { id: 'l3-rel-rest', text: 'lit the desk', kind: 'core' },
+    ],
+    relations: [
+      {
+        id: 'l3-rel-1',
+        modifierId: 'l3-rel-glowing',
+        targetId: 'l3-rel-lamp',
+        relationType: 'modifies',
+        label: 'Modifier → target: glowing near the window → the lamp',
+        explanation: '長い分詞句は後ろから the lamp を説明します。lamp が glow する能動関係なので、形は glowing です。',
+      },
+    ],
+    explanation: '分詞句の位置が変わっても、修飾する名詞との関係を確認することが中心です。',
+  },
+  {
+    ...shared,
     id: 'PART-L4-P001-REL',
     requirements: ['LR-PART-004', 'LR-PART-007'],
     sourceEvidence: {

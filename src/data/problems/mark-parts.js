@@ -5,6 +5,31 @@ const sourceBase = {
 
 export const markPartsProblems = [
   {
+    id: 'PART-L1-P001-MARK',
+    type: 'mark-parts',
+    lessonId: 'PART-L1',
+    requirements: ['LR-PART-001', 'LR-PART-004'],
+    sourceEvidence: {
+      source: 'chapter14-ocr.md',
+      section: '14-1-1 形容詞の意識と2種類の形',
+    },
+    targetNoun: 'the lamp',
+    baseVerb: 'glow',
+    semanticVoice: 'active',
+    participleForm: '-ing',
+    prompt: 'smiling のように名詞を説明している分詞を見つける準備として、glowing が説明する名詞を選んでください。',
+    targetRole: 'Target noun',
+    tokens: [
+      { id: 'l1-the', text: 'The', role: 'Determiner' },
+      { id: 'l1-glowing', text: 'glowing', role: 'Participle' },
+      { id: 'l1-lamp', text: 'lamp', role: 'Target noun' },
+      { id: 'l1-lit', text: 'lit', role: 'Verb' },
+      { id: 'l1-desk', text: 'the desk.', role: 'Complement' },
+    ],
+    answer: ['l1-lamp'],
+    explanation: 'glowing は glow 由来の分詞で、the lamp の性質を説明しています。',
+  },
+  {
     id: 'PART-L4-P001-MARK',
     type: 'mark-parts',
     lessonId: 'PART-L4',

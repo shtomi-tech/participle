@@ -1,10 +1,20 @@
 import { mountMarkTheParts } from './markTheParts.js';
 import { mountModifierConnectionViewer } from './modifierConnectionViewer.js';
+import { mountGrammarClassifier } from './grammarClassifier.js';
+import { mountWordOrderBuilder } from './wordOrderBuilder.js';
+import { mountSentenceComparison } from './sentenceComparison.js';
+import { mountErrorCorrector } from './errorCorrector.js';
+import { mountModifierPositioner } from './modifierPositioner.js';
 import { getProblemById } from '../../data/problems/index.js';
 
 export const demoRegistry = {
   'mark-parts': { mount: mountMarkTheParts, demoProblemId: 'PART-L4-P001-MARK' },
   'modifier-connection-viewer': { mount: mountModifierConnectionViewer, demoProblemId: 'PART-L4-P001-REL' },
+  'grammar-classifier': { mount: mountGrammarClassifier, demoProblemId: 'PART-L1-P002-CLASS' },
+  'word-order': { mount: mountWordOrderBuilder, demoProblemId: 'PART-L1-P003-WORD' },
+  'sentence-comparison': { mount: mountSentenceComparison, demoProblemId: 'PART-L1-P004-COMPARE' },
+  'error-corrector': { mount: mountErrorCorrector, demoProblemId: 'PART-L2-P003-ERROR' },
+  'modifier-positioner': { mount: mountModifierPositioner, demoProblemId: 'PART-L3-P001-POSITION' },
 };
 
 export function getDemoProblem(type, problemId) {

@@ -628,18 +628,18 @@ Next（completion後のみ）
 
 ## Reuse metrics
 
-集計単位は、分詞教材で採用する8つのカタログInteractionと、1つの複合Lesson戦略です。複合戦略は新Componentではありません。
+集計単位は、Phase 2で実装した7つのInteraction typeと、1つの複合Lesson戦略です。複合戦略は新Componentではありません。
 
 ```text
-Total Interactions: 9
-R0: 8
+Total implemented interaction types: 7
+R0: 7
 R1: 0
 R2: 1
 R3: 0
-Reuse coverage (R0 + R1 + R2): 100%
+Reuse coverage (implemented types): 100%
 ```
 
-- R0: Word Order Builder, Mark the Parts, Grammar Classifier, Modifier Positioner, Modifier Connection Viewer, Sentence Comparison, Error Corrector, Context Grammar
+- R0: Word Order Builder, Mark the Parts, Grammar Classifier, Modifier Positioner, Modifier Connection Viewer, Sentence Comparison, Error Corrector
 - R1: なし
 - R2: Mark the Parts → Modifier Connection ViewerによるHidden S-V discovery sequence
 - R3: なし
@@ -657,4 +657,45 @@ Reuse coverage (R0 + R1 + R2): 100%
 7. Problem / Lesson validator、pure logic、browser interaction、keyboard、狭い幅を検証する。
 8. 実装後の受入条件を、`npm test`、`npm run check`、`npm run build`、実ブラウザの主要操作へ分ける。
 
-Phase 1では、この縦切りだけを実装・検証・公開対象とします。レビュー完了までは、Lesson 1〜3・5・6の実装、Problem Dataの量産、未確認の教材素材の追加へ進みません。
+Phase 1の受入確認を経て、Phase 2ではLesson 1〜3を実装・検証しました。Lesson 5・6、Problem Dataの量産、未確認の教材素材の追加は次フェーズレビューまで保留します。
+
+## Phase 2 implementation update
+
+### Implemented Lessons
+
+- `PART-L1` — 分詞とは何か。4 steps。
+- `PART-L2` — `-ing / p.p.` の基本。4 steps。
+- `PART-L3` — 前置修飾・後置修飾。4 steps。
+- `PART-L4` — 名詞と分詞のHidden S-V。Phase 1の8-step regression sliceを維持。
+
+### Implemented Components
+
+- Existing/reused generic components: `MarkTheParts`, `ModifierConnectionViewer`, `GrammarClassifier`, `WordOrderBuilder`, `SentenceComparison`, `ErrorCorrector`, `ModifierPositioner`。
+- Phase 2では分詞教材専用のComponent APIを追加せず、Problem DataとLesson Registryで教材文を注入する構造を維持する。
+- `ContextGrammar`は設計上の候補として残し、Phase 2の実装範囲には含めない。
+
+### Reuse levels after Phase 2
+
+```text
+Total implemented interaction types: 7
+R0: 7
+R1: 0
+R2: 1 (Hidden S-V sequence)
+R3: 0
+Reuse coverage: 100%
+```
+
+`R2`は新しいComponentではなく、`MarkTheParts → ModifierConnectionViewer`というLesson sequencingの再利用を指す。
+
+### Known limitations
+
+- Lesson 5・6と、未採用の発展教材は未実装。
+- 進捗はLesson画面内のmemoryのみで、localStorage・DB・アカウントは追加していない。
+- GitHub Pagesへの公開は行わない。リポジトリの公開範囲も変更しない。
+
+### Phase 2 verification result
+
+- `npm test` — 8 tests passed。
+- `npm run check` — 20 problems、4 lessons、7 demo typesを検証。
+- `npm run build` — static build passed。
+- 実ブラウザでLesson 1〜4の主要操作、キーボード入力、Lesson遷移、誤配置からのリセットを確認済み。390px幅で横スクロールなし、比較カードと関係カードの1列化、コンソールエラーなしを確認した。

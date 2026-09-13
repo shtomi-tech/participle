@@ -14,30 +14,36 @@ function getRoute() {
 
 function renderHome() {
   document.title = '分詞インタラクティブ教材';
-  const lesson = lessons[0];
+  const lessonCards = lessons.map((lesson, index) => `
+    <article class="lesson-card">
+      <p class="step-label">${escapeHtml(lesson.label)}</p>
+      <h2>${escapeHtml(lesson.title)}</h2>
+      <p>${escapeHtml(lesson.description)}</p>
+      <a class="button" href="#lessons/${escapeHtml(lesson.slug)}">${index === 0 ? 'Lesson 1を始める' : `${escapeHtml(lesson.label)}へ進む`} →</a>
+    </article>`).join('');
   app.innerHTML = `
     <main class="home shell">
       <p class="eyebrow">Participle / vertical slice</p>
       <h1>分詞を見たら、<span>名詞と動詞の関係を見る。</span></h1>
       <p class="lead">分詞の形を暗記する前に、説明される名詞と元動詞の関係を操作して確かめます。</p>
-      <section class="lesson-card" aria-labelledby="lesson-card-title">
-        <p class="step-label">${escapeHtml(lesson.label)}</p>
-        <h2 id="lesson-card-title">${escapeHtml(lesson.title)}</h2>
-        <p>${escapeHtml(lesson.description)}</p>
-        <a class="button" href="#lessons/${escapeHtml(lesson.slug)}">Lesson 4を始める →</a>
+      <section class="lesson-list" aria-label="Lessons">
+        ${lessonCards}
       </section>
     </main>`;
 }
 
 function renderLesson(lesson) {
   document.title = `${lesson.label}: ${lesson.title}`;
+  const lessonIndex = lessons.findIndex((entry) => entry.id === lesson.id);
+  const previousLesson = lessons[lessonIndex - 1];
+  const nextLesson = lessons[lessonIndex + 1];
   let stepIndex = 0;
   let completedStepIds = new Set();
   let cleanup = null;
 
   app.innerHTML = `
     <main class="lesson-page shell">
-      <div class="topline"><a href="#">← Start</a><span>${escapeHtml(lesson.id)}</span></div>
+      <div class="topline"><a href="#">← Lesson list</a><span>${escapeHtml(lesson.id)} · Lesson ${lessonIndex + 1} / ${lessons.length}</span></div>
       <header class="lesson-header">
         <p class="eyebrow">${escapeHtml(lesson.label)}</p>
         <h1>${escapeHtml(lesson.title)}</h1>
@@ -53,6 +59,10 @@ function renderLesson(lesson) {
         <nav class="lesson-navigation" aria-label="Lesson navigation">
           <button class="button secondary" type="button" data-previous>← Previous</button>
           <button class="button" type="button" data-next>Next →</button>
+        </nav>
+        <nav class="lesson-switcher" aria-label="Move between lessons">
+          ${previousLesson ? `<a class="button secondary" href="#lessons/${escapeHtml(previousLesson.slug)}">← ${escapeHtml(previousLesson.label)}</a>` : '<span></span>'}
+          ${nextLesson ? `<a class="button secondary" href="#lessons/${escapeHtml(nextLesson.slug)}">${escapeHtml(nextLesson.label)} →</a>` : '<span class="lesson-switcher-end">All foundation lessons shown</span>'}
         </nav>
       </section>
     </main>`;
@@ -90,7 +100,7 @@ function renderLesson(lesson) {
         if (!result.correct) return;
         completedStepIds = markLessonStepComplete(completedStepIds, step.id);
         const progress = updateProgress();
-        completion.textContent = progress.allComplete ? 'Lesson complete — Hidden S-Vを最後まで確認しました。' : 'Step complete — 次の関係へ進めます。';
+        completion.textContent = progress.allComplete ? 'Lesson complete — このLessonを最後まで確認しました。' : 'Step complete — 次の関係へ進めます。';
         next.disabled = stepIndex === lesson.steps.length - 1;
       },
     });
