@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { learningRequirementIdSet } from '../src/data/learning-requirements.js';
+import { learningRequirementIdSet, learningRequirementIds } from '../src/data/learning-requirements.js';
 import { lessons } from '../src/data/lessons.js';
 import { problemRegistry, problems } from '../src/data/problems/index.js';
 import { checkClassification } from '../src/lib/grammar/classification.js';
@@ -62,26 +62,50 @@ test('error correction and modifier placement use declared answers', () => {
   assert.equal(getPlacementRelation(positionProblem, 'l3p1-before-noun').targetId, 'l3p1-lamp');
 });
 
-test('all Phase 3 data has source traceability and valid problem contracts', () => {
+test('all Phase 4 data has source traceability, full LR coverage, and valid problem contracts', () => {
   const result = validateProblems(problems, { knownRequirementIds: learningRequirementIdSet });
   assert.equal(result.valid, true, result.errors.join('\n'));
-  assert.equal(problems.length, 24);
-  assert.deepEqual(lessons.map((lesson) => lesson.id), ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4', 'PART-L5']);
+  assert.equal(problems.length, 29);
+  assert.deepEqual(lessons.map((lesson) => lesson.id), ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4', 'PART-L5', 'PART-L6']);
   assert.ok(problems.every((problem) => problem.lessonId && problem.requirements.length > 0 && problem.sourceEvidence.source === 'chapter14-ocr.md'));
+  const referencedRequirementIds = new Set(problems.flatMap((problem) => problem.requirements));
+  assert.deepEqual(learningRequirementIds.filter((id) => !referencedRequirementIds.has(id)), []);
   assert.ok(problems.some((problem) => problem.semanticVoice === 'active'));
   assert.ok(problems.some((problem) => problem.semanticVoice === 'passive'));
-  assert.equal(lessons.at(-1).steps.length, 4);
+  assert.equal(lessons.at(-1).steps.length, 5);
   assert.deepEqual(lessons.at(-1).steps.map((step) => step.problemId), [
-    'PART-L5-P001-CLASS',
-    'PART-L5-P002-COMPARE',
-    'PART-L5-P003-ERROR',
-    'PART-L5-P004-CONTEXT',
+    'PART-L6-P001-MARK',
+    'PART-L6-P002-REL',
+    'PART-L6-P003-ERROR',
+    'PART-L6-P004-POSITION',
+    'PART-L6-P005-CONTEXT',
   ]);
-  assert.deepEqual(
-    problemRegistry['PART-L5-P002-COMPARE'].comparisonAxes,
-    ['base verb', 'role', 'direction', 'form', 'meaning'],
-  );
+  assert.ok(lessons.at(-1).steps.every((step) => problemRegistry[step.problemId].requirements.includes('LR-PART-013')));
   assert.ok(['PART-L1-P001-MARK', 'PART-L4-P001-MARK', 'PART-L4-P004-REL'].every((id) => problemRegistry[id]));
+});
+
+test('Lesson 6 problems use existing pure logic and stable answers', () => {
+  const mark = problemRegistry['PART-L6-P001-MARK'];
+  assert.equal(checkTokenSelection(mark.answer, mark.answer), true);
+  assert.equal(checkTokenSelection(['l6m-front-row'], mark.answer), false);
+
+  const relation = problemRegistry['PART-L6-P002-REL'];
+  assert.equal(getRelationsForChunk(relation.relations, 'l6r-instructions')[0].id, 'l6r-relation-1');
+  assert.equal(hasExploredAllRelations(relation.relations, new Set()), false);
+  assert.equal(hasExploredAllRelations(relation.relations, new Set(['l6r-relation-1'])), true);
+
+  const error = problemRegistry['PART-L6-P003-ERROR'];
+  const correction = getCorrectionByTokenId(error.corrections, 'l6e-fallen');
+  assert.equal(isAcceptedCorrection(correction, 'l6e-opt-fallen'), true);
+  assert.equal(isAcceptedCorrection(correction, 'l6e-opt-falling'), false);
+  assert.equal(hasCompletedAllCorrections(error.corrections, new Map([['l6e-completion', 'l6e-opt-fallen']])), true);
+
+  const position = problemRegistry['PART-L6-P004-POSITION'];
+  assert.equal(isGoalMatchingPlacement(position, 'l6p-after-phrase'), true);
+  assert.equal(isGoalMatchingPlacement(position, 'l6p-before-word'), false);
+  assert.equal(isGoalMatchingPlacement(position, 'missing-placement'), false);
+  assert.equal(buildModifierPlacementSentence(position, 'l6p-after-phrase'), 'The workshop designed for beginners helped new teachers.');
+  assert.equal(getPlacementRelation(position, 'l6p-after-phrase').targetId, 'l6p-workshop');
 });
 
 test('context grammar logic resolves steps, choices, acceptance, and completion', () => {
@@ -98,6 +122,15 @@ test('context grammar logic resolves steps, choices, acceptance, and completion'
   assert.equal(hasCompletedScenario(problem.steps, new Set()), false);
   assert.equal(hasCompletedScenario(problem.steps, new Set(problem.steps.map((step) => step.id))), true);
   assert.equal(hasCompletedScenario(problem.steps, problem.steps.map((step) => step.id)), true);
+});
+
+test('Lesson 6 context grammar supports rejection, accepted choices, and completion', () => {
+  const problem = problemRegistry['PART-L6-P005-CONTEXT'];
+  const first = getScenarioStep(problem.steps, 'l6-context-step-1');
+  assert.equal(getScenarioChoice(first, 'l6-context-choice-1a').id, 'l6-context-choice-1a');
+  assert.equal(isAcceptedScenarioChoice(first, 'l6-context-choice-1a'), true);
+  assert.equal(isAcceptedScenarioChoice(first, 'l6-context-choice-1b'), false);
+  assert.equal(hasCompletedScenario(problem.steps, new Set(problem.steps.map((step) => step.id))), true);
 });
 
 test('problem validator rejects duplicates, unknown types, unknown LR IDs, and broken references', () => {
@@ -138,7 +171,7 @@ test('context grammar validator rejects broken scenario contracts', () => {
     assert.ok(result.errors.some((error) => error.includes(expectedMessage)), `${name}: ${result.errors.join('\n')}`);
   }
 
-  const mismatchedLesson = structuredClone(lessons.at(-1));
+  const mismatchedLesson = structuredClone(lessons.find((lesson) => lesson.id === 'PART-L5'));
   mismatchedLesson.id = 'PART-LX';
   const lessonResult = validateLessons([mismatchedLesson], { problemRegistry, problemTypes: new Set(['context-grammar']) });
   assert.equal(lessonResult.valid, false);

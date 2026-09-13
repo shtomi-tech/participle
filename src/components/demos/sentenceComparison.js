@@ -107,6 +107,7 @@ export function mountSentenceComparison(root, problem, options = {}) {
     exploredDifferenceIds.clear();
     completed = false;
     render({ type: 'reset' });
+    onComplete({ correct: false, problemId: problem.id, reset: true });
   });
 
   render();

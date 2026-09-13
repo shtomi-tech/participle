@@ -121,6 +121,21 @@ export const lessons = [
       { id: 'PART-L5-STEP-04', interactionType: 'context-grammar', problemId: 'PART-L5-P004-CONTEXT', title: '会話の中で感情表現を選ぶ', instruction: '場面と伝えたい意味に合う -ing / -ed を選び、会話を進めます。' },
     ],
   },
+  {
+    id: 'PART-L6',
+    slug: 'integrated-judgment',
+    label: 'Lesson 6',
+    title: '総合判断',
+    description: '初見の英文で、説明対象・元動詞・関係・位置・文脈を順に確認します。',
+    learningGoal: '分詞を見たら、名詞と動詞の関係を中心に、形と判断理由を短く説明できるようにする。',
+    steps: [
+      { id: 'PART-L6-STEP-01', interactionType: 'mark-parts', problemId: 'PART-L6-P001-MARK', title: '初見文の説明対象を特定する', instruction: '分詞が説明している名詞を選びます。元動詞や形はまだ決めません。' },
+      { id: 'PART-L6-STEP-02', interactionType: 'modifier-connection-viewer', problemId: 'PART-L6-P002-REL', title: '元動詞とHidden S-Vを確認する', instruction: '関係カードを選び、target noun と元動詞の意味上の関係を確認します。' },
+      { id: 'PART-L6-STEP-03', interactionType: 'error-corrector', problemId: 'PART-L6-P003-ERROR', title: '形と完了の意味を判断する', instruction: '初見文の意味に合う形を選び、受動ではなく完了となる理由を確認します。' },
+      { id: 'PART-L6-STEP-04', interactionType: 'modifier-positioner', problemId: 'PART-L6-P004-POSITION', title: '分詞の位置とまとまりを判断する', instruction: '分詞1語と分詞句の位置を比べ、意味と文脈に合う配置を選びます。' },
+      { id: 'PART-L6-STEP-05', interactionType: 'context-grammar', problemId: 'PART-L6-P005-CONTEXT', title: '文脈で形と理由を結び付ける', instruction: '会話の文脈から感情の与え手・受け手を判断し、形と理由を含む応答を選びます。' },
+    ],
+  },
 ];
 
 export function getLessonBySlug(slug) {

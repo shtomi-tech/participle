@@ -76,6 +76,7 @@ export function mountMarkTheParts(root, problem, options = {}) {
     completed = false;
     clearFeedback();
     render();
+    onComplete({ correct: false, problemId: problem.id, reset: true });
   });
   on(checkButton, 'click', check);
   render();

@@ -122,6 +122,7 @@ export function mountErrorCorrector(root, problem, options = {}) {
     feedbackKind = '';
     completionNotified = false;
     render({ type: 'reset' });
+    onComplete({ correct: false, problemId: problem.id, reset: true });
   });
 
   render();

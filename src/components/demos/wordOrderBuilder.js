@@ -96,6 +96,7 @@ export function mountWordOrderBuilder(root, problem, options = {}) {
     if (hintOutput) hintOutput.textContent = '';
     if (hintButton) hintButton.disabled = false;
     render();
+    onComplete({ correct: false, problemId: problem.id, reset: true });
   });
   if (hintButton) on(hintButton, 'click', () => {
     if (!hintOutput || hintIndex >= hints.length) return;

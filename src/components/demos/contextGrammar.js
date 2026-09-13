@@ -195,6 +195,7 @@ export function mountContextGrammar(root, problem, options = {}) {
     state.completed = false;
     state.completionNotified = false;
     render({ type: 'reset' });
+    onComplete({ correct: false, problemId: problem.id, reset: true });
   }
 
   on(choices, 'click', (event) => {

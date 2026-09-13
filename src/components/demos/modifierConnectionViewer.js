@@ -88,6 +88,7 @@ export function mountModifierConnectionViewer(root, problem, options = {}) {
     exploredRelationIds.clear();
     completed = false;
     render({ type: 'reset' });
+    onComplete({ correct: false, problemId: problem.id, reset: true });
   });
   render();
   return cleanup;

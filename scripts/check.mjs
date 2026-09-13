@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { demoRegistry } from '../src/components/demos/registry.js';
 import { lessons } from '../src/data/lessons.js';
 import { problemRegistry, problems } from '../src/data/problems/index.js';
-import { learningRequirementIdSet } from '../src/data/learning-requirements.js';
+import { learningRequirementIdSet, learningRequirementIds } from '../src/data/learning-requirements.js';
 import { validateDemoRegistry, validateProblems } from '../src/lib/validateProblems.js';
 import { validateLessons } from '../src/lib/validateLessons.js';
 
@@ -66,15 +66,26 @@ const registryValidation = validateDemoRegistry(demoRegistry, problemRegistry);
 if (!registryValidation.valid) throw new Error(registryValidation.errors.join('\n'));
 const lessonValidation = validateLessons(lessons, { problemRegistry, problemTypes: new Set(Object.keys(demoRegistry)) });
 if (!lessonValidation.valid) throw new Error(lessonValidation.errors.join('\n'));
-if (lessons.length !== 5 || lessons.at(-1)?.id !== 'PART-L5') throw new Error('Phase 3 requires five lessons ending with PART-L5.');
-if (Object.keys(demoRegistry).length !== 8 || !demoRegistry['context-grammar']) throw new Error('Phase 3 requires eight demo types including context-grammar.');
+const expectedLessonIds = ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4', 'PART-L5', 'PART-L6'];
+if (lessons.length !== expectedLessonIds.length || lessons.some((lesson, index) => lesson.id !== expectedLessonIds[index])) {
+  throw new Error(`Phase 4 requires lessons in order: ${expectedLessonIds.join(', ')}.`);
+}
+if (Object.keys(demoRegistry).length !== 8 || !demoRegistry['context-grammar']) throw new Error('Phase 4 requires eight demo types including context-grammar.');
 
-if (existsSync(join(root, '.github/workflows/pages.yml'))) throw new Error('GitHub Pages workflow must not remain in Phase 2.');
+const referencedRequirementIds = new Set(problems.flatMap((problem) => problem.requirements ?? []));
+const missingRequirementIds = learningRequirementIds.filter((id) => !referencedRequirementIds.has(id));
+if (missingRequirementIds.length > 0) throw new Error(`Learning requirements lack Problem coverage: ${missingRequirementIds.join(', ')}.`);
+const finalLessonProblems = lessons.at(-1).steps.map((step) => problemRegistry[step.problemId]);
+if (finalLessonProblems.length !== 5 || finalLessonProblems.some((problem) => !problem.requirements.includes('LR-PART-013'))) {
+  throw new Error('Every Lesson 6 Problem must include LR-PART-013.');
+}
+
+if (existsSync(join(root, '.github/workflows/pages.yml'))) throw new Error('GitHub Pages workflow must not remain.');
 const ciPath = join(root, '.github/workflows/ci.yml');
 if (!existsSync(ciPath)) throw new Error('CI workflow is missing.');
 const ciText = readFileSync(ciPath, 'utf8');
 if (/deploy-pages|upload-pages-artifact|pages:\s*write|id-token:\s*write/.test(ciText)) {
-  throw new Error('CI workflow must remain validation-only in Phase 2.');
+  throw new Error('CI workflow must remain validation-only.');
 }
 
 const active = problems.filter((problem) => problem.semanticVoice === 'active').length;

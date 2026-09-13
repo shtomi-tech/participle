@@ -78,6 +78,58 @@ export const modifierPositionerProblems = [
     punctuation: '.',
     explanation: '分詞句は名詞の後ろに置いて、直前の名詞を説明するのが基本です。',
   },
+  {
+    id: 'PART-L6-P004-POSITION',
+    type: 'modifier-positioner',
+    lessonId: 'PART-L6',
+    requirements: ['LR-PART-005', 'LR-PART-006', 'LR-PART-013'],
+    sourceEvidence: {
+      source: 'chapter14-ocr.md',
+      section: '14-1-2 分詞の位置（分詞の前置修飾・後置修飾）',
+    },
+    prompt: '初見文で、分詞1語と分詞句の位置の違いを確認してください。',
+    goal: { description: 'designed は1語なら前置、designed for beginners のような分詞句なら workshop の後ろに置く基本を確認する。' },
+    chunks: [
+      { id: 'l6p-the', text: 'The' },
+      { id: 'l6p-workshop', text: 'workshop' },
+      { id: 'l6p-helped', text: 'helped new teachers' },
+    ],
+    modifier: { id: 'l6p-designed', text: 'designed' },
+    placements: [
+      {
+        id: 'l6p-before-word',
+        position: 1,
+        label: 'Before “workshop” · designed (one word)',
+        modifierText: 'designed',
+        grammatical: true,
+        matchesGoal: false,
+        relation: { modifierId: 'l6p-designed', targetId: 'l6p-workshop', relationType: 'modifies', label: 'designed → workshop', explanation: 'designed だけなら workshop の前に置けます。' },
+        meaning: '設計されたワークショップは新人教師を助けた。',
+      },
+      {
+        id: 'l6p-after-phrase',
+        position: 2,
+        label: 'After “workshop” · designed for beginners (phrase)',
+        modifierText: 'designed for beginners',
+        grammatical: true,
+        matchesGoal: true,
+        relation: { modifierId: 'l6p-designed', targetId: 'l6p-workshop', relationType: 'modifies', label: 'designed for beginners → workshop', explanation: 'designed for beginners は語句として workshop の後ろから説明します。' },
+        meaning: '初心者向けに設計されたワークショップは新人教師を助けた。',
+      },
+      {
+        id: 'l6p-before-phrase',
+        position: 1,
+        label: 'Before “workshop” · designed for beginners (phrase)',
+        modifierText: 'designed for beginners',
+        grammatical: false,
+        matchesGoal: false,
+        relation: { modifierId: 'l6p-designed', targetId: 'l6p-workshop', relationType: 'modifies', label: 'designed for beginners → workshop', explanation: 'この長い分詞句を前に置く配置は、この問題では自然な基本配置ではありません。' },
+        meaning: 'この問題では自然な配置になりません。',
+      },
+    ],
+    punctuation: '.',
+    explanation: '1語なら前置、分詞を中心とする語句なら後置が基本です。ただしこれは目安なので、意味と文脈も確認します。',
+  },
 ];
 
 export const modifierPositionerProblem = modifierPositionerProblems[0];

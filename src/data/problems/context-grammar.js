@@ -110,6 +110,117 @@ export const contextGrammarProblems = [
     ],
     explanation: 'context → intended meaning → emotion giver / receiver → -ing / -ed の順に考えます。人か物かだけで形を決めないことがポイントです。',
   },
+  {
+    id: 'PART-L6-P005-CONTEXT',
+    type: 'context-grammar',
+    lessonId: 'PART-L6',
+    requirements: ['LR-PART-011', 'LR-PART-012', 'LR-PART-013'],
+    sourceEvidence: {
+      source: 'chapter14-ocr.md',
+      section: '14-2 感情動詞の分詞化',
+    },
+    prompt: '文脈から intended meaning と感情の向きを確かめ、形と理由を含む応答を選んでください。',
+    scenario: {
+      title: 'Explaining a surprising school event',
+      setting: '学校行事について友人と話し、出来事が与えた感情と自分が受けた感情を説明する場面です。',
+      learnerRole: 'Student',
+      goal: '文脈から感情の与え手・受け手を見分け、形と理由を結び付ける。',
+    },
+    context: '最後の会話では、形だけでなく「誰・何が感情を起こしたか／誰が感じたか」まで考えます。',
+    steps: [
+      {
+        id: 'l6-context-step-1',
+        speaker: 'Friend',
+        line: 'How was the student science fair?',
+        instruction: '行事そのものが与えた感情を、理由つきで答えてください。',
+        choices: [
+          {
+            id: 'l6-context-choice-1a',
+            text: 'The science fair was exciting — it caused the feeling.',
+            reply: 'That sounds like an event worth visiting.',
+            grammarLabel: '-ing: emotion giver',
+            explanation: 'The science fair excites visitors. 行事が感情を起こす側なので exciting です。物だからではなく、cause だからこの形になります。',
+          },
+          {
+            id: 'l6-context-choice-1b',
+            text: 'The science fair was excited — it received the feeling.',
+            reply: 'The fair did not feel the excitement in this meaning.',
+            grammarLabel: '-ed: emotion receiver',
+            explanation: 'この文脈では fair が感情を起こす側です。受け手の -ed を cause に置かないようにします。',
+          },
+          {
+            id: 'l6-context-choice-1c',
+            text: 'I was exciting — I received the feeling.',
+            reply: 'That form says you caused excitement for someone else.',
+            grammarLabel: '-ing: emotion giver',
+            explanation: 'I was exciting は「私が人をワクワクさせた」という意味です。受け手としての自分を表す答えにはなりません。',
+          },
+        ],
+        acceptedChoiceIds: ['l6-context-choice-1a'],
+      },
+      {
+        id: 'l6-context-step-2',
+        speaker: 'Friend',
+        line: 'How did you feel when the lights suddenly went out?',
+        instruction: '知らせを受けた自分の反応を、理由つきで答えてください。',
+        choices: [
+          {
+            id: 'l6-context-choice-2a',
+            text: 'I was surprised — I received the feeling.',
+            reply: 'The sudden change really surprised you.',
+            grammarLabel: '-ed: emotion receiver',
+            explanation: 'The sudden change surprised me. 私は感情を受ける側なので surprised です。',
+          },
+          {
+            id: 'l6-context-choice-2b',
+            text: 'I was surprising — I caused the feeling.',
+            reply: 'That would mean you surprised other people.',
+            grammarLabel: '-ing: emotion giver',
+            explanation: 'I was surprising は自分が他の人を驚かせたという意味です。自分の反応には surprised を使います。',
+          },
+          {
+            id: 'l6-context-choice-2c',
+            text: 'The lights were surprised — they received the feeling.',
+            reply: 'The lights caused the surprise; they did not experience it.',
+            grammarLabel: '-ed on the cause',
+            explanation: 'lights が原因なら、The lights were surprising. のように与える側の形を考えます。',
+          },
+        ],
+        acceptedChoiceIds: ['l6-context-choice-2a'],
+      },
+      {
+        id: 'l6-context-step-3',
+        speaker: 'Friend',
+        line: 'Was the long wait difficult for you?',
+        instruction: '待ち時間が与えた感情を、理由つきで答えてください。',
+        choices: [
+          {
+            id: 'l6-context-choice-3a',
+            text: 'The long wait was boring — it caused the feeling.',
+            reply: 'Yes, long waits can feel very slow.',
+            grammarLabel: '-ing: emotion giver',
+            explanation: 'The long wait bored me. 待ち時間が退屈さを起こす側なので boring です。',
+          },
+          {
+            id: 'l6-context-choice-3b',
+            text: 'The long wait was bored — it received the feeling.',
+            reply: 'The wait caused the boredom in this situation.',
+            grammarLabel: '-ed: emotion receiver',
+            explanation: 'この文脈では wait が感情を起こす側なので、受け手の bored ではなく boring を使います。',
+          },
+          {
+            id: 'l6-context-choice-3c',
+            text: 'I was boring — I caused the feeling.',
+            reply: 'That would describe your effect on other people, not the wait.',
+            grammarLabel: '-ing: emotion giver',
+            explanation: 'I was boring は自分が周囲を退屈させたという意味です。待ち時間についての原因説明にはなりません。',
+          },
+        ],
+        acceptedChoiceIds: ['l6-context-choice-3a'],
+      },
+    ],
+    explanation: '文脈 → intended meaning → target / experiencer → 感情の向き → -ing / -ed の順に確認し、形と理由を一緒に答えます。',
+  },
 ];
 
 export const contextGrammarProblem = contextGrammarProblems[0];

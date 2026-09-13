@@ -2,7 +2,7 @@
 
 ## Design status
 
-この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計・実装の正本です。Phase 1でLesson 4、Phase 2でLesson 1〜3、Phase 3でLesson 5を実装済みです。Lesson 6とプロジェクト全体の最終受入は次フェーズです。
+この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計・実装の正本です。Phase 1でLesson 4、Phase 2でLesson 1〜3、Phase 3でLesson 5、Phase 4でLesson 6を実装済みです。ローカル実ブラウザで主要操作・キーボード・390px幅・Lesson 1〜5回帰を確認済みで、CIはpush後に確認します。
 
 調査日は 2026-09-13。参照元 `C:\Users\shtom\dev\english-grammar-interactive-atlas` は調査時点で未コミット変更を含んでいたため、読み取り専用で扱いました。参照元にはGraft graphがなく、`graft check` は `NO GRAPH` でした。以下の記述は実ファイルの確認結果です。
 
@@ -596,10 +596,10 @@ Next（completion後のみ）
 
 | Step | Existing interaction | 目的 | LR |
 | --- | --- | --- | --- |
-| 1 | Mark the Parts | 初見文で説明対象を特定する | 004 |
-| 2 | Modifier Connection Viewer | 元動詞とHidden S-Vを確認する | 007, 008 |
-| 3 | Error Corrector | `-ing / p.p.`の誤答を訂正する | 003, 009, 010 |
-| 4 | Modifier Positioner | 前置・後置と意味を確認する | 005, 006 |
+| 1 | Mark the Parts | 初見文で説明対象を特定する | 004, 013 |
+| 2 | Modifier Connection Viewer | 元動詞とHidden S-Vを確認する | 007, 008, 013 |
+| 3 | Error Corrector | `-ing / p.p.`の誤答を訂正する | 003, 009, 010, 013 |
+| 4 | Modifier Positioner | 前置・後置と意味を確認する | 005, 006, 013 |
 | 5 | Context Grammar | 感情動詞を含む文脈で最終選択する | 011, 012, 013 |
 
 ## Proposed assessment evidence
@@ -624,11 +624,11 @@ Next（completion後のみ）
 | `chapter14-ocr.md:281-312` Hidden S-V、能動・受動 | Goal / LR-007〜009 | Mark the Parts + Modifier Connection Viewer | Lesson 2, 4, 6 | 名詞・元動詞・関係・形 |
 | `chapter14-ocr.md:170-180` 自動詞p.p. | Goal / LR-010 | Grammar Classifier, Error Corrector | Lesson 2, 6 | 受動ではなく完了の判定 |
 | `chapter14-ocr.md:350-414` 感情動詞と`-ing / -ed` | Goal / LR-011, 012 | Sentence Comparison, Error Corrector, Context Grammar | Lesson 5, 6 | 与える／受けるの説明 |
-| `chapter14-ocr.md:318-345`, `484-508` 発展・境界 | Goalの発展メモ / LR-013の保留領域 | 既存Interactionでの追加調査待ち | 次フェーズ判断 | 基本判定と混同しない |
+| `chapter14-ocr.md:318-345`, `484-508` 発展・境界 | Goalの発展メモ / 基本Lesson外 | 既存Interactionを拡張しない | 対象外 | 基本判定と混同しない |
 
 ## Reuse metrics
 
-集計単位は、Phase 3時点で実装した8つのInteraction typeと、1つの複合Lesson戦略です。複合戦略は新Componentではありません。
+集計単位は、Phase 4までに実装した8つのInteraction typeと、1つの複合Lesson戦略です。複合戦略は新Componentではありません。
 
 ```text
 Total implemented interaction types: 8
@@ -657,7 +657,7 @@ Reuse coverage (implemented types): 100%
 7. Problem / Lesson validator、pure logic、browser interaction、keyboard、狭い幅を検証する。
 8. 実装後の受入条件を、`npm test`、`npm run check`、`npm run build`、実ブラウザの主要操作へ分ける。
 
-Phase 1の受入確認を経て、Phase 2ではLesson 1〜3、Phase 3ではLesson 5を実装・検証しました。Lesson 6、Problem Dataの量産、未確認の教材素材の追加は次フェーズレビューまで保留します。
+Phase 1の受入確認を経て、Phase 2ではLesson 1〜3、Phase 3ではLesson 5、Phase 4ではLesson 6を実装・検証します。Problem Dataの量産や未確認の教材素材の追加は行いません。
 
 ## Phase 2 implementation update
 
@@ -737,7 +737,68 @@ R3: 0
 - ContextGrammar pure logic、受入・拒否選択、Scenario完了、Lesson 1〜5のRegistry整合性をテストする。
 - `npm test`、`npm run check`、`npm run build`、CI、デスクトップブラウザ、390px幅、キーボード操作、Reset、Lesson 1〜4回帰を確認する。
 
-### Phase 3 known limitations
+### Phase 3 known limitations (Phase 3時点)
 
-- Lesson 6「総合判断」と最終Mastery判定は未実装。
+- Lesson 6「総合判断」と最終Mastery判定はPhase 3時点では未実装だった。
 - 進捗はLesson画面内のmemoryのみ。永続化、アカウント、サーバー、外部サービス、デプロイは追加していない。
+
+## Phase 4 implementation update
+
+### Implemented Lesson 6
+
+- `PART-L6` — 総合判断。Mark the Parts → Modifier Connection Viewer → Error Corrector → Modifier Positioner → Context Grammarの5 steps。
+- Lesson 1〜5で学んだ説明対象、元動詞、Hidden S-V、能動・受動・完了、位置、文脈を、初見英文と理由つき選択肢で統合する。
+- `LR-PART-013`を全5 Problemへ付与し、総合判断の中心要件として追跡可能にした。
+
+### Lesson 6 Problem traceability
+
+| Problem | Interaction | LR | Evidence |
+| --- | --- | --- | --- |
+| `PART-L6-P001-MARK` | Mark the Parts | 004, 013 | 初見文の分詞が説明する名詞を選択 |
+| `PART-L6-P002-REL` | Modifier Connection Viewer | 007, 008, 013 | target noun、`print`、受動Hidden S-V、`printed`をrelationで表示 |
+| `PART-L6-P003-ERROR` | Error Corrector | 003, 009, 010, 013 | 自動詞`fall`の完了用法を`fallen`へ訂正 |
+| `PART-L6-P004-POSITION` | Modifier Positioner | 005, 006, 013 | 1語の前置と分詞句の後置を意味つきで比較 |
+| `PART-L6-P005-CONTEXT` | Context Grammar | 011, 012, 013 | 3-step会話で形と感情の向きを理由つきで選択 |
+
+### End-to-End LR coverage matrix
+
+| LR | Lesson | Problem | Interaction | Evidence |
+| --- | --- | --- | --- | --- |
+| LR-PART-001 | 1 | `PART-L1-P001-MARK` | Mark the Parts | 分詞と名詞の形容詞的関係 |
+| LR-PART-002 | 1, 2 | `PART-L1-P002-CLASS`, `PART-L2-P001-COMPARE` | Grammar Classifier / Sentence Comparison | 名称を時制と同一視しない |
+| LR-PART-003 | 2, 6 | `PART-L2-P001-COMPARE`, `PART-L6-P003-ERROR` | Sentence Comparison / Error Corrector | 能動・受動と完了の意味軸 |
+| LR-PART-004 | 1, 4, 6 | `PART-L1-P001-MARK`, `PART-L4-P001-MARK`, `PART-L6-P001-MARK` | Mark the Parts | 説明対象の名詞 |
+| LR-PART-005 | 1, 3, 6 | `PART-L1-P003-WORD`, `PART-L3-P001-POSITION`, `PART-L6-P004-POSITION` | Word Order / Modifier Positioner | 分詞1語の前置 |
+| LR-PART-006 | 3, 6 | `PART-L3-P002-POSITION`, `PART-L6-P004-POSITION` | Modifier Positioner | 分詞句の後置と境界 |
+| LR-PART-007 | 4, 6 | `PART-L4-P001-REL`, `PART-L6-P002-REL` | Modifier Connection Viewer | 名詞が元動詞をするHidden S-V |
+| LR-PART-008 | 2, 4, 6 | `PART-L2-P003-ERROR`, `PART-L4-P002-REL`, `PART-L6-P002-REL` | Error Corrector / Modifier Connection Viewer | 名詞が元動詞をされるHidden S-V |
+| LR-PART-009 | 2, 4, 5, 6 | `PART-L2-P003-ERROR`, `PART-L5-P003-ERROR`, `PART-L6-P003-ERROR` | Error Corrector | 訳・人/物だけで決めない |
+| LR-PART-010 | 2, 6 | `PART-L2-P002-CLASS`, `PART-L6-P003-ERROR` | Grammar Classifier / Error Corrector | 自動詞p.p.の完了 |
+| LR-PART-011 | 5, 6 | `PART-L5-P001-CLASS`, `PART-L6-P005-CONTEXT` | Grammar Classifier / Context Grammar | 感情動詞を「〜させる」と捉える |
+| LR-PART-012 | 5, 6 | `PART-L5-P002-COMPARE`, `PART-L6-P005-CONTEXT` | Sentence Comparison / Context Grammar | 感情の与え手・受け手 |
+| LR-PART-013 | 6 | `PART-L6-P001-MARK`〜`PART-L6-P005-CONTEXT` | 既存5 Interaction | 初見英文で判断手順を最後まで適用 |
+
+### Reuse metrics after Phase 4
+
+```text
+Implemented interaction types: 8
+R0: 8
+R1: 0
+R2: 1 (MarkTheParts → ModifierConnectionViewer Hidden S-V sequence)
+R3: 0
+```
+
+新規Interaction、Component API、Problem Typeは追加していない。Lesson 6は既存Interactionの組み合わせとして実装した。
+
+### Phase 4 verification result
+
+- `npm test` は12件、`npm run check` は29 Problems・6 Lessons・8 Interaction types、`npm run build`、`git diff --check` が成功した。
+- `validateProblems`、`validateLessons`、LR-PART-001〜013 coverage、Lesson順、Lesson 6全ProblemのLR-PART-013付与を検証した。
+- 実ブラウザで全Lesson経路、Lesson 6の5 Step、keyboard/focus、Reset、390px幅、Lesson 1〜5回帰、コンソールエラーなしを確認した。CIはpush後に確認する。
+- Lesson 6完了時だけ `All lessons complete — 分詞を見たら、名詞と動詞の関係を見る。` を表示し、Lesson 1〜5ではLesson単位の完了表示に留める。
+
+### Final known limitations
+
+- 分詞構文、独立分詞構文、`with + O + 分詞`、高度な例外事項は対象外。
+- 進捗はLesson画面内のmemoryのみ。localStorage、アカウント、サーバー、DB、外部API、analyticsは追加していない。
+- 自由入力のLLM採点、初回正答率の保存、外部公開・デプロイは行わない。

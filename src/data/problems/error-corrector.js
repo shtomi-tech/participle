@@ -82,6 +82,39 @@ export const errorCorrectorProblems = [
     ],
     explanation: 'exciting は感情を起こす側、excited はその感情を受ける側です。She is exciting. のように、人でも周囲をワクワクさせる意味なら -ing が成立します。',
   },
+  {
+    id: 'PART-L6-P003-ERROR',
+    type: 'error-corrector',
+    lessonId: 'PART-L6',
+    requirements: ['LR-PART-003', 'LR-PART-009', 'LR-PART-010', 'LR-PART-013'],
+    sourceEvidence: {
+      source: 'chapter14-ocr.md',
+      section: '14-1-3 -ingとp.p.の判別',
+    },
+    prompt: '初見文の意味に合う分詞の形を選び、なぜその形になるかを確認してください。',
+    context: 'The branches reached the ground before the hikers arrived. fall は自動詞なので、branches が誰かに落とされる受動ではなく、落ちる動作が完了した状態を表します。',
+    tokens: [
+      { id: 'l6e-after', text: 'After the storm,' },
+      { id: 'l6e-fallen', text: 'fallen', correctionId: 'l6e-completion' },
+      { id: 'l6e-branches', text: 'branches' },
+      { id: 'l6e-blocked', text: 'blocked the path.' },
+    ],
+    corrections: [
+      {
+        id: 'l6e-completion',
+        tokenId: 'l6e-fallen',
+        options: [
+          { id: 'l6e-opt-falling', text: 'falling' },
+          { id: 'l6e-opt-fallen', text: 'fallen' },
+          { id: 'l6e-opt-fall', text: 'fall' },
+        ],
+        acceptedOptionIds: ['l6e-opt-fallen'],
+        ruleLabel: 'Completion meaning',
+        explanation: 'branches は fall するもので、誰かに fall されるものではありません。落ちる動作がすでに完了した状態なので、受動ではなく p.p. の完了の読みで fallen です。',
+      },
+    ],
+    explanation: 'p.p. を見ても、すぐに受動とは決めません。自動詞 fall のように「動作が完了した状態」を表す場合があるため、元動詞と文脈を確認します。',
+  },
 ];
 
 export const errorCorrectorProblem = errorCorrectorProblems[0];

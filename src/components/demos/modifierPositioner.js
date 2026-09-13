@@ -79,6 +79,7 @@ export function mountModifierPositioner(root, problem, options = {}) {
     selectedPlacementId = null;
     completed = false;
     render('reset');
+    onComplete({ correct: false, problemId: problem.id, reset: true });
   });
 
   render();

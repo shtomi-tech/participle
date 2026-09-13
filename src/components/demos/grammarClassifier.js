@@ -151,6 +151,7 @@ export function mountGrammarClassifier(root, problem, options = {}) {
     assignments = {};
     clearFeedback();
     render({ type: 'item', id: problem.items[0].id });
+    onComplete({ correct: false, problemId: problem.id, reset: true });
   });
   on(checkButton, 'click', check);
 

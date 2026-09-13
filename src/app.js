@@ -84,6 +84,12 @@ function renderLesson(lesson) {
     return progress;
   }
 
+  function getLessonCompletionMessage(progress) {
+    if (!progress.allComplete) return 'Step complete — 次の関係へ進めます。';
+    if (lessonIndex === lessons.length - 1) return 'All lessons complete — 分詞を見たら、名詞と動詞の関係を見る。';
+    return 'Lesson complete — このLessonを最後まで確認しました。';
+  }
+
   function renderStep(shouldFocus = true) {
     const step = lesson.steps[stepIndex];
     const stepComplete = isLessonStepComplete(completedStepIds, step.id);
@@ -97,10 +103,17 @@ function renderLesson(lesson) {
     next.disabled = stepIndex === lesson.steps.length - 1 || !stepComplete;
     cleanup = mountDemoProblem(step.interactionType, componentRoot, getProblemForStep(step), {
       onComplete(result) {
+        if (result.reset) {
+          completedStepIds = new Set([...completedStepIds].filter((id) => id !== step.id));
+          const progress = updateProgress();
+          completion.textContent = progress.allComplete ? getLessonCompletionMessage(progress) : '';
+          next.disabled = true;
+          return;
+        }
         if (!result.correct) return;
         completedStepIds = markLessonStepComplete(completedStepIds, step.id);
         const progress = updateProgress();
-        completion.textContent = progress.allComplete ? 'Lesson complete — このLessonを最後まで確認しました。' : 'Step complete — 次の関係へ進めます。';
+        completion.textContent = getLessonCompletionMessage(progress);
         next.disabled = stepIndex === lesson.steps.length - 1;
       },
     });

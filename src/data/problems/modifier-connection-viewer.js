@@ -161,4 +161,36 @@ export const modifierConnectionProblems = [
     ],
     explanation: '翻訳の語尾ではなく、songs が play するのか play されるのかで形を判断します。',
   },
+  {
+    ...shared,
+    id: 'PART-L6-P002-REL',
+    lessonId: 'PART-L6',
+    requirements: ['LR-PART-007', 'LR-PART-008', 'LR-PART-013'],
+    sourceEvidence: {
+      source: 'chapter14-ocr.md',
+      section: '14-1-3 -ingとp.p.の判別',
+    },
+    sentence: 'The detailed instructions printed by the guide were easy to follow.',
+    targetNoun: 'the detailed instructions',
+    baseVerb: 'print',
+    semanticVoice: 'passive',
+    participleForm: 'p.p.',
+    prompt: '関係カードを選び、初見文の target noun と元動詞の関係を確認してください。',
+    chunks: [
+      { id: 'l6r-instructions', text: 'the detailed instructions', kind: 'core' },
+      { id: 'l6r-printed', text: 'printed by the guide', kind: 'modifier' },
+      { id: 'l6r-rest', text: 'were easy to follow', kind: 'core' },
+    ],
+    relations: [
+      {
+        id: 'l6r-relation-1',
+        modifierId: 'l6r-printed',
+        targetId: 'l6r-instructions',
+        relationType: 'modifies',
+        label: 'Hidden S-V: passive · the instructions ← print · result: printed',
+        explanation: 'The instructions are printed by the guide. instructions が元動詞 print をされる関係なので受動で、結果の形は printed です。',
+      },
+    ],
+    explanation: 'printed by the guide は the detailed instructions を説明します。target noun と元動詞の間に「される」というHidden S-Vを置くと、p.p. の理由まで確認できます。',
+  },
 ];

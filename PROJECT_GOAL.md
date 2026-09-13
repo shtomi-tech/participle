@@ -2,7 +2,7 @@
 
 ## Status
 
-これは教材設計と実装の正本です。Phase 3まで（Lesson 1〜5、汎用Interaction、Problem Data、validator、CI）は実装済みです。Lesson 6とプロジェクト全体の最終受入条件は未完了で、次フェーズで継続します。
+これは教材設計と実装の正本です。Phase 4まで（Lesson 1〜6、汎用Interaction、Problem Data、validator、CI）は実装済みです。ローカル実ブラウザで主要操作・キーボード・390px幅・Lesson 1〜5回帰を確認済みで、CIはpush後に確認します。
 
 ## Source boundary
 
@@ -125,3 +125,15 @@ Lesson
   ↓
 Assessment / completion
 ```
+
+## Final completion mapping
+
+| Completion criterion | Lesson / Problem evidence |
+| --- | --- |
+| 説明対象の名詞を選ぶ | Lesson 1 `PART-L1-P001-MARK`、Lesson 4 `PART-L4-P001-MARK`、Lesson 6 `PART-L6-P001-MARK` |
+| 元動詞と名詞の関係を説明する | Lesson 4 `PART-L4-P001-REL` / `PART-L4-P002-REL`、Lesson 6 `PART-L6-P002-REL` |
+| `-ing / p.p.` を能動・受動から選ぶ | Lesson 2 `PART-L2-P001-COMPARE` / `PART-L2-P003-ERROR`、Lesson 6 `PART-L6-P003-ERROR` |
+| 前置・後置を位置と意味で区別する | Lesson 3 `PART-L3-P001-POSITION` / `PART-L3-P002-POSITION`、Lesson 6 `PART-L6-P004-POSITION` |
+| 自動詞の p.p. を機械的に受動としない | Lesson 2 `PART-L2-P002-CLASS` / `PART-L2-P004-COMPARE`、Lesson 6 `PART-L6-P003-ERROR` |
+| 感情の与え手・受け手で判断する | Lesson 5 `PART-L5-P001-CLASS`〜`PART-L5-P004-CONTEXT`、Lesson 6 `PART-L6-P005-CONTEXT` |
+| 正答・説明・次の練習へ追跡する | 全Problemの `sourceEvidence` → LR → Lesson/Step → Interaction → `onComplete` |
