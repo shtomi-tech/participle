@@ -80,7 +80,6 @@ if (finalLessonProblems.length !== 5 || finalLessonProblems.some((problem) => !p
   throw new Error('Every Lesson 6 Problem must include LR-PART-013.');
 }
 
-if (existsSync(join(root, '.github/workflows/pages.yml'))) throw new Error('GitHub Pages workflow must not remain.');
 const ciPath = join(root, '.github/workflows/ci.yml');
 if (!existsSync(ciPath)) throw new Error('CI workflow is missing.');
 const ciText = readFileSync(ciPath, 'utf8');

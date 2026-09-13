@@ -801,4 +801,11 @@ R3: 0
 
 - 分詞構文、独立分詞構文、`with + O + 分詞`、高度な例外事項は対象外。
 - 進捗はLesson画面内のmemoryのみ。localStorage、アカウント、サーバー、DB、外部API、analyticsは追加していない。
-- 自由入力のLLM採点、初回正答率の保存、外部公開・デプロイは行わない。
+- 自由入力のLLM採点、初回正答率の保存、外部API・ユーザーアカウント・サーバーDBは行わない。
+
+## Deployment
+
+- GitHub Pagesで `main` の `dist` を公開する。
+- Workflow: `.github/workflows/pages.yml`
+- 公開URL: `https://shtomi-tech.github.io/participle/`
+- リポジトリはGitHub Pages利用条件に合わせて公開設定に変更した。
