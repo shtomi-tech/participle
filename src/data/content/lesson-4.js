@@ -1,13 +1,13 @@
 export const lesson4Content = {
   lessonId: 'PART-L4',
-  introduction: '分詞を選ぶときの中心は、名詞と元動詞の間にあるHidden S-Vです。表面には主語と動詞が並んでいなくても、名詞が動作をするのか、されるのかを復元すれば、-ing / p.p. の根拠を説明できます。',
+  introduction: '分詞を選ぶときの決め手は、名詞と元動詞の間にあるHidden S-Vです。文の表面に主語と動詞が並んでいなくても、名詞が動作を「する」のか「される」のかを復元すれば、-ing / p.p. を選ぶ根拠をはっきり説明できます。',
   sections: [
     {
       id: 'PART-L4-EXPLAIN-01',
       title: '名詞と分詞の間にあるHidden S-V',
       paragraphs: [
-        'the girl standing by the door の standing は、単に「立っている」と訳して終わる語ではありません。standing by the door が説明している名詞は the girl です。そこで、分詞を元の動詞 stand に戻し、the girl stands by the door という意味上のS-Vを作ります。',
-        'このS-Vは、実際の文に独立した主語・動詞として書かれているわけではありません。だからHidden S-Vと呼びます。分詞を見たら、分詞と結び付く名詞を見つけ、その名詞を仮の主語にして短い文を作ることが判断の出発点です。',
+        'the girl standing by the door の standing は、単に「立っている」と訳して終わりではありません。standing by the door が説明している名詞は the girl です。そこで、分詞を元の動詞 stand に戻し、the girl stands by the door という意味上のS-Vを作ります。',
+        'このS-Vは、実際の文に主語・動詞として直接書かれているわけではありません。そのためHidden S-Vと呼びます。分詞を見たら、結び付く名詞を見つけて仮の主語にし、短い文を作ることが判断のスタートです。',
       ],
       examples: [
         { id: 'L4-EX-01', english: 'the girl standing by the door', translation: 'ドアのそばに立っている少女', structure: 'the girl → stand → the girl stands', point: 'girl が stand するので能動関係です。' },
@@ -24,8 +24,8 @@ export const lesson4Content = {
       id: 'PART-L4-EXPLAIN-02',
       title: '能動なら -ing、受動なら p.p.',
       paragraphs: [
-        'Hidden S-Vが「名詞が元動詞をする」なら能動です。the baby smiling at her mother では、the baby smiles at her mother と作れるので smiling を使います。名詞が動作主であることが、-ing の理由です。',
-        '一方、Hidden S-Vが「名詞が元動詞をされる」なら受動です。the language spoken in that country では、language が speak するのではなく、language is spoken です。「話している言語」のような訳の表面に引っ張られず、名詞を主語にした関係を確認します。',
+        'Hidden S-Vが「名詞が元動詞をする」なら能動です。the baby smiling at her mother では、the baby smiles at her mother と文が作れるので smiling を使います。名詞が動作をする側であることが、-ing を選ぶ理由です。',
+        '一方、Hidden S-Vが「名詞が元動詞をされる」なら受動です。the language spoken in that country では、language が speak するのではなく language is spoken です。「話している言語」のような訳の表面に惑わされず、名詞を主語にした関係を確認します。',
       ],
       examples: [
         { id: 'L4-EX-03', english: 'the baby smiling at her mother', translation: '母親にほほえみかけている赤ちゃん', structure: 'the baby smiles → active → smiling', point: 'baby が smile する側です。' },
@@ -39,8 +39,8 @@ export const lesson4Content = {
       id: 'PART-L4-EXPLAIN-03',
       title: 'Hidden S-Vの6ステップ',
       paragraphs: [
-        '入試の空所では、次の順序を固定すると迷いにくくなります。STEP 1 分詞を見つける。STEP 2 その分詞が説明する名詞を探す。STEP 3 分詞を元動詞へ戻す。STEP 4 「名詞が〜する／される」を作る。STEP 5 自然にする側なら能動で -ing。STEP 6 される側なら受動で p.p.です。',
-        '語順が長くなっても、判断の核は同じです。the students in the front row reading quietly なら、reading quietly の説明対象は直前の front row ではなく the students です。まず名詞句の中心を見つけ、students read quietly という関係を作ります。',
+        '入試の空所補充では、次の手順を固定すると迷いにくくなります。STEP 1 分詞を見つける。STEP 2 その分詞が説明する名詞を探す。STEP 3 分詞を元動詞に戻す。STEP 4 「名詞が〜する／される」を作る。STEP 5 する側なら能動で -ing。STEP 6 される側なら受動で p.p.です。',
+        '文が長くなっても、判断の核は同じです。the students in the front row reading quietly では、reading quietly が説明する対象は直前の front row ではなく the students です。まず名詞句の中心を見つけ、students read quietly という関係を作ります。',
       ],
       examples: [
         { id: 'L4-EX-05', english: 'the students in the front row reading quietly', translation: '前列で静かに読んでいる生徒たち', structure: 'the students → read → active → reading', point: '隣の front row ではなく、意味上の主語 students と結び付けます。' },
@@ -74,7 +74,7 @@ export const lesson4Content = {
     '隣の語ではなく、意味上の主語を探す。',
   ],
   detailedReview: [
-    { title: 'Hidden S-Vの振り返り', paragraphs: ['正解の形だけでなく、target noun と base verb を言えるか確認します。the songs → play → passive → played のように、関係を一行で説明できれば判断が安定しています。'] },
+    { title: 'Hidden S-Vの振り返り', paragraphs: ['正解の形だけでなく、target noun と base verb を言えるか確認します。the songs → play → passive → played のように、関係を一行で説明できれば判断が安定します。'] },
   ],
   sourceEvidence: [
     { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 312, concept: '名詞と分詞のHidden S-V、能動・受動による形の判別' },

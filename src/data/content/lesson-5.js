@@ -1,13 +1,13 @@
 export const lesson5Content = {
   lessonId: 'PART-L5',
-  introduction: '感情動詞は、日本語の「驚く」「興味を持つ」の感覚だけで覚えると方向を逆にしやすい単元です。まず「〜させる」という元動詞を押さえ、感情を与える側か受ける側かで -ing / -ed を選びます。',
+  introduction: '感情動詞は、日本語の「驚く」「興味を持つ」の感覚だけで覚えると、向きを取り違えやすい単元です。まずは「〜させる」という元の動詞の意味を押さえ、感情を与える側か受ける側かで -ing / -ed を選びます。',
   sections: [
     {
       id: 'PART-L5-EXPLAIN-01',
       title: '感情動詞は「〜させる」',
       paragraphs: [
-        'surprise は「驚く」ではなく「驚かせる」です。誰かを驚かせる側と、驚かされる側では立場が反対なので、ここを取り違えると後の分詞の形も逆になります。同じように interest は「興味を持たせる」、excite は「ワクワクさせる」、bore は「退屈させる」と、原因から受け手へ向かう動詞として捉えます。',
-        '感情動詞を見たら、まず目的語を置いて短い文を作ります。The movie excited me. では movie が原因、me が感情を受ける人です。英語ではこの向きが文の形に反映されるため、単語の日本語訳を一つ覚えるより、誰が誰に何を起こすかを確認します。',
+        'surprise は「驚く」ではなく「驚かせる」です。「驚かせる側」と「驚かされる側」では立場が反対なので、ここを取り違えると分詞の形も逆になってしまいます。同様に interest は「興味を持たせる」、excite は「ワクワクさせる」、bore は「退屈させる」のように、原因から受け手へ向かう動詞として捉えます。',
+        '感情動詞を見たら、まず目的語を置いた短い文を作ってみましょう。The movie excited me. では movie が原因、me が感情を受ける人です。英語ではこの向きが文の形に反映されます。単語の日本語訳を丸暗記するのではなく、「誰が誰に何を起こすか」を確認します。',
       ],
       examples: [
         { id: 'L5-EX-01', english: 'surprise = make someone feel surprised', translation: 'surprise = 人を驚かせる', structure: 'someone/something → surprise → someone', point: 'surprise は感情を起こす側の動詞です。' },
@@ -24,8 +24,8 @@ export const lesson5Content = {
       id: 'PART-L5-EXPLAIN-02',
       title: '感情を与える側・受ける側',
       paragraphs: [
-        '感情を与える側を分詞にすると -ing です。The movie was exciting. は、映画が見た人をワクワクさせる内容だった、という意味です。反対に感情を受ける側を分詞にすると p.p. / -ed です。I was excited. は、私がワクワクさせられ、その感情を感じたという意味になります。',
-        'この違いは、物か人かでは決まりません。人でも周囲を退屈させるなら He is boring. と言えますし、人が退屈を感じているなら He is bored. です。判断基準は主語の種類ではなく、感情を与える側か受ける側かです。',
+        '感情を与える側を分詞にすると -ing になります。The movie was exciting. は、映画が見た人をワクワクさせる内容だった、という意味です。反対に感情を受ける側を分詞にすると p.p. / -ed になります。I was excited. は、私がワクワクさせられ、その感情を抱いたという意味になります。',
+        'この違いは「人か物か」では決まりません。人であっても周囲を退屈させるなら He is boring. と言えますし、その人が退屈を感じているなら He is bored. です。判断基準は主語の種類ではなく、感情を与える側か受ける側かです。',
       ],
       examples: [
         { id: 'L5-EX-03', english: 'The movie was exciting.', translation: 'その映画はワクワクするものでした。', structure: 'movie → excite people → exciting', point: 'movie は感情を与える側です。' },
@@ -41,14 +41,14 @@ export const lesson5Content = {
       id: 'PART-L5-EXPLAIN-03',
       title: '語彙を広げても同じ判断',
       paragraphs: [
-        '感情動詞には amaze、interest、impress、annoy、confuse などもあります。すべてを別々の語尾ルールとして暗記する必要はありません。元動詞が「感情を起こす」向きかを確認し、その原因を説明するなら -ing、感じた人を説明するなら -ed と考えます。',
-        'ただし、語によっては形容詞として定着した使い方もあります。入試では、選択肢の人・物だけを見て決めると誤りやすいので、主語が原因か経験者か、文脈が何を言いたいのかを最後まで確認します。',
+        '感情動詞には amaze、interest、impress、annoy、confuse などもあります。すべてを別々のルールとして暗記する必要はありません。元動詞が「感情を起こす」向きであることを確認し、原因を説明するなら -ing、感じた人を説明するなら -ed と考えます。',
+        'ただし、語によっては形容詞として定着した使い方もあります。入試では、選択肢の人・物だけを見て決めると間違えやすいため、主語が原因か経験者か、文脈の意味を最後まで確認します。',
       ],
       examples: [
         { id: 'L5-EX-07', english: 'The audience was impressed by her performance.', translation: '観客は彼女の演技に感銘を受けました。', structure: 'audience receives impression → impressed', point: '観客は感情を受ける側です。' },
       ],
       callouts: [
-        { kind: 'CAUTION', text: '「人なら -ed、物なら -ing」は使えません。与える側・受ける側で判断します。' },
+        { kind: 'CAUTION', text: '「人なら -ed、物なら -ing」という決めつけは禁物です。与える側・受ける側で判断します。' },
       ],
       sourceEvidence: [
         { source: 'chapter14-ocr.md', heading: '14-2-1', lineStart: 388, lineEnd: 414, concept: '人・物ではなく感情の方向で判定する' },
@@ -62,7 +62,7 @@ export const lesson5Content = {
   ],
   commonMistakes: [
     'surprise を「驚く」とだけ覚える。',
-    '人なら -ed、物なら -ing と決める。',
+    '人なら -ed、物なら -ing と決めつける。',
     'exciting / excited を語尾の暗記だけで使い分ける。',
   ],
   examPoints: [
