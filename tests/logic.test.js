@@ -147,6 +147,22 @@ test('entrance word order data exposes a structured explanation after the accept
   assert.equal(problem.fixedSuffix, 'from the village.');
 });
 
+test('guards the cleaned Lesson 5 and Lesson 6 entrance word-order data', () => {
+  const lesson5 = problemRegistry['PART-L5-EXAM-WORD-001'];
+  assert.equal(checkWordOrder(lesson5.acceptedAnswers[0], lesson5.acceptedAnswers), true);
+  assert.equal(lesson5.explanation.includes('announcement'), false);
+  assert.equal(lesson5.misconceptions.some((item) => item.includes('人なら-ing')), false);
+
+  const lesson6 = problemRegistry['PART-L6-EXAM-WORD-001'];
+  assert.equal(checkWordOrder(lesson6.acceptedAnswers[0], lesson6.acceptedAnswers), true);
+  assert.equal(lesson6.misconceptions.some((item) => item.includes('in science')), false);
+  assert.deepEqual(lesson6.words.map(({ id, text }) => [id, text]), [
+    ['l6w1-teacher', 'teacher'],
+    ['l6w1-teaching', 'teaching'],
+    ['l6w1-science', 'science'],
+  ]);
+});
+
 test('Lesson 6 problems use existing pure logic and stable answers', () => {
   const mark = problemRegistry['PART-L6-P001-MARK'];
   assert.equal(checkTokenSelection(mark.answer, mark.answer), true);
