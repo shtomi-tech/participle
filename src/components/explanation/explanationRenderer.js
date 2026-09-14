@@ -11,11 +11,11 @@ function renderCallout(callout) {
 function renderExample(example, index) {
   return `
     <article class="lesson-example" data-example-id="${escapeHtml(example.id ?? `example-${index + 1}`)}">
-      <p class="lesson-example-label">Example ${index + 1}</p>
+      <p class="lesson-example-label">例 ${index + 1}</p>
       <p class="lesson-example-english" lang="en">${escapeHtml(example.english)}</p>
       <p class="lesson-example-translation">${escapeHtml(example.translation)}</p>
-      ${example.structure ? `<p class="lesson-example-structure"><strong>Structure</strong> ${escapeHtml(example.structure)}</p>` : ''}
-      ${example.point ? `<p class="lesson-example-point"><strong>Point</strong> ${escapeHtml(example.point)}</p>` : ''}
+      ${example.structure ? `<p class="lesson-example-structure"><strong>構造</strong> ${escapeHtml(example.structure)}</p>` : ''}
+      ${example.point ? `<p class="lesson-example-point"><strong>ポイント</strong> ${escapeHtml(example.point)}</p>` : ''}
     </article>`;
 }
 
@@ -36,7 +36,7 @@ function renderReviewItems(items) {
   if (!Array.isArray(items) || items.length === 0) return '';
   return `
     <section class="lesson-review-notes" data-explanation-kind="detailed-review">
-      <h2>Detailed Review</h2>
+      <h2>詳しい復習</h2>
       ${items.map((item) => `
         <article class="lesson-review-note">
           <h3>${escapeHtml(item.title)}</h3>
@@ -48,13 +48,13 @@ function renderReviewItems(items) {
 function renderSources(sourceEvidence) {
   return `
     <section class="lesson-sources" data-explanation-kind="source-evidence">
-      <h3>Source evidence</h3>
-      <ul>${sourceEvidence.map((evidence) => `<li><code>${escapeHtml(evidence.source)}:${escapeHtml(evidence.section)}</code> — ${escapeHtml(evidence.concept)}</li>`).join('')}</ul>
+      <h3>出典</h3>
+      <ul>${sourceEvidence.map((evidence) => `<li><code>${escapeHtml(evidence.source)}:${escapeHtml(String(evidence.lineStart))}-${escapeHtml(String(evidence.lineEnd))}</code> — ${escapeHtml(evidence.concept)}</li>`).join('')}</ul>
     </section>`;
 }
 
 function renderSectionSources(sourceEvidence) {
-  return `<ul class="lesson-section-sources" aria-label="この説明の出典">${sourceEvidence.map((evidence) => `<li><code>${escapeHtml(evidence.source)}:${escapeHtml(evidence.section)}</code> — ${escapeHtml(evidence.concept)}</li>`).join('')}</ul>`;
+  return `<details class="lesson-section-source-details"><summary>出典を確認</summary><ul class="lesson-section-sources" aria-label="この説明の出典">${sourceEvidence.map((evidence) => `<li><code>${escapeHtml(evidence.source)}:${escapeHtml(String(evidence.lineStart))}-${escapeHtml(String(evidence.lineEnd))}</code> — ${escapeHtml(evidence.heading)} — ${escapeHtml(evidence.concept)}</li>`).join('')}</ul></details>`;
 }
 
 export function renderExplanationContent(content, { includeClosingSections = true } = {}) {
@@ -69,7 +69,7 @@ export function renderExplanationContent(content, { includeClosingSections = tru
           ${(section.callouts ?? []).map(renderCallout).join('')}
           ${renderSectionSources(section.sourceEvidence)}
         </section>`).join('')}
-      ${renderTextList(content.keyRules, 'key-rules', 'Key Rules', 'key-rules')}
+      ${renderTextList(content.keyRules, 'key-rules', '重要ルール', 'key-rules')}
       ${renderTextList(content.commonMistakes, 'common-mistakes', 'よくある間違い', 'common-mistakes')}
       ${renderTextList(content.examPoints, 'exam-points', '入試POINT', 'exam-points')}
       ${includeClosingSections ? renderExplanationClosing(content) : ''}
@@ -77,7 +77,7 @@ export function renderExplanationContent(content, { includeClosingSections = tru
 }
 
 export function renderExplanationClosing(content) {
-  return `${renderReviewItems(content.detailedReview)}${renderTextList(content.summary, 'lesson-summary', 'Lesson Summary', 'summary')}${renderSources(content.sourceEvidence)}`;
+  return `${renderReviewItems(content.detailedReview)}${renderTextList(content.summary, 'lesson-summary', 'このLessonのまとめ', 'summary')}${renderSources(content.sourceEvidence)}`;
 }
 
 export function mountExplanation(root, content, options = {}) {

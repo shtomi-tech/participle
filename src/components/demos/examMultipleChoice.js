@@ -14,19 +14,19 @@ export function mountExamMultipleChoice(root, problem, options = {}) {
   root.innerHTML = `
     <p class="instruction">${escapeHtml(problem.prompt)}</p>
     <div class="demo-stage exam-mc-stage">
-      <h3>Question</h3>
+      <h3>問題</h3>
       <p class="exam-mc-stem">${escapeHtml(problem.stem)}</p>
-      <div class="exam-mc-choices" data-exam-choices role="group" aria-label="Answer choices"></div>
+      <div class="exam-mc-choices" data-exam-choices role="group" aria-label="解答の選択肢"></div>
       <div class="demo-actions">
         <button class="button" type="button" data-exam-submit disabled>解答する</button>
       </div>
       <div class="exam-mc-result" data-exam-result role="status" aria-live="polite" tabindex="-1" hidden></div>
       <section class="exam-mc-overall" data-exam-overall hidden>
-        <h3>Grammar explanation</h3>
+        <h3>文法解説</h3>
         <p data-exam-overall-text></p>
       </section>
       <section class="exam-mc-review" data-exam-review hidden>
-        <h3>Choice explanations</h3>
+        <h3>選択肢ごとの解説</h3>
         <ol class="exam-mc-review-list" data-exam-review-list></ol>
       </section>
       <div class="demo-actions">
@@ -56,12 +56,12 @@ export function mountExamMultipleChoice(root, problem, options = {}) {
         let stateLabel = '';
         if (submitted) {
           stateLabel = choice.id === problem.answerChoiceId
-            ? 'Correct answer'
+            ? '正解'
             : choice.id === selectedChoiceId
-              ? 'Your answer'
-              : 'Not selected';
+              ? 'あなたの選択'
+              : '未選択';
         } else if (selected) {
-          stateLabel = 'Selected';
+          stateLabel = '選択中';
         }
         return `
           <button class="exam-mc-choice${selected ? ' is-selected' : ''}" type="button" data-exam-choice-id="${escapeHtml(choice.id)}" aria-pressed="${selected}"${submitted ? ' disabled' : ''}>

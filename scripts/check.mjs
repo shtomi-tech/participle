@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -12,6 +12,9 @@ import { validateLessons } from '../src/lib/validateLessons.js';
 import { validateLessonContents } from '../src/lib/validateLessonContent.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
+const ocrSourcePath = join(root, 'chapter14-ocr.md');
+const ocrText = readFileSync(ocrSourcePath, 'utf8');
+const ocrLines = ocrText.split(/\r?\n/);
 const sourceFiles = [
   'src/app.js',
   'src/data/content/index.js',
@@ -97,8 +100,14 @@ for (const [lessonId, expectedCount] of Object.entries(expectedExamCounts)) {
   const count = examProblems.filter((problem) => problem.lessonId === lessonId).length;
   if (count !== expectedCount) throw new Error(`Phase 5 requires ${expectedCount} exam problems for ${lessonId}, found ${count}.`);
 }
+const examDifficultyCounts = Object.fromEntries(['basic', 'standard', 'entrance'].map((difficulty) => [difficulty, examProblems.filter((problem) => problem.difficulty === difficulty).length]));
+if (JSON.stringify(examDifficultyCounts) !== JSON.stringify({ basic: 2, standard: 8, entrance: 10 })) throw new Error(`Unexpected exam difficulty distribution: ${JSON.stringify(examDifficultyCounts)}.`);
 const wordOrderCounts = Object.fromEntries(lessons.map((lesson) => [lesson.id, problems.filter((problem) => problem.type === 'word-order' && problem.lessonId === lesson.id).length]));
 if (JSON.stringify(wordOrderCounts) !== JSON.stringify({ 'PART-L1': 1, 'PART-L2': 1, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 1, 'PART-L6': 2 })) throw new Error(`Unexpected Phase 5 word-order distribution: ${JSON.stringify(wordOrderCounts)}.`);
+const entranceWordOrderProblems = problems.filter((problem) => problem.type === 'word-order' && problem.assessmentKind === 'entrance');
+if (entranceWordOrderProblems.length !== 8 || entranceWordOrderProblems.some((problem) => problem.assessmentKind !== 'entrance')) throw new Error('Phase 6 requires exactly eight entrance Word Order problems marked assessmentKind=entrance.');
+const practiceWordOrderCounts = Object.fromEntries(lessons.map((lesson) => [lesson.id, entranceWordOrderProblems.filter((problem) => problem.lessonId === lesson.id).length]));
+if (JSON.stringify(practiceWordOrderCounts) !== JSON.stringify({ 'PART-L1': 0, 'PART-L2': 1, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 1, 'PART-L6': 2 })) throw new Error(`Unexpected Phase 6 entrance word-order distribution: ${JSON.stringify(practiceWordOrderCounts)}.`);
 
 const referencedRequirementIds = new Set(problems.flatMap((problem) => problem.requirements ?? []));
 const missingRequirementIds = learningRequirementIds.filter((id) => !referencedRequirementIds.has(id));
@@ -108,11 +117,48 @@ if (finalLessonProblems.length !== 5 || finalLessonProblems.some((problem) => !p
   throw new Error('Every Lesson 6 Problem must include LR-PART-013.');
 }
 
-const ciPath = join(root, '.github/workflows/ci.yml');
-if (!existsSync(ciPath)) throw new Error('CI workflow is missing.');
-const ciText = readFileSync(ciPath, 'utf8');
-if (/deploy-pages|upload-pages-artifact|pages:\s*write|id-token:\s*write/.test(ciText)) {
-  throw new Error('CI workflow must remain validation-only.');
+const workflowDir = join(root, '.github/workflows');
+const workflowFiles = existsSync(workflowDir)
+  ? readdirSync(workflowDir).filter((file) => /\.ya?ml$/i.test(file))
+  : [];
+if (!workflowFiles.some((file) => file.toLowerCase() === 'ci.yml')) throw new Error('CI workflow is missing.');
+const forbiddenDeploymentPatterns = [/actions\/deploy-pages/i, /actions\/upload-pages-artifact/i, /pages:\s*write/i, /id-token:\s*write/i, /github-pages environment/i];
+for (const workflowFile of workflowFiles) {
+  const workflowText = readFileSync(join(workflowDir, workflowFile), 'utf8');
+  if (forbiddenDeploymentPatterns.some((pattern) => pattern.test(workflowText))) throw new Error(`Workflow must remain validation-only: ${workflowFile}`);
+}
+
+function validateSourceEvidence(evidence, label) {
+  const errors = [];
+  if (!evidence || evidence.source !== 'chapter14-ocr.md') errors.push(`${label}.source must be chapter14-ocr.md`);
+  if (!evidence || typeof evidence.heading !== 'string' || !evidence.heading.trim()) errors.push(`${label}.heading is required`);
+  else if (!ocrText.includes(evidence.heading)) errors.push(`${label}.heading does not exist in chapter14-ocr.md: ${evidence.heading}`);
+  if (!Number.isInteger(evidence?.lineStart) || evidence.lineStart < 1) errors.push(`${label}.lineStart must be an integer >= 1`);
+  if (!Number.isInteger(evidence?.lineEnd) || evidence.lineEnd < evidence.lineStart) errors.push(`${label}.lineEnd must be an integer >= lineStart`);
+  if (Number.isInteger(evidence?.lineEnd) && evidence.lineEnd > ocrLines.length) errors.push(`${label}.lineEnd exceeds chapter14-ocr.md line count`);
+  if (!evidence || typeof evidence.concept !== 'string' || !evidence.concept.trim()) errors.push(`${label}.concept is required`);
+  return errors;
+}
+
+const traceableEvidence = [
+  ...lessonContents.flatMap((content) => [
+    ...content.sections.map((section) => ({ label: `${content.lessonId}.${section.id}`, evidence: section.sourceEvidence })),
+    { label: `${content.lessonId}.lesson`, evidence: content.sourceEvidence },
+  ]),
+  ...problems
+    .filter((problem) => problem.type === 'exam-multiple-choice' || problem.assessmentKind === 'entrance')
+    .map((problem) => ({ label: problem.id, evidence: [problem.sourceEvidence] })),
+];
+const traceabilityErrors = traceableEvidence.flatMap(({ label, evidence }) => (evidence ?? []).flatMap((item, index) => validateSourceEvidence(item, `${label}.sourceEvidence[${index}]`)));
+if (traceabilityErrors.length > 0) throw new Error(traceabilityErrors.join('\n'));
+const mutationTestErrors = validateSourceEvidence({ source: 'chapter14-ocr.md', heading: 'heading-that-does-not-exist', lineStart: 99999, lineEnd: 99999, concept: 'mutation test' }, 'mutation-test');
+if (mutationTestErrors.length === 0) throw new Error('Source evidence mutation test did not fail as expected.');
+
+const consistencyMarkers = ['Explanation is primary', 'Interaction is supportive', 'Assessment confirms transfer'];
+for (const documentName of ['PROJECT_GOAL.md', 'DESIGN.md']) {
+  const documentText = readFileSync(join(root, documentName), 'utf8');
+  const missingMarkers = consistencyMarkers.filter((marker) => !documentText.includes(marker));
+  if (missingMarkers.length > 0) throw new Error(`${documentName} is missing consistency markers: ${missingMarkers.join(', ')}`);
 }
 
 const active = problems.filter((problem) => problem.semanticVoice === 'active').length;

@@ -17,22 +17,22 @@ export const lesson1Content = {
         { kind: 'POINT', text: '分詞は動詞由来ですが、名詞を説明するときは形容詞のように働きます。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '100-108', concept: '分詞の定義と形容詞的用法' },
+        { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 100, lineEnd: 108, concept: '分詞の定義と形容詞的用法' },
       ],
     },
     {
       id: 'PART-L1-EXPLAIN-02',
       title: '形容詞と同じ場所で働く',
       paragraphs: [
-        '形容詞は名詞を修飾するだけでなく、be動詞の後ろで主語を説明する補語にもなります。分詞にもこの働きがあります。たとえば dancing は girl の状態を説明します。ただし is dancing 全体を一つの動詞として見る方が簡単な場合もあり、ここでは細かい文型名より「何を説明しているか」を優先します。',
+        '形容詞は名詞を修飾するだけでなく、be動詞の後ろで主語を説明する補語にもなります。分詞にもこの働きがあります。ただし The girl is dancing. の dancing は be + -ing の進行形として読むのが自然で、このLessonの名詞修飾の代表例ではありません。ここでは細かい文型名より「何を説明しているか」を優先します。',
         '名詞修飾では、分詞が名詞の前に置かれる形から始めます。a smiling baby では smiling が baby を説明しています。分詞の位置や -ing / p.p. の選び方は次のLessonで扱いますが、どのLessonでも最初に説明対象を確認する習慣は変わりません。',
       ],
       examples: [
-        { id: 'L1-EX-03', english: 'The girl is dancing.', translation: 'その少女は踊っています。', structure: 'The girl → is dancing', point: 'dancing は主語 girl の状態を説明する位置にあります。' },
+        { id: 'L1-EX-03', english: 'The girl is tired.', translation: 'その少女は疲れています。', structure: 'The girl → is tired', point: 'tired は be動詞の後ろで主語 girl を説明する形容詞です。-ing を見ても、まず文全体の動詞の形か名詞修飾かを確認します。' },
         { id: 'L1-EX-04', english: 'Look at the glowing lamp.', translation: '光っているランプを見て。', structure: 'glowing → lamp', point: 'glowing は glow 由来で、lamp を説明する分詞です。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '108-119', concept: '補語と名詞修飾の働き' },
+        { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 108, lineEnd: 119, concept: '補語と名詞修飾の働き' },
       ],
     },
     {
@@ -49,7 +49,7 @@ export const lesson1Content = {
         { kind: 'CAUTION', text: '分詞構文の詳しい副詞用法は今回の範囲外です。まず名詞を説明する分詞に集中します。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '100-123', concept: '分詞の形容詞的用法と今回扱う範囲' },
+        { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 100, lineEnd: 123, concept: '分詞の形容詞的用法と今回扱う範囲' },
       ],
     },
   ],
@@ -76,7 +76,7 @@ export const lesson1Content = {
     { title: '判断の振り返り', paragraphs: ['分詞を見つけたら、まず説明対象の名詞を囲みます。smiling → baby のように関係を作れたら、形や位置の判断へ進めます。'] },
   ],
   sourceEvidence: [
-    { source: 'chapter14-ocr.md', section: '100-123', concept: '分詞の形容詞的用法と現在分詞・過去分詞の導入' },
-    { source: 'chapter14-ocr.md', section: '108-119', concept: '補語と名詞修飾の働き' },
+    { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 100, lineEnd: 123, concept: '分詞の形容詞的用法と現在分詞・過去分詞の導入' },
+    { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 108, lineEnd: 119, concept: '補語と名詞修飾の働き' },
   ],
 };

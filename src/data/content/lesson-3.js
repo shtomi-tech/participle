@@ -17,7 +17,7 @@ export const lesson3Content = {
         { kind: 'RULE', text: '分詞1語は、まず名詞の前から修飾する基本パターンとして読む。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '200-215', concept: '分詞1語の前置修飾' },
+        { source: 'chapter14-ocr.md', heading: '14-1-2', lineStart: 200, lineEnd: 215, concept: '分詞1語の前置修飾' },
       ],
     },
     {
@@ -32,7 +32,7 @@ export const lesson3Content = {
         { id: 'L3-EX-04', english: 'the car used by Jun', translation: 'ジュンが使う車', structure: 'the car ← used by Jun', point: 'used by Jun は car が使われる受動関係です。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '208-243', concept: '分詞句の後置修飾と修飾対象' },
+        { source: 'chapter14-ocr.md', heading: '14-1-2', lineStart: 208, lineEnd: 243, concept: '分詞句の後置修飾と修飾対象' },
       ],
     },
     {
@@ -43,13 +43,13 @@ export const lesson3Content = {
         '最終的には、分詞がどの名詞を説明しているか、どんな一時的・具体的な場面か、文全体が自然かを確認します。この確認は次のHidden S-Vへつながります。位置だけで迷ったら、分詞を元動詞へ戻し、名詞との関係を作り直します。',
       ],
       examples: [
-        { id: 'L3-EX-05', english: 'Hikaru is the girl dancing over there.', translation: 'ヒカルは、向こうで踊っている女の子です。', structure: 'the girl ← dancing', point: '分詞1語の後置も、文脈があれば自然に使えます。' },
+        { id: 'L3-EX-05', english: 'Hikaru is the girl dancing.', translation: 'ヒカルは、踊っている女の子です。', structure: 'the girl ← dancing', point: 'dancing は1語の後置修飾です。over there や on the stage を足すと、分詞句全体が後置されます。' },
       ],
       callouts: [
         { kind: 'CAUTION', text: '「1語 = 必ず前」は絶対規則ではありません。語数は入口の目安で、修飾関係と文脈が優先です。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '222-274', concept: '1語の分詞が後置される例と文脈' },
+        { source: 'chapter14-ocr.md', heading: '14-1-2', lineStart: 222, lineEnd: 274, concept: '1語の分詞が後置される例と文脈' },
       ],
     },
   ],
@@ -76,7 +76,7 @@ export const lesson3Content = {
     { title: '位置の振り返り', paragraphs: ['前後の位置を決める前に、分詞を含むまとまりと説明対象を確認します。語数の目安に合わないときも、文脈とHidden S-Vで説明できれば判断できます。'] },
   ],
   sourceEvidence: [
-    { source: 'chapter14-ocr.md', section: '200-274', concept: '分詞の前置修飾・後置修飾と1語の例外' },
-    { source: 'chapter14-ocr.md', section: '222-243', concept: '後置位置による一時的・具体的な読み' },
+    { source: 'chapter14-ocr.md', heading: '14-1-2', lineStart: 200, lineEnd: 274, concept: '分詞の前置修飾・後置修飾と1語の例外' },
+    { source: 'chapter14-ocr.md', heading: '14-1-2', lineStart: 222, lineEnd: 243, concept: '後置位置による一時的・具体的な読み' },
   ],
 };

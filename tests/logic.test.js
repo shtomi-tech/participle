@@ -115,12 +115,12 @@ test('lesson explanation content is complete and renderer escapes every content 
   }, { includeClosingSections: false });
   assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
   assert.ok(!html.includes('<script>'));
-  assert.ok(html.includes('Key Rules'));
+  assert.ok(html.includes('重要ルール'));
   assert.ok(html.includes('よくある間違い'));
   assert.ok(html.includes('入試POINT'));
   assert.ok(html.includes('Lesson Summary') === false);
   assert.ok(html.includes('data-explanation-kind="key-rules"'));
-  assert.ok(renderExplanationContent(lessonContents[0]).includes('Lesson Summary'));
+  assert.ok(renderExplanationContent(lessonContents[0]).includes('このLessonのまとめ'));
 });
 
 test('exam multiple choice reuses the registry contract and evaluates stable choice IDs', () => {

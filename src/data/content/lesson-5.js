@@ -17,7 +17,7 @@ export const lesson5Content = {
         { kind: 'POINT', text: '感情動詞は「感情を持つ」ではなく、まず「人をその感情にさせる」と考えます。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '350-382', concept: '感情動詞を「〜させる」と捉える' },
+        { source: 'chapter14-ocr.md', heading: '14-2-1', lineStart: 350, lineEnd: 382, concept: '感情動詞を「〜させる」と捉える' },
       ],
     },
     {
@@ -34,7 +34,7 @@ export const lesson5Content = {
         { id: 'L5-EX-06', english: 'He is bored.', translation: '彼は退屈しています。', structure: 'he receives boredom → bored', point: '人でも受ける側なら -ed です。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '388-400', concept: '感情の与え手・受け手と-ing / -ed' },
+        { source: 'chapter14-ocr.md', heading: '14-2-1', lineStart: 388, lineEnd: 400, concept: '感情の与え手・受け手と-ing / -ed' },
       ],
     },
     {
@@ -51,7 +51,7 @@ export const lesson5Content = {
         { kind: 'CAUTION', text: '「人なら -ed、物なら -ing」は使えません。与える側・受ける側で判断します。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '388-414', concept: '人・物ではなく感情の方向で判定する' },
+        { source: 'chapter14-ocr.md', heading: '14-2-1', lineStart: 388, lineEnd: 414, concept: '人・物ではなく感情の方向で判定する' },
       ],
     },
   ],
@@ -79,7 +79,7 @@ export const lesson5Content = {
     { title: '感情の方向の振り返り', paragraphs: ['The movie → excite → me のように、原因と受け手を分けます。原因を説明する形が exciting、受け手を説明する形が excited です。'] },
   ],
   sourceEvidence: [
-    { source: 'chapter14-ocr.md', section: '350-414', concept: '感情動詞の「〜させる」用法と-ing / p.p.の使い分け' },
-    { source: 'chapter14-ocr.md', section: '388-400', concept: 'boreを使った感情の与え手・受け手' },
+    { source: 'chapter14-ocr.md', heading: '14-2-1', lineStart: 350, lineEnd: 414, concept: '感情動詞の「〜させる」用法と-ing / p.p.の使い分け' },
+    { source: 'chapter14-ocr.md', heading: '14-2-1', lineStart: 388, lineEnd: 400, concept: 'boreを使った感情の与え手・受け手' },
   ],
 };

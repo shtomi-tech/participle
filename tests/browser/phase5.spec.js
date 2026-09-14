@@ -54,7 +54,7 @@ test('regresses every existing interaction type with an accepted path', async ({
   await interactive.locator('[data-token-id="l1-lamp"]').click();
   await interactive.locator('[data-parts-check]').click();
   await expect(interactive.locator('[data-parts-feedback]')).toHaveText(/Correct/);
-  await page.locator('[data-next]').click();
+  await page.locator('[data-next]').press('Enter');
 
   for (const [itemId, categoryId] of [
     ['l1-cheerful', 'ordinary-adjective'],
@@ -177,6 +177,27 @@ test('keeps the entrance question keyboard-accessible', async ({ page }) => {
   await expect(exam.locator('[data-exam-choice-id="l4e1-c1"]')).toBeFocused();
 });
 
+test('keeps entrance Word Order assessment separate from the Lesson 1 interactive check', async ({ page }) => {
+  const expectedWordOrderCounts = {
+    'participle-basics': 0,
+    'ing-vs-pp': 1,
+    'modifier-position': 2,
+    'hidden-sv': 2,
+    'emotion-verbs': 1,
+    'integrated-judgment': 2,
+  };
+  for (const slug of lessonSlugs) {
+    await page.goto(`/#lessons/${slug}`);
+    const section = page.locator('[data-assessment-section="word-order"]');
+    if (slug === 'participle-basics') {
+      await expect(section).toBeHidden();
+    } else {
+      await expect(section).toBeVisible();
+      await expect(section.locator('[data-word-order-counter]')).toHaveText(`1 / ${expectedWordOrderCounts[slug]}`);
+    }
+  }
+});
+
 test('supports wrong-answer review, reset, and detailed explanation for entrance word order', async ({ page }) => {
   await page.goto('/#lessons/ing-vs-pp');
   const wordOrder = page.locator('[data-word-order-component]');
@@ -185,24 +206,26 @@ test('supports wrong-answer review, reset, and detailed explanation for entrance
   await expect(wordOrder.locator('[data-feedback]')).toHaveText(/Not yet/);
   await wordOrder.locator('[data-reset]').click();
   for (const id of ['l2w1-a', 'l2w1-dog', 'l2w1-barking']) {
-    await wordOrder.locator(`[data-word-id="${id}"]`).click();
+    await wordOrder.locator(`[data-word-id="${id}"]`).press('Enter');
   }
-  await wordOrder.locator('[data-check]').click();
+  await wordOrder.locator('[data-check]').press('Enter');
   await expect(wordOrder.locator('[data-feedback]')).toHaveText(/Correct/);
   await expect(wordOrder.locator('[data-explanation-steps]')).toBeVisible();
   await expect(wordOrder.locator('[data-explanation-steps] li')).toHaveCount(3);
 });
 
-test('has no horizontal overflow at 390px on a long Lesson', async ({ page }) => {
+test('has no horizontal overflow at 390px on every Lesson', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/#lessons/hidden-sv');
-  await expect(page.locator('.lesson-example')).toHaveCount(5);
-  await expect(page.locator('[data-exam-choice-id]')).toHaveCount(4);
-  await expect(page.locator('.exam-mc-stem')).toBeVisible();
-  await expect(page.locator('[data-word-order-component]')).toBeVisible();
-  const layout = await page.evaluate(() => ({
-    clientWidth: document.documentElement.clientWidth,
-    scrollWidth: document.documentElement.scrollWidth,
-  }));
-  expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth);
+  for (const slug of lessonSlugs) {
+    await page.goto(`/#lessons/${slug}`);
+    await expect(page.locator('[data-lesson-explanation]')).toBeVisible();
+    await expect(page.locator('[data-lesson-interactive]')).toBeVisible();
+    await expect(page.locator('[data-assessment-section="exam"]')).toBeVisible();
+    await expect(page.locator('[data-lesson-closing]')).toBeVisible();
+    const layout = await page.evaluate(() => ({
+      clientWidth: document.documentElement.clientWidth,
+      scrollWidth: document.documentElement.scrollWidth,
+    }));
+    expect(layout.scrollWidth).toBeLessThanOrEqual(layout.clientWidth);
+  }
 });

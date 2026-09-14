@@ -10,14 +10,14 @@ export const lesson6Content = {
         'この順序は、すべてを一度に推測するためのものではありません。まず名詞と動詞の関係を作り、必要なら完了や感情の方向を追加します。位置や訳は最後の確認に回すと、表面的な語尾や隣の語に引っ張られにくくなります。',
       ],
       examples: [
-        { id: 'L6-EX-01', english: 'The branches fallen after the storm blocked the path.', translation: '嵐の後に落ちた枝が道をふさいだ。', structure: 'branches → fall → completion → fallen', point: 'fall は自動詞で、落下が完了した状態です。' },
+        { id: 'L6-EX-01', english: 'The fallen branches blocked the path after the storm.', translation: '落ちた枝が嵐の後で道をふさいだ。', structure: 'branches → fall → completion → fallen', point: 'fall は自動詞で、落下が完了した状態です。fallen は branches を前から説明します。' },
         { id: 'L6-EX-02', english: 'The report prepared for new staff explains the safety rules.', translation: '新しい職員向けに用意された報告書が安全規則を説明する。', structure: 'report → prepare → passive → prepared', point: 'report は prepare される側です。' },
       ],
       callouts: [
         { kind: 'RULE', text: '①分詞 → ②名詞 → ③元動詞 → ④関係 → ⑤意味軸 → ⑥形 → ⑦位置 → ⑧文脈。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '281-312', concept: '分詞判断の手順とHidden S-V' },
+        { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 312, concept: '分詞判断の手順とHidden S-V' },
       ],
     },
     {
@@ -33,8 +33,8 @@ export const lesson6Content = {
         { id: 'L6-EX-05', english: 'The lecture was interesting, and the students were interested.', translation: 'その講義は興味深く、学生たちは興味を持った。', structure: 'lecture → give interest / students → receive interest', point: '同じ interest でも与える側と受ける側で形が変わります。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '281-312', concept: '構造から能動・受動を判定する' },
-        { source: 'chapter14-ocr.md', section: '350-414', concept: '感情動詞の与える・受ける関係' },
+        { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 312, concept: '構造から能動・受動を判定する' },
+        { source: 'chapter14-ocr.md', heading: '14-2-1', lineStart: 350, lineEnd: 414, concept: '感情動詞の与える・受ける関係' },
       ],
     },
     {
@@ -51,7 +51,7 @@ export const lesson6Content = {
         { kind: 'POINT', text: '答えは形だけで終えず、target noun・base verb・関係・理由を短く言い直します。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '281-312', concept: '初見英文で説明対象と元動詞を特定する' },
+        { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 312, concept: '初見英文で説明対象と元動詞を特定する' },
       ],
     },
   ],
@@ -79,8 +79,8 @@ export const lesson6Content = {
     { title: '総合判断の振り返り', paragraphs: ['問題ごとに、target noun、base verb、active / passive / completion、position、context を確認します。誤答した場合も、正しい関係を言い直せれば復習は成立します。'] },
   ],
   sourceEvidence: [
-    { source: 'chapter14-ocr.md', section: '281-312', concept: 'Hidden S-Vを使った能動・受動の判断' },
-    { source: 'chapter14-ocr.md', section: '350-414', concept: '感情動詞の与える・受ける関係' },
-    { source: 'chapter14-ocr.md', section: '170-180', concept: '自動詞p.p.の完了・結果状態' },
+    { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 312, concept: 'Hidden S-Vを使った能動・受動の判断' },
+    { source: 'chapter14-ocr.md', heading: '14-2-1', lineStart: 350, lineEnd: 414, concept: '感情動詞の与える・受ける関係' },
+    { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 170, lineEnd: 180, concept: '自動詞p.p.の完了・結果状態' },
   ],
 };

@@ -82,10 +82,11 @@ function validateSources(sourceEvidence, label, errors) {
   }
   sourceEvidence.forEach((evidence, index) => {
     const evidenceLabel = `${label}[${index}]`;
-    if (!isRecord(evidence) || !hasText(evidence.source) || !hasText(evidence.section) || !hasText(evidence.concept)) {
-      errors.push(`${evidenceLabel} needs source, section, and concept`);
+    if (!isRecord(evidence) || !hasText(evidence.source) || !hasText(evidence.heading) || !Number.isInteger(evidence.lineStart) || !Number.isInteger(evidence.lineEnd) || !hasText(evidence.concept)) {
+      errors.push(`${evidenceLabel} needs source, heading, integer lineStart/lineEnd, and concept`);
       return;
     }
+    if (evidence.lineStart < 1 || evidence.lineEnd < evidence.lineStart) errors.push(`${evidenceLabel} has an invalid line range`);
     if (!allowedSources.has(evidence.source)) errors.push(`${evidenceLabel}.source is not an allowed OCR source: ${evidence.source}`);
   });
 }

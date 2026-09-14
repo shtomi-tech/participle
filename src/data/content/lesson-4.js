@@ -17,7 +17,7 @@ export const lesson4Content = {
         { kind: 'POINT', text: '分詞の形を先に決めず、名詞を主語にしたHidden S-Vを復元します。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '281-295', concept: 'Hidden S-Vと修飾対象の復元' },
+        { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 295, concept: 'Hidden S-Vと修飾対象の復元' },
       ],
     },
     {
@@ -32,7 +32,7 @@ export const lesson4Content = {
         { id: 'L4-EX-04', english: 'the songs played at the festival', translation: 'その祭りで演奏された曲', structure: 'the songs are played → passive → played', point: 'songs は play される側です。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '296-304', concept: 'Hidden S-Vによる能動・受動の判別' },
+        { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 296, lineEnd: 304, concept: 'Hidden S-Vによる能動・受動の判別' },
       ],
     },
     {
@@ -49,7 +49,7 @@ export const lesson4Content = {
         { kind: 'RULE', text: 'STEP 1 分詞 → STEP 2 名詞 → STEP 3 元動詞 → STEP 4 S-V → STEP 5/6 能動・受動と形。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '281-312', concept: 'Hidden S-Vの判断手順' },
+        { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 312, concept: 'Hidden S-Vの判断手順' },
       ],
     },
   ],
@@ -77,7 +77,7 @@ export const lesson4Content = {
     { title: 'Hidden S-Vの振り返り', paragraphs: ['正解の形だけでなく、target noun と base verb を言えるか確認します。the songs → play → passive → played のように、関係を一行で説明できれば判断が安定しています。'] },
   ],
   sourceEvidence: [
-    { source: 'chapter14-ocr.md', section: '281-312', concept: '名詞と分詞のHidden S-V、能動・受動による形の判別' },
-    { source: 'chapter14-ocr.md', section: '208-215', concept: '分詞句と修飾対象の名詞' },
+    { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 312, concept: '名詞と分詞のHidden S-V、能動・受動による形の判別' },
+    { source: 'chapter14-ocr.md', heading: '14-1-2', lineStart: 208, lineEnd: 215, concept: '分詞句と修飾対象の名詞' },
   ],
 };

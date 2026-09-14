@@ -1,4 +1,12 @@
-const source = (section, concept) => ({ source: 'chapter14-ocr.md', section, concept });
+const sourceHeadings = new Map([
+  [100, '14-1-1'], [108, '14-1-1'], [120, '14-1-1'], [170, '14-1-1'],
+  [200, '14-1-2'], [208, '14-1-2'], [222, '14-1-2'], [245, '14-1-2'],
+  [281, '14-1-3'], [296, '14-1-3'], [350, '14-2-1'], [388, '14-2-1'],
+]);
+const source = (section, concept) => {
+  const [lineStart, lineEnd] = section.split('-').map(Number);
+  return { source: 'chapter14-ocr.md', heading: sourceHeadings.get(lineStart), lineStart, lineEnd, concept };
+};
 
 export const examMultipleChoiceProblems = [
   {
@@ -27,16 +35,16 @@ export const examMultipleChoiceProblems = [
     requirements: ['LR-PART-001', 'LR-PART-002'],
     sourceEvidence: source('100-123', '動詞由来の分詞と形容詞の働き'),
     prompt: '空所に入る最も適切な形を選びなさい。',
-    stem: 'We watched the (     ) child from the doorway.',
+    stem: 'The (     ) child waved at us from the doorway.',
     choices: [
       { id: 'l1e2-c1', text: 'smile', explanation: 'smile は元動詞の原形です。child を説明する語としては、分詞の形が必要です。' },
-      { id: 'l1e2-c2', text: 'smiling', explanation: 'smiling は smile 由来の分詞です。child が smile する関係で、child を前から説明します。' },
+      { id: 'l1e2-c2', text: 'smiling', explanation: 'smiling は smile 由来の分詞です。child が smile する関係で、child を前から説明します。主節の動詞は waved です。' },
       { id: 'l1e2-c3', text: 'smiled', explanation: 'smiled を過去時制の名前だけで選ぶことはできません。この名詞句では、child との関係を表す形を選びます。' },
       { id: 'l1e2-c4', text: 'smiles', explanation: 'smiles は child を主語にした文の中心動詞になる形で、名詞の前に置く修飾語ではありません。' },
     ],
     answerChoiceId: 'l1e2-c2',
-    explanation: 'smiling は smile から作られた分詞で、形容詞のように child を説明します。分詞と名詞を一つのまとまりとして読みます。',
-    difficulty: 'standard',
+    explanation: 'smiling は smile から作られた分詞で、形容詞のように child を説明します。分詞と名詞を一つのまとまりとして読み、waved が主節の動詞だと確認します。',
+    difficulty: 'basic',
     misconceptions: ['原形をそのまま名詞の前に置く', '過去分詞の名称を過去時制と同一視する', '三単現の形を名詞修飾に使う'],
   },
   {
@@ -68,13 +76,17 @@ export const examMultipleChoiceProblems = [
     stem: 'The (     ) leaves covered the path after the storm.',
     choices: [
       { id: 'l2e2-c1', text: 'falling', explanation: 'falling は落ちている途中の能動を表しますが、文は嵐の後にすでに落ちた葉を説明しています。' },
-      { id: 'l2e2-c2', text: 'fell', explanation: 'fell は fall の過去形で、名詞 leaves を修飾する形ではありません。' },
+      { id: 'l2e2-c2', text: 'having fallen', explanation: 'having fallen は完了分詞のまとまりです。この空所では、名詞の前に置く単純な分詞 fallen を選びます。' },
       { id: 'l2e2-c3', text: 'fallen', explanation: 'leaves が fall する変化が完了した結果の状態なので、fallen が適切です。fall は自動詞で受動ではありません。' },
       { id: 'l2e2-c4', text: 'were fallen', explanation: 'fall は通常、自分で落ちる自動詞です。ここで「落とされた」という受動の be 動詞を置く必要はありません。' },
     ],
     answerChoiceId: 'l2e2-c3',
     explanation: 'fallen leaves は「落とされた葉」ではなく、leaves が fall し終えた結果の落ち葉です。p.p.には完了・結果状態の読みもあります。',
     difficulty: 'entrance',
+    distractorReview: [
+      { choiceId: 'l2e2-c1', misconception: '進行中と完了した状態を区別しない', rationale: 'falling は落下中で、after the storm が示す結果状態と合いません。' },
+      { choiceId: 'l2e2-c2', misconception: '完了分詞を単純な名詞修飾にそのまま置く', rationale: 'having fallen はこの位置で求める単純な分詞ではありません。' },
+    ],
     misconceptions: ['p.p.は必ず受動だと決める', '進行中と完了した状態を区別しない', '過去形を名詞修飾に使う'],
   },
   {
@@ -103,15 +115,15 @@ export const examMultipleChoiceProblems = [
     requirements: ['LR-PART-004', 'LR-PART-006'],
     sourceEvidence: source('200-243', '分詞句の後置修飾と修飾対象'),
     prompt: '空所に入る最も適切な形を選びなさい。',
-    stem: 'We noticed a bird (     ) on the fence.',
+    stem: 'The bird (     ) on the fence suddenly flew away.',
     choices: [
-      { id: 'l3e1-c1', text: 'sits', explanation: 'sits は文の中心動詞の形です。この文では noticed が中心動詞なので、bird を説明する形が必要です。' },
+      { id: 'l3e1-c1', text: 'sits', explanation: 'sits は bird を説明する分詞の形ではありません。主節の動詞は flew です。' },
       { id: 'l3e1-c2', text: 'sat', explanation: 'sat は過去形ですが、bird を説明する分詞としては使えません。' },
       { id: 'l3e1-c3', text: 'sitting', explanation: 'sitting on the fence 全体が bird を後ろから説明し、bird が sit する能動関係になります。' },
       { id: 'l3e1-c4', text: 'is sit', explanation: 'is sit は正しい分詞の形ではなく、文中の修飾語にもなりません。' },
     ],
     answerChoiceId: 'l3e1-c3',
-    explanation: 'sitting on the fence は複数語の分詞句なので bird の後ろに置かれています。bird が sit する能動関係も確認できます。',
+    explanation: 'sitting on the fence は複数語の分詞句なので bird の後ろに置かれています。bird が sit する能動関係と、flew が主節の動詞であることを確認します。',
     difficulty: 'standard',
     misconceptions: ['分詞句の修飾対象を見失う', '過去形を分詞として使う', '後置修飾を分詞構文と混同する'],
   },
@@ -126,12 +138,16 @@ export const examMultipleChoiceProblems = [
     choices: [
       { id: 'l3e2-c1', text: 'parking', explanation: 'car が park するのではなく、park される側です。能動の parking にはしません。' },
       { id: 'l3e2-c2', text: 'parked', explanation: 'parked by the bridge は car を後ろから説明し、the car was parked という受動関係になります。' },
-      { id: 'l3e2-c3', text: 'park', explanation: 'park は元動詞の原形で、car を説明する分詞句の形ではありません。' },
+      { id: 'l3e2-c3', text: 'having parked', explanation: 'having parked は car が park したという能動の完了関係になります。car は park される側なので、受動の parked を選びます。' },
       { id: 'l3e2-c4', text: 'parks', explanation: 'parks は三単現の中心動詞の形で、文の中心動詞 belongs と役割が重なります。' },
     ],
     answerChoiceId: 'l3e2-c2',
     explanation: 'parked by the bridge というまとまりが car を後ろから修飾します。car は park される側なので p.p. parked です。',
     difficulty: 'entrance',
+    distractorReview: [
+      { choiceId: 'l3e2-c1', misconception: '名詞がされる関係を -ing にする', rationale: 'parking は car が park する能動関係ですが、by the bridge が示す car は park される側です。' },
+      { choiceId: 'l3e2-c3', misconception: '完了分詞の能動関係を受動修飾と取り違える', rationale: 'having parked では car が park したことになり、by句を伴う受動関係を表せません。' },
+    ],
     misconceptions: ['名詞がされる関係を -ing にする', '語数と位置だけで形を決める', '原形や三単現を修飾語に使う'],
   },
   {
@@ -164,12 +180,16 @@ export const examMultipleChoiceProblems = [
     choices: [
       { id: 'l4e2-c1', text: 'approving', explanation: 'documents が approve するのではなく、manager に approve される側です。' },
       { id: 'l4e2-c2', text: 'approved', explanation: 'the documents were approved by the manager という受動のHidden S-Vから approved を選びます。' },
-      { id: 'l4e2-c3', text: 'approve', explanation: 'approve は元動詞の原形で、documents を説明する分詞になっていません。' },
+      { id: 'l4e2-c3', text: 'having approved', explanation: 'having approved は documents が approve したという能動の完了関係です。manager に approve される documents には使いません。' },
       { id: 'l4e2-c4', text: 'approves', explanation: 'approves は三単現の中心動詞の形で、複数の documents にもこの位置にも合いません。' },
     ],
     answerChoiceId: 'l4e2-c2',
     explanation: 'documents は manager に approve される側です。名詞を主語にして the documents were approved と作れるため approved です。',
     difficulty: 'entrance',
+    distractorReview: [
+      { choiceId: 'l4e2-c1', misconception: '受動関係を能動の -ing にする', rationale: 'approving では documents が manager を approve する向きになってしまいます。' },
+      { choiceId: 'l4e2-c3', misconception: '完了分詞でも名詞との能動・受動関係を確認しない', rationale: 'having approved も documents を動作主とするため、manager にされる関係と合いません。' },
+    ],
     misconceptions: ['受動関係を能動の -ing にする', '原形を分詞として扱う', 'by句を見ても名詞との関係を作らない'],
   },
   {
@@ -182,13 +202,17 @@ export const examMultipleChoiceProblems = [
     stem: 'The students in the front row (     ) quietly finished the task first.',
     choices: [
       { id: 'l4e3-c1', text: 'reading', explanation: 'students が read するので、reading 自体は能動の形です。この文では students を説明する選択肢として扱います。' },
-      { id: 'l4e3-c2', text: 'read', explanation: 'read は元動詞または過去形の形で、students を説明する分詞の形にはなっていません。' },
+      { id: 'l4e3-c2', text: 'having read', explanation: 'having read は完了分詞です。ここでは students が静かに読む動作を表す単純な reading が必要です。' },
       { id: 'l4e3-c3', text: 'reads', explanation: 'reads は三単現で、複数主語 students にも名詞修飾の位置にも合いません。' },
-      { id: 'l4e3-c4', text: 'were read', explanation: 'students が read されるのではなく read する側なので、受動の were read にはしません。' },
+      { id: 'l4e3-c4', text: 'being read', explanation: 'being read は students が読まれる受動の意味になります。students は read する側なので reading です。' },
     ],
     answerChoiceId: 'l4e3-c1',
     explanation: 'この問題では reading quietly が students の動作を表します。the students read quietly という能動のHidden S-Vを作り、reading を選びます。',
-    difficulty: 'entrance',
+    difficulty: 'standard',
+    distractorReview: [
+      { choiceId: 'l4e3-c2', misconception: '完了分詞を文脈なしに選ぶ', rationale: 'having read は完了した先行動作を表し、この文の静かな動作の同時性と合いません。' },
+      { choiceId: 'l4e3-c4', misconception: '名詞がする関係を受動にする', rationale: 'being read では students が読まれる側になり、Hidden S-Vの向きが逆です。' },
+    ],
     misconceptions: ['直前の front row を主語だと誤認する', '過去形と分詞を同一視する', '複数主語に三単現を使う'],
   },
   {
@@ -202,12 +226,16 @@ export const examMultipleChoiceProblems = [
     choices: [
       { id: 'l4e4-c1', text: 'playing', explanation: 'songs が play するのではなく、演奏される側です。日本語の「流れている」だけで -ing にしません。' },
       { id: 'l4e4-c2', text: 'played', explanation: 'the songs were played at the festival という受動関係が成り立つため played が適切です。' },
-      { id: 'l4e4-c3', text: 'play', explanation: 'play は元動詞の原形で、songs を説明する分詞句の形になっていません。' },
-      { id: 'l4e4-c4', text: 'plays', explanation: 'plays は三単現の中心動詞の形で、複数主語 songs にも合いません。' },
+      { id: 'l4e4-c3', text: 'having played', explanation: 'having played は songs が play したという能動の完了関係です。songs は演奏される側なので played が必要です。' },
+      { id: 'l4e4-c4', text: 'play', explanation: 'play は元動詞の原形で、songs を説明する分詞句の形になっていません。' },
     ],
     answerChoiceId: 'l4e4-c2',
     explanation: 'songs は play される側です。訳の表面ではなく、the songs were played という受動のHidden S-Vから played を選びます。',
     difficulty: 'entrance',
+    distractorReview: [
+      { choiceId: 'l4e4-c1', misconception: '「流れている」から playing とする', rationale: 'playing は songs が play する能動関係になり、演奏される songs と向きが合いません。' },
+      { choiceId: 'l4e4-c3', misconception: '完了分詞でも受動関係を作らない', rationale: 'having played は songs を動作主にするため、受動の played にはなりません。' },
+    ],
     misconceptions: ['「流れている」から playing とする', '受動関係を見落とす', '分詞の位置だけで形を決める'],
   },
   {
@@ -266,6 +294,10 @@ export const examMultipleChoiceProblems = [
     explanation: '人・物ではなく、感情を与える側か受ける側かで決めます。この文の He は周囲を退屈させる側なので boring です。',
     difficulty: 'entrance',
     misconceptions: ['人なら必ず -ed とする', 'bored / boring の意味方向を逆にする', '感情動詞を「感じる」とだけ覚える'],
+    distractorReview: [
+      { choiceId: 'l5e3-c2', misconception: '人なら必ず -ed とする', rationale: 'bored は He が退屈を受ける側という意味になり、周囲を退屈させる文脈と逆です。' },
+      { choiceId: 'l5e3-c3', misconception: '感情動詞の原形を補語に置く', rationale: 'bore は元動詞の原形で、be動詞の後ろで性質を説明する形になっていません。' },
+    ],
   },
   {
     id: 'PART-L5-EXAM-004',
@@ -285,6 +317,10 @@ export const examMultipleChoiceProblems = [
     explanation: 'her performance impressed the audience. と戻すと、audience は感情を受ける側だと分かります。よって impressed です。',
     difficulty: 'entrance',
     misconceptions: ['主語が人だからという理由だけで選ぶ', 'by句の原因と受け手を取り違える', '感情動詞の目的語関係を見ない'],
+    distractorReview: [
+      { choiceId: 'l5e4-c1', misconception: 'by句の原因と受け手を取り違える', rationale: 'impressing は audience が印象を与える側になりますが、audience は performance から印象を受けます。' },
+      { choiceId: 'l5e4-c3', misconception: '感情動詞の原形を補語に置く', rationale: 'impress は元動詞の原形で、was の後ろの状態説明には使えません。' },
+    ],
   },
   {
     id: 'PART-L6-EXAM-001',
@@ -297,12 +333,16 @@ export const examMultipleChoiceProblems = [
     choices: [
       { id: 'l6e1-c1', text: 'falling', explanation: 'falling は落下中の状態ですが、after the storm はすでに落ちた枝の結果状態を示します。' },
       { id: 'l6e1-c2', text: 'fallen', explanation: 'branches が fall し終えた結果の状態です。自動詞 fall なので受動ではなく完了として fallen を使います。' },
-      { id: 'l6e1-c3', text: 'fell', explanation: 'fell は fall の過去形で、branches を前から説明する分詞ではありません。' },
+      { id: 'l6e1-c3', text: 'having fallen', explanation: 'having fallen は完了分詞のまとまりです。この空所では、結果状態を表す単純な分詞 fallen を選びます。' },
       { id: 'l6e1-c4', text: 'were fallen', explanation: 'fall は自動詞で、枝が誰かに落とされる受動関係ではありません。' },
     ],
     answerChoiceId: 'l6e1-c2',
     explanation: 'fall は自動詞なので受動の were fallen にはしません。branches が落ちる変化の完了・結果状態を表す fallen です。',
     difficulty: 'entrance',
+    distractorReview: [
+      { choiceId: 'l6e1-c1', misconception: '進行と完了を文脈から分けない', rationale: 'falling は落下中で、after the storm の結果状態と合いません。' },
+      { choiceId: 'l6e1-c3', misconception: '完了分詞を単純な名詞修飾にそのまま置く', rationale: 'having fallen はこの位置で求める単純な分詞ではありません。' },
+    ],
     misconceptions: ['p.p.は必ず受動だと決める', '進行と完了を文脈から分けない', '過去形を分詞として使う'],
   },
   {
@@ -316,12 +356,16 @@ export const examMultipleChoiceProblems = [
     choices: [
       { id: 'l6e2-c1', text: 'preparing', explanation: 'report が prepare するのではなく、新しい職員のために prepare される側です。' },
       { id: 'l6e2-c2', text: 'prepared', explanation: 'the report was prepared for new staff という受動関係なので prepared が report を説明します。' },
-      { id: 'l6e2-c3', text: 'prepare', explanation: 'prepare は元動詞の原形で、report を説明する分詞になっていません。' },
+      { id: 'l6e2-c3', text: 'having prepared', explanation: 'having prepared は report が prepare したという能動の完了関係です。report は prepare される側なので prepared が適切です。' },
       { id: 'l6e2-c4', text: 'prepares', explanation: 'prepares は report を主語にした中心動詞の形ですが、文の中心動詞は explains です。' },
     ],
     answerChoiceId: 'l6e2-c2',
     explanation: '分詞 prepared の対象は report です。report is prepared という受動のHidden S-Vから prepared を選びます。',
     difficulty: 'entrance',
+    distractorReview: [
+      { choiceId: 'l6e2-c1', misconception: '直前の語だけを説明対象にする', rationale: 'preparing は report が prepare する能動関係で、report が用意される意味と逆です。' },
+      { choiceId: 'l6e2-c3', misconception: '完了分詞でも受動関係を確認しない', rationale: 'having prepared は report を動作主にするため、受動の prepared にはなりません。' },
+    ],
     misconceptions: ['直前の語だけを説明対象にする', '受動関係を能動と取り違える', '中心動詞と修飾語を区別しない'],
   },
   {
@@ -354,12 +398,16 @@ export const examMultipleChoiceProblems = [
     choices: [
       { id: 'l6e4-c1', text: 'displaying', explanation: 'painting が display するのではなく、hallway に display される側です。' },
       { id: 'l6e4-c2', text: 'displayed', explanation: 'the painting is displayed in the hallway という受動関係なので displayed が適切です。' },
-      { id: 'l6e4-c3', text: 'display', explanation: 'display は元動詞の原形で、painting を説明する分詞の形ではありません。' },
+      { id: 'l6e4-c3', text: 'having displayed', explanation: 'having displayed は painting が display したという能動の完了関係です。painting は display される側なので displayed が適切です。' },
       { id: 'l6e4-c4', text: 'displays', explanation: 'displays は painting を主語にした中心動詞の形ですが、文の中心動詞は attracts です。' },
     ],
     answerChoiceId: 'l6e4-c2',
     explanation: 'painting は display される側です。the painting is displayed という受動のHidden S-Vを復元して displayed を選びます。',
     difficulty: 'entrance',
+    distractorReview: [
+      { choiceId: 'l6e4-c1', misconception: '物だから -ing と機械的に決める', rationale: 'displaying は painting が display する能動関係で、展示される painting と合いません。' },
+      { choiceId: 'l6e4-c3', misconception: '完了分詞でも受動関係を考えない', rationale: 'having displayed は painting を動作主にするため、受動の displayed にはなりません。' },
+    ],
     misconceptions: ['物だから -ing と機械的に決める', '受動のby句がなくても受動関係を考えない', '原形を名詞修飾に使う'],
   },
   {
@@ -379,6 +427,10 @@ export const examMultipleChoiceProblems = [
     answerChoiceId: 'l6e5-c2',
     explanation: 'lecture が聞き手に興味を持たせる側なので interesting です。人・物ではなく、感情を与える方向を確認します。',
     difficulty: 'entrance',
+    distractorReview: [
+      { choiceId: 'l6e5-c1', misconception: '受け手の interested を原因に使う', rationale: 'interested は lecture が興味を受ける意味になり、聞き手に興味を与える文脈と逆です。' },
+      { choiceId: 'l6e5-c3', misconception: '元動詞の形を補語に置く', rationale: 'interest は元動詞の原形で、was の後ろで lecture の性質を説明できません。' },
+    ],
     misconceptions: ['物なら -ing とだけ覚える', '受け手の interested を原因に使う', '感情動詞の方向を文脈で確認しない'],
   },
 ];

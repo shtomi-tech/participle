@@ -78,7 +78,7 @@ function renderLesson(lesson) {
   const previousLesson = lessons[lessonIndex - 1];
   const nextLesson = lessons[lessonIndex + 1];
   const examProblems = getProblemsByType('exam-multiple-choice').filter((problem) => problem.lessonId === lesson.id);
-  const wordOrderProblems = getProblemsByType('word-order').filter((problem) => problem.lessonId === lesson.id);
+  const wordOrderProblems = getProblemsByType('word-order').filter((problem) => problem.lessonId === lesson.id && problem.assessmentKind === 'entrance');
   let stepIndex = 0;
   let completedStepIds = new Set();
   let cleanup = null;

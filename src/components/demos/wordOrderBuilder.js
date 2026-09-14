@@ -19,21 +19,21 @@ export function mountWordOrderBuilder(root, problem, options = {}) {
   root.innerHTML = `
     <p class="instruction">${escapeHtml(problem.prompt)}</p>
     <div class="demo-stage word-order-stage">
-      ${problem.translation ? `<p class="word-order-translation"><strong>Meaning</strong> ${escapeHtml(problem.translation)}</p>` : ''}
+      ${problem.translation ? `<p class="word-order-translation"><strong>意味</strong> ${escapeHtml(problem.translation)}</p>` : ''}
       ${hasSentenceFrame ? `<p class="word-order-frame"><span>${escapeHtml(fixedPrefix)}</span><strong>[ phrase ]</strong><span>${escapeHtml(fixedSuffix)}</span></p>` : ''}
-      <h3>Answer area</h3>
+      <h3>解答欄</h3>
       <div class="answer-area is-empty" data-answer-area aria-live="polite"></div>
-      <h3>Word cards</h3>
+      <h3>語句カード</h3>
       <div class="token-bank" data-word-bank></div>
       <div class="demo-actions">
         <button class="button secondary" type="button" data-reset>Reset</button>
         ${hints.length ? '<button class="button secondary" type="button" data-hint>Hint</button>' : ''}
-        <button class="button" type="button" data-check>Check answer</button>
+        <button class="button" type="button" data-check>解答を確認</button>
       </div>
       ${hints.length ? '<div class="hint" data-hint-output role="status" aria-live="polite"></div>' : ''}
       <div class="feedback" data-feedback role="status" aria-live="polite"></div>
       <p class="explanation" data-explanation hidden>${escapeHtml(problem.explanation)}</p>
-      ${Array.isArray(problem.explanationSteps) && problem.explanationSteps.length ? `<div class="word-order-explanation-steps" data-explanation-steps hidden><h3>Detailed review</h3><ol>${problem.explanationSteps.map((step) => `<li><strong>${escapeHtml(step.label)}</strong> ${escapeHtml(step.text)}</li>`).join('')}</ol></div>` : ''}
+      ${Array.isArray(problem.explanationSteps) && problem.explanationSteps.length ? `<div class="word-order-explanation-steps" data-explanation-steps hidden><h3>詳しい復習</h3><ol>${problem.explanationSteps.map((step) => `<li><strong>${escapeHtml(step.label)}</strong> ${escapeHtml(step.text)}</li>`).join('')}</ol></div>` : ''}
     </div>`;
 
   const answerArea = root.querySelector('[data-answer-area]');

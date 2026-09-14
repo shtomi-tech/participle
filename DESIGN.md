@@ -4,6 +4,8 @@
 
 この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計・実装の正本です。Phase 1〜4でLesson 1〜6と8種類の既存Interactionを実装し、Phase 5でExplanation-firstのLesson構造、汎用Explanation Renderer、Exam Multiple Choice、入試語句整序、検証・ブラウザ回帰を追加します。Phase 5の最終検証結果は末尾の実装更新に記録します。
 
+Explanation is primary. Interaction is supportive. Assessment confirms transfer.
+
 調査日は 2026-09-13。参照元 `C:\Users\shtom\dev\english-grammar-interactive-atlas` は調査時点で未コミット変更を含んでいたため、読み取り専用で扱いました。参照元にはGraft graphがなく、`graft check` は `NO GRAPH` でした。以下の記述は実ファイルの確認結果です。
 
 ## Source separation
@@ -885,9 +887,16 @@ Word Orderは既存`WordOrderBuilder`をそのまま再利用し、既存Problem
 - score storage、mastery、analytics、auth、DB、LLM自由記述採点は実装していません。進捗は従来どおりLesson画面内memoryのみです。
 - Exam Multiple Choiceは一問ずつの確認フローで、受験結果の永続化や試験モードはありません。
 
+## Phase 6 implementation update
+
+- `PROJECT_GOAL.md`をExplanation-firstの現行方針と整合させ、`DESIGN.md`にも固定の整合性マーカーを置きました。
+- Pages自動デプロイWorkflowを削除し、`scripts/check.mjs`がすべてのYAML workflowからPages権限・deploy actionを検出します。リポジトリの公開範囲は変更していません。
+- Lesson 1・3・6の例文、評価問題の曖昧な目的語補語に見える例、Lesson 6のWord Orderを修正しました。入試Word Orderは`assessmentKind: 'entrance'`で8問に分離し、Lesson 1の基本Interactionは評価欄に混ぜません。
+- Explanation / Exam / entrance Word Orderの出典に`heading`、`lineStart`、`lineEnd`、`concept`を持たせ、OCR行数・見出し存在・範囲・非空概念を`npm run check`で検証します。section内の出典は閉じたnative `details`で確認できます。
+- 入試4択の誤答には少なくとも2件の`distractorReview`を紐づけ、日本語中心の見出しへ更新しました。
+
 ## Deployment
 
-- GitHub Pagesで `main` の `dist` を公開する。
-- Workflow: `.github/workflows/pages.yml`
-- 公開URL: `https://shtomi-tech.github.io/participle/`
-- リポジトリはGitHub Pages利用条件に合わせて公開設定に変更した。
+- GitHub Pagesの自動デプロイWorkflowはPhase 6で削除し、CIは検証専用とする。
+- リポジトリの公開・非公開設定はこの実装では変更しない。
+- 既存の公開URLや過去の公開物は、現在のリリース操作や検証結果を示すものとして扱わない。

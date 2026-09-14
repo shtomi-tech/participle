@@ -35,8 +35,12 @@ function validateShared(problem, label, errors, knownRequirementIds, knownLesson
   for (const field of ['id', 'type', 'lessonId', 'prompt', 'explanation']) {
     if (!hasText(problem[field])) errors.push(`${label}.${field} is required`);
   }
-  if (!isRecord(problem.sourceEvidence) || !hasText(problem.sourceEvidence.source) || !hasText(problem.sourceEvidence.section)) {
-    errors.push(`${label}.sourceEvidence needs source and section`);
+  const strictEvidence = problem.type === 'exam-multiple-choice' || problem.assessmentKind === 'entrance';
+  const invalidEvidence = strictEvidence
+    ? !isRecord(problem.sourceEvidence) || !hasText(problem.sourceEvidence.source) || !hasText(problem.sourceEvidence.heading) || !Number.isInteger(problem.sourceEvidence.lineStart) || !Number.isInteger(problem.sourceEvidence.lineEnd) || !hasText(problem.sourceEvidence.concept)
+    : !isRecord(problem.sourceEvidence) || !hasText(problem.sourceEvidence.source) || !hasText(problem.sourceEvidence.section);
+  if (invalidEvidence) {
+    errors.push(`${label}.sourceEvidence needs ${strictEvidence ? 'source, heading, integer lineStart/lineEnd, and concept' : 'source, section, and concept'}`);
   }
   if (!['chapter14-ocr.md', 'chapter14-ocr.json'].includes(problem.sourceEvidence?.source)) {
     errors.push(`${label}.sourceEvidence.source is not an allowed OCR source`);
@@ -125,6 +129,7 @@ function validateGrammarClassifier(problem, label, errors) {
 }
 
 function validateWordOrder(problem, label, errors) {
+  if (problem.assessmentKind !== undefined && problem.assessmentKind !== 'entrance') errors.push(`${label}.assessmentKind must be entrance when provided`);
   if (!Array.isArray(problem.words) || problem.words.length < 2) {
     errors.push(`${label}.words must contain at least two words`);
   } else {
@@ -182,6 +187,23 @@ function validateExamMultipleChoice(problem, label, errors) {
   if (!difficulties.has(problem.difficulty)) errors.push(`${label}.difficulty is invalid: ${problem.difficulty}`);
   if (!Array.isArray(problem.misconceptions) || problem.misconceptions.length === 0 || problem.misconceptions.some((item) => !hasText(item))) {
     errors.push(`${label}.misconceptions must contain non-empty items`);
+  }
+  if (problem.difficulty === 'entrance') {
+    if (!Array.isArray(problem.distractorReview) || problem.distractorReview.length < 2) {
+      errors.push(`${label}.distractorReview must map at least two plausible distractors`);
+    } else {
+      const reviewIds = new Set();
+      problem.distractorReview.forEach((review, index) => {
+        if (!isRecord(review) || !hasText(review.choiceId) || !hasText(review.misconception) || !hasText(review.rationale)) {
+          errors.push(`${label}.distractorReview[${index}] needs choiceId, misconception, and rationale`);
+          return;
+        }
+        if (reviewIds.has(review.choiceId)) errors.push(`${label}.distractorReview has duplicate choiceId: ${review.choiceId}`);
+        reviewIds.add(review.choiceId);
+        if (!choiceIds.has(review.choiceId)) errors.push(`${label}.distractorReview references an unknown choice: ${review.choiceId}`);
+        if (review.choiceId === problem.answerChoiceId) errors.push(`${label}.distractorReview cannot map the correct choice`);
+      });
+    }
   }
 }
 

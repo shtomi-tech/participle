@@ -17,7 +17,7 @@ export const lesson2Content = {
         { kind: 'RULE', text: '現在分詞 ≠ 現在時制、過去分詞 ≠ 過去時制。まず名詞と元動詞の関係を確認します。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '120-123', concept: '現在分詞・過去分詞という名称' },
+        { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 120, lineEnd: 123, concept: '現在分詞・過去分詞という名称' },
       ],
     },
     {
@@ -32,7 +32,7 @@ export const lesson2Content = {
         { id: 'L2-EX-04', english: 'students coming from abroad', translation: '海外から来る学生たち', structure: 'students come → active → coming', point: 'students が come する側なので coming です。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '120-140', concept: '能動・受動関係による-ing / p.p.の選択' },
+        { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 120, lineEnd: 140, concept: '能動・受動関係による-ing / p.p.の選択' },
       ],
     },
     {
@@ -51,7 +51,7 @@ export const lesson2Content = {
         { kind: 'CAUTION', text: '自動詞由来の p.p.は、受動ではなく完了・結果状態の読みになることがあります。' },
       ],
       sourceEvidence: [
-        { source: 'chapter14-ocr.md', section: '170-180', concept: '自動詞由来のp.p.と完了・結果状態' },
+        { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 170, lineEnd: 180, concept: '自動詞由来のp.p.と完了・結果状態' },
       ],
     },
   ],
@@ -78,7 +78,7 @@ export const lesson2Content = {
     { title: '形を決める順序', paragraphs: ['名詞を主語にして元動詞へ戻し、能動か受動かを確認します。受動にならない自動詞なら、変化が完了した状態という読みを検討します。'] },
   ],
   sourceEvidence: [
-    { source: 'chapter14-ocr.md', section: '120-180', concept: '-ing / p.p.の意味軸と自動詞p.p.の完了・結果状態' },
-    { source: 'chapter14-ocr.md', section: '281-312', concept: '名詞と分詞の能動・受動関係' },
+    { source: 'chapter14-ocr.md', heading: '14-1-1', lineStart: 120, lineEnd: 180, concept: '-ing / p.p.の意味軸と自動詞p.p.の完了・結果状態' },
+    { source: 'chapter14-ocr.md', heading: '14-1-3', lineStart: 281, lineEnd: 312, concept: '名詞と分詞の能動・受動関係' },
   ],
 };
