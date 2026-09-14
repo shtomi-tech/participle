@@ -1,3 +1,5 @@
+import { lessonContents } from '../data/content/index.js';
+
 const problemTypes = new Set([
   'mark-parts',
   'modifier-connection-viewer',
@@ -13,6 +15,7 @@ const metadataTypes = new Set(['mark-parts', 'modifier-connection-viewer']);
 const voices = new Set(['active', 'passive']);
 const forms = new Set(['-ing', 'p.p.']);
 const difficulties = new Set(['basic', 'standard', 'entrance']);
+const defaultExplanationSectionLessons = new Map(lessonContents.flatMap((content) => content.sections.map((section) => [section.id, content.lessonId])));
 
 function hasText(value) {
   return typeof value === 'string' && value.trim().length > 0;
@@ -31,10 +34,30 @@ function duplicateIds(entries, label, errors) {
   });
 }
 
-function validateShared(problem, label, errors, knownRequirementIds, knownLessonIds) {
+function validateContentRefs(problem, label, errors, explanationSectionLessons) {
+  if (!Array.isArray(problem.contentRefs) || problem.contentRefs.length === 0) {
+    errors.push(`${label}.contentRefs must contain at least one explanation section ID`);
+    return;
+  }
+  const refs = new Set();
+  problem.contentRefs.forEach((ref, index) => {
+    if (!hasText(ref)) {
+      errors.push(`${label}.contentRefs[${index}] must be a non-empty explanation section ID`);
+      return;
+    }
+    if (refs.has(ref)) errors.push(`${label}.contentRefs has duplicate contentRef: ${ref}`);
+    refs.add(ref);
+    if (!(explanationSectionLessons instanceof Map) || explanationSectionLessons.size === 0) return;
+    if (!explanationSectionLessons.has(ref)) errors.push(`${label}.contentRefs references an unknown explanation section: ${ref}`);
+    else if (explanationSectionLessons.get(ref) !== problem.lessonId) errors.push(`${label}.contentRefs references a cross-lesson explanation section: ${ref}`);
+  });
+}
+
+function validateShared(problem, label, errors, knownRequirementIds, knownLessonIds, explanationSectionLessons) {
   for (const field of ['id', 'type', 'lessonId', 'prompt', 'explanation']) {
     if (!hasText(problem[field])) errors.push(`${label}.${field} is required`);
   }
+  validateContentRefs(problem, label, errors, explanationSectionLessons);
   const strictEvidence = problem.type === 'exam-multiple-choice' || problem.assessmentKind === 'entrance';
   const invalidEvidence = strictEvidence
     ? !isRecord(problem.sourceEvidence) || !hasText(problem.sourceEvidence.source) || !hasText(problem.sourceEvidence.heading) || !Number.isInteger(problem.sourceEvidence.lineStart) || !Number.isInteger(problem.sourceEvidence.lineEnd) || !hasText(problem.sourceEvidence.concept)
@@ -348,7 +371,7 @@ function validateContextGrammar(problem, label, errors) {
   });
 }
 
-export function validateProblems(entries, { knownRequirementIds = new Set(), knownLessonIds = new Set() } = {}) {
+export function validateProblems(entries, { knownRequirementIds = new Set(), knownLessonIds = new Set(), explanationSectionLessons = defaultExplanationSectionLessons } = {}) {
   const errors = [];
   if (!Array.isArray(entries)) return { valid: false, errors: ['Problems must be an array'] };
   duplicateIds(entries, 'Problems', errors);
@@ -362,7 +385,7 @@ export function validateProblems(entries, { knownRequirementIds = new Set(), kno
       errors.push(`${label}.type is unknown: ${problem.type}`);
       return;
     }
-    validateShared(problem, label, errors, knownRequirementIds, knownLessonIds);
+    validateShared(problem, label, errors, knownRequirementIds, knownLessonIds, explanationSectionLessons);
     if (problem.type === 'mark-parts') validateMarkParts(problem, label, errors);
     if (problem.type === 'modifier-connection-viewer') validateModifierConnection(problem, label, errors);
     if (problem.type === 'grammar-classifier') validateGrammarClassifier(problem, label, errors);

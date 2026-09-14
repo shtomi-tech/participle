@@ -895,6 +895,34 @@ Word Orderは既存`WordOrderBuilder`をそのまま再利用し、既存Problem
 - Explanation / Exam / entrance Word Orderの出典に`heading`、`lineStart`、`lineEnd`、`concept`を持たせ、OCR行数・見出し存在・範囲・非空概念を`npm run check`で検証します。section内の出典は閉じたnative `details`で確認できます。
 - 入試4択の誤答には少なくとも2件の`distractorReview`を紐づけ、日本語中心の見出しへ更新しました。
 
+## Phase 7 implementation update — Explanation-aligned Practice
+
+Phase 7以降のPracticeは、固定した日本語解説を起点に次の順で構成する。
+
+```text
+Japanese Explanation is frozen.
+Interactive Check explains the explanation.
+Exam Practice tests transfer.
+Word Order is used only when syntax construction is itself instructional.
+```
+
+日本語解説を正本として固定する。Interactive Checkは解説を理解するために置く。4択は初見英文への転移を確認する。語句整序は、語順・修飾構造の構築そのものに学習価値がある場合だけ使う。解説ファイルのhashは`scripts/frozen-lesson-content.json`に保存し、`npm run check`で変更を拒否する。
+
+Interactive Checkは24 Step（L1=3、L2=4、L3=3、L4=6、L5=4、L6=4）、Exam Multiple Choiceは20問、Entrance Word Orderは6問（L1=0、L2=0、L3=2、L4=2、L5=0、L6=2）とする。既存の9 Interaction ComponentとそのAPIは変更しない。
+
+### Practice Traceability Matrix
+
+| Lesson | Explanation Section | Interactive Problem | Exam Problem | Word Order Problem | Learning Requirement |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `PART-L1-EXPLAIN-01`, `-02` | `PART-L1-P004-COMPARE`, `PART-L1-P001-MARK`, `PART-L1-P002-CLASS` | `PART-L1-EXAM-001`, `-002` | — | 分詞は動詞由来で名詞を説明する形容詞的要素 |
+| 2 | `PART-L2-EXPLAIN-01`, `-02`, `-03` | `PART-L2-P001-COMPARE`, `PART-L2-P002-CLASS`, `PART-L2-P003-ERROR`, `PART-L2-P004-COMPARE` | `PART-L2-EXAM-001`, `-002`, `-003` | — | 名詞がする・される・変化が完了した関係から形を選ぶ |
+| 3 | `PART-L3-EXPLAIN-01`, `-02`, `-03` | `PART-L3-P001-POSITION`, `PART-L3-P002-POSITION`, `PART-L3-P004-COMPARE` | `PART-L3-EXAM-001`, `-002` | `PART-L3-EXAM-WORD-001`, `-002` | 1語の前置、分詞句の後置、1語後置の文脈 |
+| 4 | `PART-L4-EXPLAIN-01`, `-02`, `-03` | `PART-L4-P001-MARK`, `PART-L4-P001-REL`, `PART-L4-P002-MARK`, `PART-L4-P002-REL`, `PART-L4-P003-MARK`, `PART-L4-P003-REL` | `PART-L4-EXAM-001`〜`-004` | `PART-L4-EXAM-WORD-001`, `-002` | Hidden S-Vで対象名詞・元動詞・能動受動・形を判断 |
+| 5 | `PART-L5-EXPLAIN-01`, `-02` | `PART-L5-P002-COMPARE`, `PART-L5-P001-GIVER-RECEIVER`, `PART-L5-P003-COMPARE-BORING`, `PART-L5-P004-CONTEXT` | `PART-L5-EXAM-001`〜`-004` | — | 感情のgiver/causeとreceiver/experiencerから-ing/-edを選ぶ |
+| 6 | `PART-L6-EXPLAIN-01`, `-02`, `-03` | `PART-L6-IC-001-MARK`, `PART-L6-IC-002-REL`, `PART-L6-IC-003-FORM`, `PART-L6-IC-004-POSITION` | `PART-L6-EXAM-001`〜`-005` | `PART-L6-EXAM-WORD-001`, `-002` | 同じ英文をtarget noun、base verb、関係、形、位置まで処理する |
+
+全Practice Problemは`contentRefs`で同一Lessonの固定Explanation sectionへ結び付く。`validateProblems`は空配列、重複、未知ID、別Lessonの参照を拒否し、`scripts/check.mjs`はMatrixの数とLesson構成を検証する。
+
 ## Deployment
 
 - GitHub Pagesは`.github/workflows/pages.yml`で`main`の`dist`を公開し、`.github/workflows/ci.yml`は検証専用とする。

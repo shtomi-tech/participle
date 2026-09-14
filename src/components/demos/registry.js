@@ -13,7 +13,7 @@ export const demoRegistry = {
   'mark-parts': { mount: mountMarkTheParts, demoProblemId: 'PART-L4-P001-MARK' },
   'modifier-connection-viewer': { mount: mountModifierConnectionViewer, demoProblemId: 'PART-L4-P001-REL' },
   'grammar-classifier': { mount: mountGrammarClassifier, demoProblemId: 'PART-L1-P002-CLASS' },
-  'word-order': { mount: mountWordOrderBuilder, demoProblemId: 'PART-L1-P003-WORD' },
+  'word-order': { mount: mountWordOrderBuilder, demoProblemId: 'PART-L3-EXAM-WORD-001' },
   'sentence-comparison': { mount: mountSentenceComparison, demoProblemId: 'PART-L1-P004-COMPARE' },
   'error-corrector': { mount: mountErrorCorrector, demoProblemId: 'PART-L2-P003-ERROR' },
   'modifier-positioner': { mount: mountModifierPositioner, demoProblemId: 'PART-L3-P001-POSITION' },
