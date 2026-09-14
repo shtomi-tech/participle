@@ -890,13 +890,13 @@ Word Orderは既存`WordOrderBuilder`をそのまま再利用し、既存Problem
 ## Phase 6 implementation update
 
 - `PROJECT_GOAL.md`をExplanation-firstの現行方針と整合させ、`DESIGN.md`にも固定の整合性マーカーを置きました。
-- Pages自動デプロイWorkflowを削除し、`scripts/check.mjs`がすべてのYAML workflowからPages権限・deploy actionを検出します。リポジトリの公開範囲は変更していません。
+- GitHub Pagesの自動デプロイWorkflowを`.github/workflows/pages.yml`として有効化し、`scripts/check.mjs`はCI workflowだけをvalidation-onlyとして検査します。リポジトリの公開範囲は変更していません。
 - Lesson 1・3・6の例文、評価問題の曖昧な目的語補語に見える例、Lesson 6のWord Orderを修正しました。入試Word Orderは`assessmentKind: 'entrance'`で8問に分離し、Lesson 1の基本Interactionは評価欄に混ぜません。
 - Explanation / Exam / entrance Word Orderの出典に`heading`、`lineStart`、`lineEnd`、`concept`を持たせ、OCR行数・見出し存在・範囲・非空概念を`npm run check`で検証します。section内の出典は閉じたnative `details`で確認できます。
 - 入試4択の誤答には少なくとも2件の`distractorReview`を紐づけ、日本語中心の見出しへ更新しました。
 
 ## Deployment
 
-- GitHub Pagesの自動デプロイWorkflowはPhase 6で削除し、CIは検証専用とする。
+- GitHub Pagesは`.github/workflows/pages.yml`で`main`の`dist`を公開し、`.github/workflows/ci.yml`は検証専用とする。
 - リポジトリの公開・非公開設定はこの実装では変更しない。
 - 既存の公開URLや過去の公開物は、現在のリリース操作や検証結果を示すものとして扱わない。

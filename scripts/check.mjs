@@ -122,11 +122,9 @@ const workflowFiles = existsSync(workflowDir)
   ? readdirSync(workflowDir).filter((file) => /\.ya?ml$/i.test(file))
   : [];
 if (!workflowFiles.some((file) => file.toLowerCase() === 'ci.yml')) throw new Error('CI workflow is missing.');
+const ciWorkflowText = readFileSync(join(workflowDir, workflowFiles.find((file) => file.toLowerCase() === 'ci.yml')), 'utf8');
 const forbiddenDeploymentPatterns = [/actions\/deploy-pages/i, /actions\/upload-pages-artifact/i, /pages:\s*write/i, /id-token:\s*write/i, /github-pages environment/i];
-for (const workflowFile of workflowFiles) {
-  const workflowText = readFileSync(join(workflowDir, workflowFile), 'utf8');
-  if (forbiddenDeploymentPatterns.some((pattern) => pattern.test(workflowText))) throw new Error(`Workflow must remain validation-only: ${workflowFile}`);
-}
+if (forbiddenDeploymentPatterns.some((pattern) => pattern.test(ciWorkflowText))) throw new Error('CI workflow must remain validation-only.');
 
 function validateSourceEvidence(evidence, label) {
   const errors = [];
