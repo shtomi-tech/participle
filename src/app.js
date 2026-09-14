@@ -265,5 +265,8 @@ function render() {
   else renderHome();
 }
 
-window.addEventListener('hashchange', render);
+window.addEventListener('hashchange', () => {
+  render();
+  window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+});
 render();
