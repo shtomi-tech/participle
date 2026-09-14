@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node tests/logic.test.js",
+    "test": "node --test tests/logic.test.js tests/participle-spec.test.js",
     "check": "node scripts/check.mjs",
     "build": "node scripts/build.mjs",
     "test:runtime": "playwright test",

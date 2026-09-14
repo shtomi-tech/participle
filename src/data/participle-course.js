@@ -19,6 +19,7 @@ export const participleLessons = [
         title: '分詞と分詞構文は、別もの。',
         description: 'このLessonで扱うのは「分詞」。分詞は、名詞を説明する「形容詞」の仲間です。',
         kind: 'intro',
+        lookSentences: ['The girl is tall.', 'The girl is dancing.'],
         cards: [
           { id: 'participle', title: '分詞', detail: '形容詞として働く', badge: 'TODAY' },
           { id: 'participle-clause', title: '分詞構文', detail: '副詞として働く', badge: 'NOT TODAY' },
@@ -36,6 +37,8 @@ export const participleLessons = [
         title: '名詞を説明する働きに気づく',
         description: 'cute と smiling の共通点を確認し、Lesson 5への伏線にも触れます。',
         kind: 'try-intro',
+        rule: ['分詞は', '名詞を説明する', '「形容詞」の仲間'],
+        callback: { prompt: 'surprise = ?', answerText: '驚かせる', explanation: 'なぜ surprise が「驚かせる」なのかは、Lesson 5で解明します。' },
         question: {
           id: 'l1-surprise',
           prompt: 'surprise = ?',
@@ -50,8 +53,8 @@ export const participleLessons = [
         description: '分詞が形容詞の仲間として働くことを、2問で確認します。',
         kind: 'quiz',
         questions: [
-          { id: 'l1-q1', prompt: 'Look at the smiling baby.\nsmiling の働きは？', choices: [choice('noun', '名詞'), choice('adjective', '形容詞'), choice('adverb', '副詞')], answer: 'adjective', reason: 'smiling は baby を説明する形容詞の仲間です。' },
-          { id: 'l1-q2', prompt: 'The girl is dancing.\nこのLessonでは dancing を何の仲間として見る？', choices: [choice('adjective', '形容詞'), choice('preposition', '前置詞'), choice('conjunction', '接続詞')], answer: 'adjective', reason: 'このLessonでは、形容詞と同じように説明する働きに注目します。' },
+          { id: 'l1-q1', prompt: 'Look at the smiling baby.\nsmiling は何を説明していますか？', choices: [choice('baby', 'baby'), choice('look', 'look'), choice('sentence', '文全体')], answer: 'baby', reason: 'smiling は baby がどんなものかを説明しています。' },
+          { id: 'l1-q2', prompt: 'the broken window\nbroken は何を説明していますか？', choices: [choice('window', 'window'), choice('the', 'the'), choice('sentence', '文全体')], answer: 'window', reason: 'broken は window がどんなものかを説明しています。' },
         ],
       },
       { id: 'summary', title: '今日のまとめ', description: '分詞を見たときの最初の見方を一行で覚えます。', kind: 'summary' },
@@ -85,7 +88,7 @@ export const participleLessons = [
         questions: [
           { id: 'l2-q1', prompt: 'the dog running in the park\ndog と run の関係は？', choices: [choice('active', 'dog が run する'), choice('passive', 'dog が run される')], answer: 'active', reason: 'dog が run する側なので running です。' },
           { id: 'l2-q2', prompt: 'the car used by Jun\ncar と use の関係は？', choices: [choice('active', 'car が use する'), choice('passive', 'car が use される')], answer: 'passive', reason: 'car は Jun に use される側なので used です。' },
-          { id: 'l2-q3', prompt: '-ing = ______\np.p. = ______', choices: [choice('active-passive', '能動 / 受動'), choice('passive-active', '受動 / 能動')], answer: 'active-passive', reason: '-ing はする側、p.p. はされる側です。' },
+          { id: 'l2-q3', kind: 'drag-rule', prompt: 'カードを正しい関係へ移動してください。', dragItems: [{ id: 'ing', text: '-ing' }, { id: 'pp', text: 'p.p.' }], dragTargets: [{ id: 'active', text: '能動・する側' }, { id: 'passive', text: '受動・される側' }], answer: 'active-passive', reason: '-ing はする側、p.p. はされる側です。' },
         ],
       },
       { id: 'summary', title: '今日のまとめ', description: '語尾ではなく、動作の向きを思い出します。', kind: 'summary' },
@@ -98,17 +101,18 @@ export const participleLessons = [
     title: '分詞はどこに置く？',
     shortTitle: '分詞の位置',
     goal: '1語なら前、説明が長ければ後ろという基本位置を体験する。',
-    summary: '1語なら前。説明が2語以上になったら後ろ。',
+    summary: '原則：\n1語なら前\n2語以上なら後ろ',
     stages: [
-      { id: 'look', title: '1語の分詞は名詞の前', description: 'laughing だけなら1語。名詞の前に置きます。', kind: 'one-word' },
+      { id: 'look', title: '1語の分詞は名詞の前', description: 'laughing だけなら1語。原則として名詞の前に置きます。', kind: 'one-word' },
       { id: 'notice', title: '説明が長くなったら後ろへ', description: 'at the clown を laughing に追加して、分詞句を作ります。', kind: 'build-phrase' },
-      { id: 'try', title: '長い説明は後ろから', description: '分詞以外にも、長い説明を後ろに置く例があります。', kind: 'position-compare' },
+      { id: 'try', title: '長い説明は後ろから', description: '分詞以外にも、長い説明を後ろに置く例があります。', kind: 'position-compare', advanced: { title: 'ADVANCED：1語でも後ろに置くことがあります。', body: '前：一般的・特徴として説明することがあります。\n後ろ：その場の具体的な様子を表すことがあります。\nthe dancing girl / the girl dancing' } },
       {
         id: 'check', title: 'Lesson 3 確認問題', description: '語数と位置の関係を3問で確認します。', kind: 'quiz',
         questions: [
           { id: 'l3-q1', prompt: 'smiling / baby\n正しい順番は？', choices: [choice('front', 'the smiling baby'), choice('back', 'the baby smiling')], answer: 'front', reason: 'smiling は1語なので名詞 baby の前に置きます。' },
           { id: 'l3-q2', prompt: 'smiling at her mother / baby\n正しい順番は？', choices: [choice('back', 'the baby smiling at her mother'), choice('front', 'the smiling at her mother baby')], answer: 'back', reason: '分詞に情報が続く2語以上の分詞句なので後ろに置きます。' },
-          { id: 'l3-q3', prompt: 'the car ___\n前に置けるのは？', choices: [choice('used', 'used car'), choice('used-by-jun', 'used by Jun car')], answer: 'used', reason: 'used だけなら1語なので used car と前置できます。' },
+          { id: 'l3-q3', prompt: 'used / car\n正しい順番は？', choices: [choice('used', 'the used car'), choice('used-by-jun', 'the car used by Jun')], answer: 'used', reason: 'used だけなら1語なので the used car と前置できます。' },
+          { id: 'l3-q4', prompt: 'used by Jun / car\n正しい順番は？', choices: [choice('used-by-jun', 'the car used by Jun'), choice('used', 'the used by Jun car')], answer: 'used-by-jun', reason: 'used by Jun は2語以上の分詞句なので the car used by Jun と後置します。' },
         ],
       },
       { id: 'summary', title: '今日のまとめ', description: '分詞の長さを見て、置き場所を決めます。', kind: 'summary' },
@@ -124,8 +128,14 @@ export const participleLessons = [
     summary: '迷ったら日本語訳ではなく、「名詞がする / される」を見る。',
     stages: [
       { id: 'look', title: 'WHO DOES IT?', description: '-ing か p.p. か迷ったら、まず「誰がその動作をする？」と考えます。', kind: 'sv-flow' },
-      { id: 'notice', title: '関係を先に決める', description: '形を選ぶ前に、名詞と元動詞をクリックして関係を作ります。', kind: 'sv-cases' },
-      { id: 'try', title: '関係判定 → 形選択', description: '2段階で判断する練習です。BONUSでは例外も確認できます。', kind: 'rapid-judge' },
+      {
+        id: 'notice', title: '関係を先に決める', description: '形を選ぶ前に、名詞と元動詞をクリックして関係を作ります。', kind: 'sv-cases',
+        cases: [
+          { id: 'l4-case-1', sentence: 'the baby ___ at her mother', noun: 'baby', verb: 'smile', relationAnswer: 'active', relationSentence: 'baby smiles.', forms: [choice('smiling', 'smiling'), choice('smiled', 'smiled')], formAnswer: 'smiling', relationReason: 'baby が smile する' },
+          { id: 'l4-case-2', sentence: 'the language ___ in that country', noun: 'language', verb: 'speak', relationAnswer: 'passive', relationSentence: 'language is spoken.', forms: [choice('speaking', 'speaking'), choice('spoken', 'spoken')], formAnswer: 'spoken', relationReason: 'language が speak される' },
+        ],
+      },
+      { id: 'try', title: '関係判定 → 形選択', description: '2段階で判断する練習です。BONUSでは例外も確認できます。', kind: 'rapid-judge', rapid: { sentence: 'the dog ___ in the park', noun: 'dog', verb: 'run', relationAnswer: 'active', forms: [choice('running', 'running'), choice('run', 'run')], formAnswer: 'running' } },
       {
         id: 'check', title: 'Lesson 4 確認問題', description: '各問題で、SV関係と分詞の形を両方答えます。', kind: 'relation-quiz',
         questions: [
@@ -151,21 +161,21 @@ export const participleLessons = [
       {
         id: 'try', title: '感情動詞を仲間分けする', description: 'Vocabulary Drawerは、暗記テストではなく語の方向を眺める場所です。', kind: 'emotion-vocabulary',
         categories: [
-          { id: 'joy', title: 'ワクワク・喜び', words: ['amuse', 'excite', 'thrill', 'please', 'satisfy'] },
-          { id: 'charm', title: '感動・魅了', words: ['move', 'impress', 'attract', 'fascinate'] },
-          { id: 'surprise', title: '驚き・疲れ・失望', words: ['surprise', 'amaze', 'bore', 'exhaust', 'disappoint'] },
-          { id: 'fear', title: '怒り・恐怖', words: ['annoy', 'upset', 'scare', 'frighten'] },
+          { id: 'joy', title: 'ワクワク・喜び', words: ['amuse', 'excite', 'thrill', 'please', 'delight', 'satisfy', 'relieve'] },
+          { id: 'charm', title: '感動・魅了', words: ['move', 'touch', 'impress', 'attract', 'fascinate', 'absorb'] },
+          { id: 'surprise', title: '驚き・疲れ・失望', words: ['surprise', 'amaze', 'bore', 'exhaust', 'embarrass', 'disappoint'] },
+          { id: 'fear', title: '怒り・恐怖', words: ['annoy', 'irritate', 'offend', 'upset', 'scare', 'frighten', 'alarm'] },
         ],
         advanced: { title: 'ADVANCED：別の形容詞を使うこともある', body: 'attract → attractive / impress → impressive / scare → scary / satisfy → satisfactory' },
       },
       {
         id: 'check', title: 'Lesson 5 最終確認問題', description: '5問中4問以上の正解で COMPLETE です。', kind: 'final-quiz',
         questions: [
-          { id: 'l5-q1', prompt: 'English is the language (speaking / spoken) in many countries.', choices: [choice('speaking', 'speaking'), choice('spoken', 'spoken')], answer: 'spoken', reason: 'language が speak されるので spoken です。', review: 'Lesson 4「SV関係で判別」' },
-          { id: 'l5-q2', prompt: 'Look at the dog (running / run) in the park.', choices: [choice('running', 'running'), choice('run', 'run')], answer: 'running', reason: 'dog が run するので running です。', review: 'Lesson 4「SV関係で判別」' },
-          { id: 'l5-q3', prompt: 'The movie was so (boring / bored) that I fell asleep.', choices: [choice('boring', 'boring'), choice('bored', 'bored')], answer: 'boring', reason: 'movie が私を退屈させるので boring です。', review: 'Lesson 5「感情を与える側 / 与えられる側」' },
-          { id: 'l5-q4', prompt: 'I was (exciting / excited) to hear the news.', choices: [choice('exciting', 'exciting'), choice('excited', 'excited')], answer: 'excited', reason: 'I はワクワクさせられた側なので excited です。', review: 'Lesson 5「感情を与える側 / 与えられる側」' },
-          { id: 'l5-q5', prompt: 'Tom is an (interesting / interested) person.', choices: [choice('interesting', 'interesting'), choice('interested', 'interested')], answer: 'interesting', reason: 'Tom は周りに興味を持たせる側なので interesting です。', review: 'Lesson 5「感情を与える側 / 与えられる側」' },
+          { id: 'l5-q1', prompt: 'English is the language (speaking / spoken) in many countries.', noun: 'language', verb: 'speak', relationAnswer: 'passive', choices: [choice('speaking', 'speaking'), choice('spoken', 'spoken')], answer: 'spoken', reason: 'language が speak されるので spoken です。', review: 'Lesson 4「SV関係で判別」' },
+          { id: 'l5-q2', prompt: 'Look at the dog (running / run) in the park.', noun: 'dog', verb: 'run', relationAnswer: 'active', choices: [choice('running', 'running'), choice('run', 'run')], answer: 'running', reason: 'dog が run するので running です。', review: 'Lesson 4「SV関係で判別」' },
+          { id: 'l5-q3', prompt: 'The movie was so (boring / bored) that I fell asleep.', noun: 'movie', verb: 'bore', relationAnswer: 'active', choices: [choice('boring', 'boring'), choice('bored', 'bored')], answer: 'boring', reason: 'movie が人を退屈させるので boring です。', review: 'Lesson 5「感情を与える側 / 与えられる側」' },
+          { id: 'l5-q4', prompt: 'I was (exciting / excited) to hear the news.', noun: 'I', verb: 'excite', relationAnswer: 'passive', choices: [choice('exciting', 'exciting'), choice('excited', 'excited')], answer: 'excited', reason: 'I はワクワクさせられた側なので excited です。', review: 'Lesson 5「感情を与える側 / 与えられる側」' },
+          { id: 'l5-q5', prompt: 'Tom is an (interesting / interested) person.', noun: 'Tom', verb: 'interest', relationAnswer: 'active', choices: [choice('interesting', 'interesting'), choice('interested', 'interested')], answer: 'interesting', reason: 'Tom は周りに興味を持たせる側なので interesting です。', review: 'Lesson 5「感情を与える側 / 与えられる側」' },
         ],
       },
       { id: 'summary', title: 'COMPLETE', description: '分詞の基本ルールを、次の英文でも使ってみましょう。', kind: 'summary' },

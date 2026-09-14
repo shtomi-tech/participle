@@ -1,12 +1,14 @@
 import { PARTICIPLE_PROGRESS_KEY } from '../data/participle-course.js';
 
 function emptyLesson() {
-  return { completed: false, quizScore: 0 };
+  return { completed: false, currentStep: 0, completedSteps: [], quizScore: 0, quizResults: {} };
 }
 
 export function defaultParticipleProgress() {
-  return { lesson1: emptyLesson(), lesson2: emptyLesson(), lesson3: emptyLesson(), lesson4: emptyLesson(), lesson5: { ...emptyLesson(), finalPassed: false }, currentLesson: 1 };
+  return { lesson1: emptyLesson(), lesson2: emptyLesson(), lesson3: emptyLesson(), lesson4: emptyLesson(), lesson5: { ...emptyLesson(), answerScore: 0, reasoningScore: 0, finalPassed: false }, currentLesson: 1 };
 }
+
+const stageIds = new Set(['look', 'notice', 'try', 'check', 'summary']);
 
 function isRecord(value) {
   return value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -20,7 +22,17 @@ export function normalizeParticipleProgress(value) {
     const key = `lesson${index}`;
     const source = isRecord(value[key]) ? value[key] : {};
     result[key].completed = source.completed === true;
+    result[key].currentStep = Number.isInteger(source.currentStep) ? Math.min(4, Math.max(0, source.currentStep)) : source.completed === true ? 4 : 0;
+    result[key].completedSteps = Array.isArray(source.completedSteps)
+      ? [...new Set(source.completedSteps.filter((step) => typeof step === 'string' && stageIds.has(step)))]
+      : [];
+    if (result[key].completed && result[key].completedSteps.length === 0) result[key].completedSteps = [...stageIds];
     result[key].quizScore = Number.isFinite(source.quizScore) ? Math.max(0, Math.floor(source.quizScore)) : 0;
+    result[key].quizResults = isRecord(source.quizResults) ? structuredClone(source.quizResults) : {};
+    if (index === 5) {
+      result[key].answerScore = Number.isFinite(source.answerScore) ? Math.max(0, Math.floor(source.answerScore)) : 0;
+      result[key].reasoningScore = Number.isFinite(source.reasoningScore) ? Math.max(0, Math.floor(source.reasoningScore)) : 0;
+    }
     if (index === 5) result[key].finalPassed = source.finalPassed === true;
   }
   result.currentLesson = Number.isInteger(value.currentLesson) ? Math.min(5, Math.max(1, value.currentLesson)) : 1;

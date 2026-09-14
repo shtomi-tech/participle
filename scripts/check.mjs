@@ -11,6 +11,7 @@ import { validateDemoRegistry, validateProblems } from '../src/lib/validateProbl
 import { validateLessons } from '../src/lib/validateLessons.js';
 import { validateLessonContents } from '../src/lib/validateLessonContent.js';
 import { validateFrozenLessonContent } from './frozen-content.mjs';
+import { participleLessons } from '../src/data/participle-course.js';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const ocrSources = new Map([
@@ -78,6 +79,8 @@ const sourceFiles = [
   'src/components/participle/SVRelationJudge.js',
   'src/components/participle/ChoiceQuestion.js',
   'src/components/participle/FeedbackPanel.js',
+  'src/components/participle/SentenceDisplay.js',
+  'src/components/participle/LessonCompletePanel.js',
   'src/components/participle/RuleSummary.js',
   'src/components/participle/AdvancedDrawer.js',
   'src/components/participleLessonPlayer.js',
@@ -87,6 +90,8 @@ const sourceFiles = [
   'scripts/check.mjs',
   'scripts/frozen-content.mjs',
   'tests/logic.test.js',
+  'tests/participle-spec.test.js',
+  'tests/browser/participle-spec.spec.js',
 ];
 
 for (const relativePath of sourceFiles) {
@@ -97,6 +102,16 @@ for (const relativePath of sourceFiles) {
     process.stderr.write(result.stderr);
     process.exit(result.status ?? 1);
   }
+}
+
+const specStageIds = ['look', 'notice', 'try', 'check', 'summary'];
+for (const lesson of participleLessons) {
+  if (lesson.stages.length !== specStageIds.length) throw new Error(`${lesson.id} must have five spec stages.`);
+  if (lesson.stages.some((stage, index) => stage.id !== specStageIds[index])) throw new Error(`${lesson.id} spec stages are out of order.`);
+}
+const lesson5Final = participleLessons.find((lesson) => lesson.id === 'PART-L5')?.stages.find((stage) => stage.kind === 'final-quiz');
+if (!lesson5Final || lesson5Final.questions.length !== 5 || lesson5Final.questions.some((question) => !question.noun || !question.verb || !question.relationAnswer)) {
+  throw new Error('Lesson 5 Final Check must contain five two-stage relation questions.');
 }
 
 const lessonIds = new Set(lessons.map((lesson) => lesson.id));

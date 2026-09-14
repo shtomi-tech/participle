@@ -931,6 +931,12 @@ Problem 101と104は、OCRの残存断片・解答解説・文法関係から最
 
 Lesson 6の実践UIは、既存の`ExamMultipleChoice`を共通実装として再利用し、`renderAfterExplanation`の拡張点からStructure問題の`analysisSteps`（predicate、modifier、target、base、relation、answer）を表示する。専用の選択・採点・Reset実装やComponent APIは増やさない。`PART-L6-PRACTICE-106`〜`110`は、述語動詞と名詞修飾を分ける6段階の分析を回帰テストで固定する。
 
+## Lesson 1-5 specification flow update
+
+Lesson 1〜5には、旧Interactionを壊さず、`src/data/participle-course.js`を教材データの正本とする5段階の仕様フロー（LOOK、NOTICE、TRY / BUILD、CHECK、SUMMARY）を追加した。`participleLessonPlayer.js`は、名詞と元動詞の関係を共通軸に、Lesson 2・4・5で`RelationArrow`と`SVRelationJudge`を再利用する。Lesson 5のFinal Checkは、関係判定と形選択を分け、`ANSWERS`と`REASONING`を別スコアとして表示する。
+
+進捗は既存の`participle.lesson-progress.v1`キーを維持し、現在Lesson・現在Step・完了Step・回答結果・Lesson 5の2種スコアをlocalStorageへ保存する。`prefers-reduced-motion`、390px幅、クリック代替付きのドラッグ操作、`aria-live`フィードバックを実装し、仕様フローの契約とブラウザ経路を`tests/participle-spec.test.js`および`tests/browser/participle-spec.spec.js`で検証する。
+
 ## Deployment
 
 - GitHub Pagesは`.github/workflows/pages.yml`で`main`の`dist`を公開し、`.github/workflows/ci.yml`は検証専用とする。
