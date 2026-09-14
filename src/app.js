@@ -1,7 +1,9 @@
 import { escapeHtml } from './lib/dom.js';
 import { getLessonBySlug, lessons } from './data/lessons.js';
-import { getProblemById } from './data/problems/index.js';
+import { getLessonContent } from './data/content/index.js';
+import { getProblemById, getProblemsByType } from './data/problems/index.js';
 import { mountDemoProblem } from './components/demos/registry.js';
+import { mountExplanation, renderExplanationClosing } from './components/explanation/explanationRenderer.js';
 import { getLessonProgress, isLessonStepComplete, markLessonStepComplete } from './lib/lesson-progress.js';
 
 const app = document.querySelector('#app');
@@ -23,20 +25,60 @@ function renderHome() {
     </article>`).join('');
   app.innerHTML = `
     <main class="home shell">
-      <p class="eyebrow">Participle / vertical slice</p>
+      <p class="eyebrow">Participle / explanation first</p>
       <h1>分詞を見たら、<span>名詞と動詞の関係を見る。</span></h1>
-      <p class="lead">分詞の形を暗記する前に、説明される名詞と元動詞の関係を操作して確かめます。</p>
+      <p class="lead">解説と例文を先に読み、文構造を見てからInteractionで確認し、最後に大学入試形式へ応用します。</p>
+      <p class="learning-loop" aria-label="Learning loop">LEARN → SEE → TOUCH → PRACTICE → REVIEW</p>
       <section class="lesson-list" aria-label="Lessons">
         ${lessonCards}
       </section>
     </main>`;
 }
 
+function setupAssessment({ section, type, problems, heading, counter, componentRoot, previous, next }) {
+  if (problems.length === 0) {
+    section.hidden = true;
+    return () => {};
+  }
+
+  let problemIndex = 0;
+  let cleanup = null;
+
+  function renderAssessment(shouldFocus = false) {
+    cleanup?.();
+    cleanup = null;
+    const problem = problems[problemIndex];
+    counter.textContent = `${problemIndex + 1} / ${problems.length}`;
+    heading.textContent = `${type === 'exam-multiple-choice' ? '4択問題' : '語句整序問題'} ${problemIndex + 1} / ${problems.length}`;
+    previous.disabled = problemIndex === 0;
+    next.disabled = problemIndex === problems.length - 1;
+    cleanup = mountDemoProblem(type, componentRoot, problem, { onComplete() {} });
+    if (shouldFocus) heading.focus({ preventScroll: true });
+  }
+
+  previous.addEventListener('click', () => {
+    if (problemIndex === 0) return;
+    problemIndex -= 1;
+    renderAssessment(true);
+  });
+  next.addEventListener('click', () => {
+    if (problemIndex >= problems.length - 1) return;
+    problemIndex += 1;
+    renderAssessment(true);
+  });
+  renderAssessment();
+  return () => cleanup?.();
+}
+
 function renderLesson(lesson) {
   document.title = `${lesson.label}: ${lesson.title}`;
+  const content = getLessonContent(lesson.id);
+  if (!content) throw new Error(`Missing lesson content: ${lesson.id}`);
   const lessonIndex = lessons.findIndex((entry) => entry.id === lesson.id);
   const previousLesson = lessons[lessonIndex - 1];
   const nextLesson = lessons[lessonIndex + 1];
+  const examProblems = getProblemsByType('exam-multiple-choice').filter((problem) => problem.lessonId === lesson.id);
+  const wordOrderProblems = getProblemsByType('word-order').filter((problem) => problem.lessonId === lesson.id);
   let stepIndex = 0;
   let completedStepIds = new Set();
   let cleanup = null;
@@ -50,22 +92,72 @@ function renderLesson(lesson) {
         <p>${escapeHtml(lesson.description)}</p>
         <div class="goal"><span>Learning goal</span><p>${escapeHtml(lesson.learningGoal)}</p></div>
       </header>
-      <section class="lesson-player" aria-labelledby="step-title">
-        <div class="progress-row"><strong data-step-label></strong><span data-progress-text></span></div>
-        <div class="progress-bar" aria-hidden="true"><span data-progress-bar></span></div>
-        <div class="step-copy"><p class="eyebrow">Current step</p><h2 id="step-title" tabindex="-1" data-step-title></h2><p data-step-instruction></p></div>
-        <div class="lesson-component" data-lesson-component></div>
-        <div class="lesson-completion" data-lesson-completion role="status" aria-live="polite"></div>
-        <nav class="lesson-navigation" aria-label="Lesson navigation">
-          <button class="button secondary" type="button" data-previous>← Previous</button>
-          <button class="button" type="button" data-next>Next →</button>
-        </nav>
-        <nav class="lesson-switcher" aria-label="Move between lessons">
-          ${previousLesson ? `<a class="button secondary" href="#lessons/${escapeHtml(previousLesson.slug)}">← ${escapeHtml(previousLesson.label)}</a>` : '<span></span>'}
-          ${nextLesson ? `<a class="button secondary" href="#lessons/${escapeHtml(nextLesson.slug)}">${escapeHtml(nextLesson.label)} →</a>` : '<span class="lesson-switcher-end">All foundation lessons shown</span>'}
-        </nav>
+
+      <section class="lesson-explanation-shell" data-lesson-explanation aria-labelledby="learn-heading">
+        <p class="eyebrow">LEARN · SEE</p>
+        <h2 id="learn-heading">このLessonで学ぶこと</h2>
+        <div data-explanation-root></div>
       </section>
+
+      <section class="lesson-interactive" data-lesson-interactive aria-labelledby="interactive-heading">
+        <p class="eyebrow">TOUCH</p>
+        <h2 id="interactive-heading">Interactive Check</h2>
+        <p class="lesson-transition">ここまで学んだ内容を、実際に操作して確認しましょう。</p>
+        <div class="lesson-player" aria-labelledby="step-title">
+          <div class="progress-row"><strong data-step-label></strong><span data-progress-text></span></div>
+          <div class="progress-bar" aria-hidden="true"><span data-progress-bar></span></div>
+          <div class="step-copy"><p class="eyebrow">Current step</p><h3 id="step-title" tabindex="-1" data-step-title></h3><p data-step-instruction></p></div>
+          <div class="lesson-component" data-lesson-component></div>
+          <div class="lesson-completion" data-lesson-completion role="status" aria-live="polite"></div>
+          <nav class="lesson-navigation" aria-label="Lesson navigation">
+            <button class="button secondary" type="button" data-previous>← Previous</button>
+            <button class="button" type="button" data-next>Next →</button>
+          </nav>
+        </div>
+      </section>
+
+      <section class="lesson-assessment" data-assessment-section="exam" aria-labelledby="exam-heading">
+        <p class="eyebrow">PRACTICE</p>
+        <h2 id="exam-heading">大学入試形式に挑戦</h2>
+        <p class="assessment-introduction">解説した判断ルールを、初見に近い4択問題へ適用します。誤答しても正答と全選択肢の理由を確認して次へ進めます。</p>
+        <div class="assessment-player">
+          <div class="assessment-progress"><strong data-exam-heading tabindex="-1"></strong><span data-exam-counter></span></div>
+          <div data-exam-component></div>
+          <nav class="assessment-navigation" aria-label="4択問題 navigation">
+            <button class="button secondary" type="button" data-exam-previous>← 前の問題</button>
+            <button class="button" type="button" data-exam-next>次の問題 →</button>
+          </nav>
+        </div>
+      </section>
+
+      <section class="lesson-assessment" data-assessment-section="word-order" aria-labelledby="word-order-heading">
+        <p class="eyebrow">PRACTICE</p>
+        <h2 id="word-order-heading">入試形式の語句整序に挑戦</h2>
+        <p class="assessment-introduction">語句のまとまりを組み立て、正解後に名詞・元動詞・分詞の関係を確認します。</p>
+        <div class="assessment-player">
+          <div class="assessment-progress"><strong data-word-order-heading tabindex="-1"></strong><span data-word-order-counter></span></div>
+          <div data-word-order-component></div>
+          <nav class="assessment-navigation" aria-label="語句整序問題 navigation">
+            <button class="button secondary" type="button" data-word-order-previous>← 前の問題</button>
+            <button class="button" type="button" data-word-order-next>次の問題 →</button>
+          </nav>
+        </div>
+      </section>
+
+      <section class="lesson-closing" data-lesson-closing aria-label="Lesson review">
+        <p class="eyebrow">REVIEW</p>
+        <div data-closing-root></div>
+      </section>
+
+      <nav class="lesson-switcher" aria-label="Move between lessons">
+        ${previousLesson ? `<a class="button secondary" href="#lessons/${escapeHtml(previousLesson.slug)}">← ${escapeHtml(previousLesson.label)}</a>` : '<span></span>'}
+        ${nextLesson ? `<a class="button secondary" href="#lessons/${escapeHtml(nextLesson.slug)}">${escapeHtml(nextLesson.label)} →</a>` : '<span class="lesson-switcher-end">All foundation lessons shown</span>'}
+      </nav>
     </main>`;
+
+  const explanationRoot = app.querySelector('[data-explanation-root]');
+  mountExplanation(explanationRoot, content, { includeClosingSections: false });
+  app.querySelector('[data-closing-root]').innerHTML = renderExplanationClosing(content);
 
   const stepLabel = app.querySelector('[data-step-label]');
   const progressText = app.querySelector('[data-progress-text]');
@@ -137,7 +229,33 @@ function renderLesson(lesson) {
     renderStep();
   });
 
+  const examCleanup = setupAssessment({
+    section: app.querySelector('[data-assessment-section="exam"]'),
+    type: 'exam-multiple-choice',
+    problems: examProblems,
+    heading: app.querySelector('[data-exam-heading]'),
+    counter: app.querySelector('[data-exam-counter]'),
+    componentRoot: app.querySelector('[data-exam-component]'),
+    previous: app.querySelector('[data-exam-previous]'),
+    next: app.querySelector('[data-exam-next]'),
+  });
+  const wordOrderCleanup = setupAssessment({
+    section: app.querySelector('[data-assessment-section="word-order"]'),
+    type: 'word-order',
+    problems: wordOrderProblems,
+    heading: app.querySelector('[data-word-order-heading]'),
+    counter: app.querySelector('[data-word-order-counter]'),
+    componentRoot: app.querySelector('[data-word-order-component]'),
+    previous: app.querySelector('[data-word-order-previous]'),
+    next: app.querySelector('[data-word-order-next]'),
+  });
+
   renderStep(false);
+  return () => {
+    cleanup?.();
+    examCleanup();
+    wordOrderCleanup();
+  };
 }
 
 function render() {

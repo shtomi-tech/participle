@@ -2,7 +2,10 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { learningRequirementIdSet, learningRequirementIds } from '../src/data/learning-requirements.js';
 import { lessons } from '../src/data/lessons.js';
-import { problemRegistry, problems } from '../src/data/problems/index.js';
+import { getProblemsByType, problemRegistry, problems } from '../src/data/problems/index.js';
+import { getLessonContent, lessonContents } from '../src/data/content/index.js';
+import { demoRegistry, getDemoProblem } from '../src/components/demos/registry.js';
+import { renderExplanationContent } from '../src/components/explanation/explanationRenderer.js';
 import { checkClassification } from '../src/lib/grammar/classification.js';
 import { getCorrectionByTokenId, hasCompletedAllCorrections, isAcceptedCorrection } from '../src/lib/grammar/error-correction.js';
 import { getRelationsForChunk, hasExploredAllRelations } from '../src/lib/grammar/modifier-relations.js';
@@ -13,7 +16,9 @@ import { checkWordOrder } from '../src/lib/grammar/word-order.js';
 import { getScenarioChoice, getScenarioStep, hasCompletedScenario, isAcceptedScenarioChoice } from '../src/lib/grammar/context-grammar.js';
 import { validateLessons } from '../src/lib/validateLessons.js';
 import { validateProblems } from '../src/lib/validateProblems.js';
+import { validateLessonContents } from '../src/lib/validateLessonContent.js';
 import { getLessonProgress, markLessonStepComplete } from '../src/lib/lesson-progress.js';
+import { evaluateExamChoice, getExamChoice, isCorrectExamChoice } from '../src/lib/grammar/exam-multiple-choice.js';
 
 test('target noun selection uses an exact accepted answer', () => {
   assert.equal(checkTokenSelection(['p1-baby'], ['p1-baby']), true);
@@ -62,10 +67,10 @@ test('error correction and modifier placement use declared answers', () => {
   assert.equal(getPlacementRelation(positionProblem, 'l3p1-before-noun').targetId, 'l3p1-lamp');
 });
 
-test('all Phase 4 data has source traceability, full LR coverage, and valid problem contracts', () => {
-  const result = validateProblems(problems, { knownRequirementIds: learningRequirementIdSet });
+test('all Phase 5 data has source traceability, full LR coverage, and valid problem contracts', () => {
+  const result = validateProblems(problems, { knownRequirementIds: learningRequirementIdSet, knownLessonIds: new Set(lessons.map((lesson) => lesson.id)) });
   assert.equal(result.valid, true, result.errors.join('\n'));
-  assert.equal(problems.length, 29);
+  assert.equal(problems.length, 57);
   assert.deepEqual(lessons.map((lesson) => lesson.id), ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4', 'PART-L5', 'PART-L6']);
   assert.ok(problems.every((problem) => problem.lessonId && problem.requirements.length > 0 && problem.sourceEvidence.source === 'chapter14-ocr.md'));
   const referencedRequirementIds = new Set(problems.flatMap((problem) => problem.requirements));
@@ -82,6 +87,64 @@ test('all Phase 4 data has source traceability, full LR coverage, and valid prob
   ]);
   assert.ok(lessons.at(-1).steps.every((step) => problemRegistry[step.problemId].requirements.includes('LR-PART-013')));
   assert.ok(['PART-L1-P001-MARK', 'PART-L4-P001-MARK', 'PART-L4-P004-REL'].every((id) => problemRegistry[id]));
+  assert.equal(getProblemsByType('exam-multiple-choice').length, 20);
+  assert.deepEqual(
+    Object.fromEntries(lessons.map((lesson) => [lesson.id, getProblemsByType('exam-multiple-choice').filter((problem) => problem.lessonId === lesson.id).length])),
+    { 'PART-L1': 2, 'PART-L2': 3, 'PART-L3': 2, 'PART-L4': 4, 'PART-L5': 4, 'PART-L6': 5 },
+  );
+  assert.deepEqual(
+    Object.fromEntries(lessons.map((lesson) => [lesson.id, getProblemsByType('word-order').filter((problem) => problem.lessonId === lesson.id).length])),
+    { 'PART-L1': 1, 'PART-L2': 1, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 1, 'PART-L6': 2 },
+  );
+});
+
+test('lesson explanation content is complete and renderer escapes every content field', () => {
+  const result = validateLessonContents(lessonContents, { lessons });
+  assert.equal(result.valid, true, result.errors.join('\n'));
+  assert.equal(lessonContents.length, 6);
+  for (const content of lessonContents) {
+    const textLength = [content.introduction, ...content.sections.flatMap((section) => section.paragraphs)].join('').length;
+    assert.ok(textLength >= 800 && textLength <= 1500, `${content.lessonId}: ${textLength}`);
+    assert.ok(content.sections.reduce((count, section) => count + section.examples.length, 0) >= 4);
+    assert.equal(getLessonContent(content.lessonId), content);
+  }
+  const html = renderExplanationContent({
+    ...lessonContents[0],
+    introduction: '<script>alert(1)</script>',
+    sections: [{ ...lessonContents[0].sections[0], title: '<b>unsafe</b>', paragraphs: ['<img src=x onerror=alert(1)>'] }],
+  }, { includeClosingSections: false });
+  assert.ok(html.includes('&lt;script&gt;alert(1)&lt;/script&gt;'));
+  assert.ok(!html.includes('<script>'));
+  assert.ok(html.includes('Key Rules'));
+  assert.ok(html.includes('よくある間違い'));
+  assert.ok(html.includes('入試POINT'));
+  assert.ok(html.includes('Lesson Summary') === false);
+  assert.ok(html.includes('data-explanation-kind="key-rules"'));
+  assert.ok(renderExplanationContent(lessonContents[0]).includes('Lesson Summary'));
+});
+
+test('exam multiple choice reuses the registry contract and evaluates stable choice IDs', () => {
+  const exam = getDemoProblem('exam-multiple-choice', 'PART-L1-EXAM-001');
+  assert.equal(demoRegistry['exam-multiple-choice'].demoProblemId, 'PART-L1-EXAM-001');
+  assert.equal(getExamChoice(exam.choices, 'l1e1-c3').text, 'crying');
+  assert.equal(getExamChoice(exam.choices, 'missing'), null);
+  assert.equal(isCorrectExamChoice(exam, 'l1e1-c3'), true);
+  assert.equal(isCorrectExamChoice(exam, 'l1e1-c1'), false);
+  assert.deepEqual(evaluateExamChoice(exam, 'l1e1-c1'), {
+    correct: false,
+    selectedChoiceId: 'l1e1-c1',
+    answerChoiceId: 'l1e1-c3',
+  });
+});
+
+test('entrance word order data exposes a structured explanation after the accepted answer', () => {
+  const problem = problemRegistry['PART-L4-EXAM-WORD-002'];
+  assert.equal(problem.type, 'word-order');
+  assert.equal(checkWordOrder(problem.acceptedAnswers[0], problem.acceptedAnswers), true);
+  assert.equal(checkWordOrder([...problem.acceptedAnswers[0]].reverse(), problem.acceptedAnswers), false);
+  assert.equal(problem.explanationSteps.at(-1).text, 'passive → written');
+  assert.equal(problem.fixedPrefix, 'The museum displayed');
+  assert.equal(problem.fixedSuffix, 'from the village.');
 });
 
 test('Lesson 6 problems use existing pure logic and stable answers', () => {

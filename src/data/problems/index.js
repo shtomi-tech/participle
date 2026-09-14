@@ -6,16 +6,19 @@ import { sentenceComparisonProblems } from './sentence-comparison.js';
 import { errorCorrectorProblems } from './error-corrector.js';
 import { modifierPositionerProblems } from './modifier-positioner.js';
 import { contextGrammarProblems } from './context-grammar.js';
+import { examMultipleChoiceProblems } from './exam-multiple-choice.js';
+import { entranceWordOrderProblems } from './entrance-word-order.js';
 
 export const problemSets = {
   'mark-parts': markPartsProblems,
   'modifier-connection-viewer': modifierConnectionProblems,
   'grammar-classifier': grammarClassifierProblems,
-  'word-order': wordOrderProblems,
+  'word-order': [...wordOrderProblems, ...entranceWordOrderProblems],
   'sentence-comparison': sentenceComparisonProblems,
   'error-corrector': errorCorrectorProblems,
   'modifier-positioner': modifierPositionerProblems,
   'context-grammar': contextGrammarProblems,
+  'exam-multiple-choice': examMultipleChoiceProblems,
 };
 
 export const problems = Object.values(problemSets).flat();
@@ -38,4 +41,6 @@ export {
   errorCorrectorProblems,
   modifierPositionerProblems,
   contextGrammarProblems,
+  examMultipleChoiceProblems,
+  entranceWordOrderProblems,
 };

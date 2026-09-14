@@ -9,6 +9,9 @@ export const wordOrderProblems = [
       section: '14-1-2 分詞の位置（分詞の前置修飾・後置修飾）',
     },
     prompt: '単語カードを並べ替えて、名詞の前にある分詞を含む句を作ってください。',
+    translation: 'ほほえんでいる赤ちゃん。',
+    fixedPrefix: '',
+    fixedSuffix: '',
     words: [
       { id: 'l1-a', text: 'a' },
       { id: 'l1-smiling', text: 'smiling' },
@@ -16,6 +19,13 @@ export const wordOrderProblems = [
     ],
     acceptedAnswers: [['l1-a', 'l1-smiling', 'l1-baby']],
     explanation: 'smiling は smile 由来ですが、この句では baby の前に置かれて baby を説明しています。',
+    explanationSteps: [
+      { label: 'Phrase', text: 'a + smiling + baby' },
+      { label: 'Modifier', text: 'smiling → baby' },
+      { label: 'Position', text: '分詞1語を名詞の前に置く' },
+    ],
+    difficulty: 'basic',
+    misconceptions: ['分詞を名詞の後ろだけに置く'],
   },
 ];
 

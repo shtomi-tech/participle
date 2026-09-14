@@ -12,10 +12,15 @@ export function mountWordOrderBuilder(root, problem, options = {}) {
   let answerIds = [];
   let hintIndex = 0;
   const hints = Array.isArray(problem.hints) ? problem.hints : [];
+  const fixedPrefix = typeof problem.fixedPrefix === 'string' ? problem.fixedPrefix : '';
+  const fixedSuffix = typeof problem.fixedSuffix === 'string' ? problem.fixedSuffix : '';
+  const hasSentenceFrame = fixedPrefix || fixedSuffix;
 
   root.innerHTML = `
     <p class="instruction">${escapeHtml(problem.prompt)}</p>
     <div class="demo-stage word-order-stage">
+      ${problem.translation ? `<p class="word-order-translation"><strong>Meaning</strong> ${escapeHtml(problem.translation)}</p>` : ''}
+      ${hasSentenceFrame ? `<p class="word-order-frame"><span>${escapeHtml(fixedPrefix)}</span><strong>[ phrase ]</strong><span>${escapeHtml(fixedSuffix)}</span></p>` : ''}
       <h3>Answer area</h3>
       <div class="answer-area is-empty" data-answer-area aria-live="polite"></div>
       <h3>Word cards</h3>
@@ -28,6 +33,7 @@ export function mountWordOrderBuilder(root, problem, options = {}) {
       ${hints.length ? '<div class="hint" data-hint-output role="status" aria-live="polite"></div>' : ''}
       <div class="feedback" data-feedback role="status" aria-live="polite"></div>
       <p class="explanation" data-explanation hidden>${escapeHtml(problem.explanation)}</p>
+      ${Array.isArray(problem.explanationSteps) && problem.explanationSteps.length ? `<div class="word-order-explanation-steps" data-explanation-steps hidden><h3>Detailed review</h3><ol>${problem.explanationSteps.map((step) => `<li><strong>${escapeHtml(step.label)}</strong> ${escapeHtml(step.text)}</li>`).join('')}</ol></div>` : ''}
     </div>`;
 
   const answerArea = root.querySelector('[data-answer-area]');
@@ -38,6 +44,7 @@ export function mountWordOrderBuilder(root, problem, options = {}) {
   const hintButton = root.querySelector('[data-hint]');
   const hintOutput = root.querySelector('[data-hint-output]');
   const checkButton = root.querySelector('[data-check]');
+  const explanationSteps = root.querySelector('[data-explanation-steps]');
 
   function restoreFocus(id) {
     if (!id) return;
@@ -58,6 +65,7 @@ export function mountWordOrderBuilder(root, problem, options = {}) {
     feedback.className = 'feedback';
     feedback.textContent = '';
     explanation.hidden = true;
+    if (explanationSteps) explanationSteps.hidden = true;
   }
 
   function check() {
@@ -67,6 +75,7 @@ export function mountWordOrderBuilder(root, problem, options = {}) {
       ? 'Correct — 文の骨格を正しく組み立てられました。'
       : 'Not yet — 主語から始めて、もう一度並びを確認してみましょう。';
     explanation.hidden = !correct;
+    if (explanationSteps) explanationSteps.hidden = !correct;
     onComplete({ correct, problemId: problem.id, answerIds: [...answerIds] });
   }
 

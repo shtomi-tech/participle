@@ -2,7 +2,7 @@
 
 ## Design status
 
-この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計・実装の正本です。Phase 1でLesson 4、Phase 2でLesson 1〜3、Phase 3でLesson 5、Phase 4でLesson 6を実装済みです。ローカル実ブラウザで主要操作・キーボード・390px幅・Lesson 1〜5回帰を確認済みで、CIもpush後に成功を確認済みです。
+この文書は、`PROJECT_GOAL.md` と `LEARNING_REQUIREMENTS.md` に基づく設計・実装の正本です。Phase 1〜4でLesson 1〜6と8種類の既存Interactionを実装し、Phase 5でExplanation-firstのLesson構造、汎用Explanation Renderer、Exam Multiple Choice、入試語句整序、検証・ブラウザ回帰を追加します。Phase 5の最終検証結果は末尾の実装更新に記録します。
 
 調査日は 2026-09-13。参照元 `C:\Users\shtom\dev\english-grammar-interactive-atlas` は調査時点で未コミット変更を含んでいたため、読み取り専用で扱いました。参照元にはGraft graphがなく、`graft check` は `NO GRAPH` でした。以下の記述は実ファイルの確認結果です。
 
@@ -14,13 +14,16 @@
 | Project goal | `PROJECT_GOAL.md` |
 | Learning requirements | `LEARNING_REQUIREMENTS.md` |
 | How to teach | `C:\Users\shtom\dev\english-grammar-interactive-atlas` の既存Component、Problem、Lesson、validator、CSS |
+| Explanation content | `src/data/content/lesson-*.js`。本文・例文・ルール・誤り・入試POINT・出典をLesson単位で保持する |
+| Explanation rendering | `src/components/explanation/explanationRenderer.js`。教材文をComponentへ直書きせず、共通Rendererで表示する |
+| Explanation validation | `src/lib/validateLessonContent.js`。Lesson、section、例文、出典の必須契約を検証する |
 | Future assessment | 分詞教材固有のProblem Data。Componentへ教材文を埋め込まない |
 
 参照Atlasのコード・教材文・外部出典をそのままコピーすることは、この設計の承認を意味しません。実装時は既存の契約と操作パターンを参考にし、分詞用の教材文とデータは一次資料を根拠に作成します。
 
 ## Existing Interaction Inventory
 
-参照Atlasは `src/data/interactions.js` と `src/data/interactions-additional.js` に40件のカタログ項目を持ち、`src/components/demos/registry.js` には11種類の実働Demoがあります。`demoType` が付いていない項目はカタログ上の候補であり、実働Componentとしては扱いません。
+参照Atlasは `src/data/interactions.js` と `src/data/interactions-additional.js` に41件のカタログ項目を持ち、`src/components/demos/registry.js` には12種類の実働Demoがあります。`demoType` が付いていない項目はカタログ上の候補であり、実働Componentとしては扱いません。
 
 | Interaction ID | 既存機能 | 所在 | 現在の用途 / 状態 | 分詞教材への適用可能性 |
 | --- | --- | --- | --- | --- |
@@ -64,6 +67,7 @@
 | INT-EXIST-038 | Request Simulator (`GRAM-INT-038`) | `src/data/interactions-additional.js`; Demo未登録 | 依頼表現の場面選択候補 | 低 |
 | INT-EXIST-039 | Travel Conversation Grammar (`GRAM-INT-039`) | `src/data/interactions-additional.js`; Demo未登録 | 旅行会話の文法選択候補 | 低 |
 | INT-EXIST-040 | Situation Tense Choice (`GRAM-INT-040`) | `src/data/interactions-additional.js`; Demo未登録 | 時間情報から時制を選ぶ候補 | 低 |
+| INT-EXIST-041 | Exam Multiple Choice (`GRAM-INT-041`) | `src/data/interactions-additional.js`; `src/components/demos/examMultipleChoice.js`; `exam-multiple-choice` | 4択を選び、正誤・正答・全選択肢の理由を確認する。実働 | 高 |
 
 ## Existing Atlas investigation
 
@@ -91,7 +95,7 @@ Previous / Next
 
 ### B. Existing interaction behavior
 
-実働11種類の操作は、以下の学習行為をカバーしています。
+実働12種類の操作は、以下の学習行為をカバーしています。
 
 | 学習行為 | 既存Component | 確認した挙動 |
 | --- | --- | --- |
@@ -106,6 +110,7 @@ Previous / Next
 | Correct | `ErrorCorrector` | 誤りトークンと訂正候補を順に選び、全correctionが正解になると完了 |
 | Simulate | `ContextGrammar` | scenarioと線形stepsを持ち、choice→feedback→Continueで会話履歴を進める |
 | Generate | `SentenceGenerator` | 全controlを選び、Generateを明示的に押す。文法的だがtarget stateと違う状態も区別して表示 |
+| Practice | `ExamMultipleChoice` | 4択を選び、正答・全選択肢の理由・リセットを確認する。入試Problem Dataを一問ずつ表示 |
 
 Drag & Dropはカタログの候補に含まれますが、分詞教材の主要経路は、参照Atlasの原則どおりタップ／クリックで完結させます。指でカードを運ぶ作業は、学習内容より先にカードが旅に出るためです。
 
@@ -116,6 +121,8 @@ Drag & Dropはカタログの候補に含まれますが、分詞教材の主要
 | Concern | Existing source | Design decision for participle |
 | --- | --- | --- |
 | Component API | `src/components/demos/*.js`, `src/components/demos/registry.js` | `mount(root, problem, options)`。教材文をComponentへ直書きしない |
+| Exam Multiple Choice | `english-grammar-interactive-atlas/src/components/demos/examMultipleChoice.js`; `src/lib/grammar/exam-multiple-choice.js` | AtlasのR0実装を再利用し、分詞用の20 Problemを注入する。Participle専用4択Componentは作らない |
+| Explanation Renderer | `src/components/explanation/explanationRenderer.js` | content dataのintroduction / sections / examples / rules / mistakes / exam points / review / sourcesを共通描画する |
 | Problem registry | `src/data/problems/index.js` | 機能別Problem DataをRegistryで解決する |
 | Pure evaluation | `src/lib/grammar/*.js` | 判定・文生成・関係検索はUIから分離する |
 | Lesson registry | `src/data/lessons.js` | Stepは`interactionType`と`problemId`でComponentを再利用する |
@@ -460,9 +467,9 @@ Sentence TransformerとSentence Generatorは、参照Atlasの現在契約では`
 
 ## Architecture consistency
 
-### Proposed repository shape for the next phase
+### Repository shape (Phase 5 implementation)
 
-教材本体を実装する場合の初期構成は、参照Atlasの責務分離に合わせます。
+教材本体は、参照Atlasの責務分離に合わせて次の構成で実装します。
 
 ```text
 participle/
@@ -476,9 +483,10 @@ participle/
 │  ├─ data/
 │  │  ├─ interactions.js
 │  │  ├─ lessons.js
+│  │  ├─ content/
 │  │  └─ problems/
 │  ├─ components/
-│  │  ├─ atlas/
+│  │  ├─ explanation/
 │  │  └─ demos/
 │  └─ lib/
 │     └─ grammar/
@@ -487,7 +495,7 @@ participle/
    └─ browser/
 ```
 
-これは次フェーズの実装方針であり、今回の設計フェーズでディレクトリやアプリコードを作る指示ではありません。
+`src/data/content/`が説明の正本、`src/components/explanation/explanationRenderer.js`が汎用Renderer、`src/data/problems/`が操作・評価データを担います。`app.js`には教材本文を埋め込みません。
 
 ### Problem Data contracts
 
@@ -503,6 +511,7 @@ participle/
 | `sentence-comparison` | `-ing / p.p.`、`exciting / excited`の対照 | 2つの`sentences`, 明示的な`differences` |
 | `error-corrector` | 典型誤答の訂正 | `tokens`, `corrections`, `options`, `acceptedOptionIds`, `ruleLabel` |
 | `context-grammar` | 感情動詞の語義・場面適用 | `scenario`, 順序付き`steps`, `choices`, `acceptedChoiceIds` |
+| `exam-multiple-choice` | 大学入試形式の4択と選択肢別レビュー | `id`, `type`, `lessonId`, `requirements`, `sourceEvidence`, `difficulty`, `misconceptions`, `stem`, 4つの`choices`, `answerChoiceId`, `explanation` |
 
 Problem IDは、次フェーズで例えば `PART-MP-001`、`PART-MCV-001` のように機能接頭辞を付け、安定IDとして一度決めたら変更しません。既存AtlasのIDを流用しません。
 
@@ -527,7 +536,7 @@ Problem IDは、次フェーズで例えば `PART-MP-001`、`PART-MCV-001` の�
 - 320px程度の狭い幅で、分詞句・関係説明・feedbackが横にはみ出さないことを確認する。
 - キーボードだけで全Stepを完了できることを、実ブラウザで確認する。
 
-## Lesson design
+## Historical Lesson design (Phase 1-4 interaction-first layout)
 
 画面構造は全Lessonで次を固定します。
 
@@ -626,7 +635,7 @@ Next（completion後のみ）
 | `chapter14-ocr.md:350-414` 感情動詞と`-ing / -ed` | Goal / LR-011, 012 | Sentence Comparison, Error Corrector, Context Grammar | Lesson 5, 6 | 与える／受けるの説明 |
 | `chapter14-ocr.md:318-345`, `484-508` 発展・境界 | Goalの発展メモ / 基本Lesson外 | 既存Interactionを拡張しない | 対象外 | 基本判定と混同しない |
 
-## Reuse metrics
+## Historical reuse metrics (Phase 1-4 baseline)
 
 集計単位は、Phase 4までに実装した8つのInteraction typeと、1つの複合Lesson戦略です。複合戦略は新Componentではありません。
 
@@ -802,6 +811,79 @@ R3: 0
 - 分詞構文、独立分詞構文、`with + O + 分詞`、高度な例外事項は対象外。
 - 進捗はLesson画面内のmemoryのみ。localStorage、アカウント、サーバー、DB、外部API、analyticsは追加していない。
 - 自由入力のLLM採点、初回正答率の保存、外部API・ユーザーアカウント・サーバーDBは行わない。
+
+## Phase 5 implementation update
+
+### Explanation-first architecture
+
+Phase 5の画面順は、全Lessonで次に固定します。
+
+```text
+LEARN（解説・例文）
+  → SEE（構造・ルール・誤り・入試POINT）
+  → TOUCH（既存Interaction）
+  → PRACTICE（Exam Multiple Choice / Word Order）
+  → REVIEW（詳細復習・要約・出典）
+```
+
+説明は `src/data/content/lesson-1.js`〜`lesson-6.js` に保持し、`src/components/explanation/explanationRenderer.js` が全Lessonを同じRendererで描画します。`app.js`はLessonの配置とProblemの接続だけを担当します。各Explanation sectionには`sourceEvidence`を持たせ、Rendererと`validateLessonContent`で確認します。
+
+### Lesson content inventory
+
+| Lesson | Explanation sections | Examples | 中心内容 |
+| --- | ---: | ---: | --- |
+| 1 | 3 | 5 | 分詞とは何か / 形容詞と同じ場所で働く / 今回扱う範囲 |
+| 2 | 3 | 7 | 現在分詞・過去分詞という名前 / 能動・受動で形を選ぶ / p.p.の完了・結果状態 |
+| 3 | 3 | 5 | 分詞1語の前置修飾 / 分詞句の後置修飾 / 「1語なら必ず前」ではない |
+| 4 | 3 | 5 | 名詞と分詞の間にあるHidden S-V / 能動なら-ing、受動ならp.p. / Hidden S-Vの6ステップ |
+| 5 | 3 | 7 | 感情動詞は「〜させる」 / 感情を与える側・受ける側 / 語彙を広げても同じ判断 |
+| 6 | 3 | 6 | 8段階の最終判断 / 構造と文脈をつなぐ / 初見英文で理由まで答える |
+
+各Lessonは、本文・4〜7例文・Key Rules・よくある間違い・入試POINT・Detailed Review・Summary・Source evidenceを持ちます。説明を読んだだけでも中心概念を理解できる量を確保し、Interactionは確認と再利用のために置きます。
+
+### Assessment inventory
+
+Atlasの`exam-multiple-choice` R0 Componentとpure evaluationを再利用し、分詞固有の4択Componentは新設していません。`src/data/problems/exam-multiple-choice.js`に20問を追加しました。
+
+| Lesson | Exam MC | difficulty内訳 |
+| --- | ---: | --- |
+| 1 | 2 | basic 2 |
+| 2 | 3 | standard 2 / entrance 1 |
+| 3 | 2 | standard 2 |
+| 4 | 4 | standard 2 / entrance 2 |
+| 5 | 4 | standard 2 / entrance 2 |
+| 6 | 5 | entrance 5 |
+| **Total** | **20** | **basic 2 / standard 8 / entrance 10** |
+
+Exam IDs:
+
+`PART-L1-EXAM-001`, `PART-L1-EXAM-002`, `PART-L2-EXAM-001`, `PART-L2-EXAM-002`, `PART-L2-EXAM-003`, `PART-L3-EXAM-001`, `PART-L3-EXAM-002`, `PART-L4-EXAM-001`, `PART-L4-EXAM-002`, `PART-L4-EXAM-003`, `PART-L4-EXAM-004`, `PART-L5-EXAM-001`, `PART-L5-EXAM-002`, `PART-L5-EXAM-003`, `PART-L5-EXAM-004`, `PART-L6-EXAM-001`, `PART-L6-EXAM-002`, `PART-L6-EXAM-003`, `PART-L6-EXAM-004`, `PART-L6-EXAM-005`。
+
+全問が4選択肢、正答、全選択肢の説明、全体説明、difficulty、misconceptions、Learning Requirement、OCR source evidenceを持ちます。誤答時も正答と4選択肢の理由を表示し、Resetできます。Assessment navigationは一問ずつ前後へ移動でき、正誤で次の問題をロックしません。
+
+Word Orderは既存`WordOrderBuilder`をそのまま再利用し、既存Problem APIに`translation`、`fixedPrefix`、`fixedSuffix`、`explanationSteps`、difficulty、misconceptionsをoptional dataとして追加しました。追加IDは次の8問です。
+
+`PART-L2-EXAM-WORD-001`, `PART-L3-EXAM-WORD-001`, `PART-L3-EXAM-WORD-002`, `PART-L4-EXAM-WORD-001`, `PART-L4-EXAM-WORD-002`, `PART-L5-EXAM-WORD-001`, `PART-L6-EXAM-WORD-001`, `PART-L6-EXAM-WORD-002`。
+
+既存Lesson 1の語句整序1問を含む分布は、L1=1、L2=1、L3=2、L4=2、L5=1、L6=2です。
+
+### Traceability and reuse
+
+- `LR-PART-001`〜`LR-PART-013`は既存ProblemとPhase 5のExam / Word Orderへ紐づき、`scripts/check.mjs`が全要件の参照を検証します。
+- Explanationの各sectionとExam / Word Orderは`chapter14-ocr.md`の該当範囲を`sourceEvidence`で保持します。
+- R0=9（既存8種類 + Exam Multiple Choice）、R1=0、R2=1（Hidden S-Vのsequence）、R3=0です。
+- Phase 5で新設したInteraction type / Participle専用の操作Componentは0です。Exam MCはAtlasの`src/components/demos/examMultipleChoice.js`と`src/lib/grammar/exam-multiple-choice.js`を参照実装として再利用します。
+- 実装した9種類のInteractionは、Mark the Parts、Modifier Connection Viewer、Grammar Classifier、Word Order Builder、Sentence Comparison、Error Corrector、Modifier Positioner、Context Grammar、Exam Multiple Choiceです。
+
+### Phase 5 validation and acceptance
+
+検証の正本は`package.json`の`npm test`、`npm run check`、`npm run build`、`npm run test:runtime`です。`tests/browser/phase5.spec.js`ではHomeからLesson 1〜6のExplanation-first順、Examの誤答・正答・Reset・全選択肢レビュー、Word Orderの誤答・正答・詳細説明、キーボード操作、390px幅の横はみ出し、全既存Interaction typeの受入経路を確認します。Phase 5の実行結果は実装完了時にこの節へ追記します。
+
+### Phase 5 limitations
+
+- 分詞構文、独立分詞構文、`with + O + 分詞`、動名詞＋名詞、`being p.p.`などの発展事項は追加していません。
+- score storage、mastery、analytics、auth、DB、LLM自由記述採点は実装していません。進捗は従来どおりLesson画面内memoryのみです。
+- Exam Multiple Choiceは一問ずつの確認フローで、受験結果の永続化や試験モードはありません。
 
 ## Deployment
 

@@ -7,10 +7,12 @@ const problemTypes = new Set([
   'error-corrector',
   'modifier-positioner',
   'context-grammar',
+  'exam-multiple-choice',
 ]);
 const metadataTypes = new Set(['mark-parts', 'modifier-connection-viewer']);
 const voices = new Set(['active', 'passive']);
 const forms = new Set(['-ing', 'p.p.']);
+const difficulties = new Set(['basic', 'standard', 'entrance']);
 
 function hasText(value) {
   return typeof value === 'string' && value.trim().length > 0;
@@ -29,7 +31,7 @@ function duplicateIds(entries, label, errors) {
   });
 }
 
-function validateShared(problem, label, errors, knownRequirementIds) {
+function validateShared(problem, label, errors, knownRequirementIds, knownLessonIds) {
   for (const field of ['id', 'type', 'lessonId', 'prompt', 'explanation']) {
     if (!hasText(problem[field])) errors.push(`${label}.${field} is required`);
   }
@@ -46,6 +48,7 @@ function validateShared(problem, label, errors, knownRequirementIds) {
       if (!knownRequirementIds.has(id)) errors.push(`${label}.requirements references unknown LR ID: ${id}`);
     });
   }
+  if (knownLessonIds.size > 0 && !knownLessonIds.has(problem.lessonId)) errors.push(`${label}.lessonId references an unknown Lesson: ${problem.lessonId}`);
   if (!metadataTypes.has(problem.type)) return;
   for (const field of ['targetNoun', 'baseVerb']) {
     if (!hasText(problem[field])) errors.push(`${label}.${field} is required`);
@@ -150,6 +153,36 @@ function validateWordOrder(problem, label, errors) {
     });
   });
   if (problem.hints !== undefined && (!Array.isArray(problem.hints) || problem.hints.length === 0 || problem.hints.some((hint) => !hasText(hint)))) errors.push(`${label}.hints must contain non-empty strings when provided`);
+  if (problem.explanationSteps !== undefined) {
+    if (!Array.isArray(problem.explanationSteps) || problem.explanationSteps.length === 0) errors.push(`${label}.explanationSteps must contain items when provided`);
+    else problem.explanationSteps.forEach((step, index) => {
+      if (!isRecord(step) || !hasText(step.label) || !hasText(step.text)) errors.push(`${label}.explanationSteps[${index}] needs label and text`);
+    });
+  }
+  if (!difficulties.has(problem.difficulty)) errors.push(`${label}.difficulty is invalid: ${problem.difficulty}`);
+  if (!Array.isArray(problem.misconceptions) || problem.misconceptions.length === 0 || problem.misconceptions.some((item) => !hasText(item))) {
+    errors.push(`${label}.misconceptions must contain non-empty items`);
+  }
+}
+
+function validateExamMultipleChoice(problem, label, errors) {
+  if (!Array.isArray(problem.choices) || problem.choices.length !== 4) {
+    errors.push(`${label}.choices must contain exactly four choices`);
+  } else {
+    duplicateIds(problem.choices, `${label}.choices`, errors);
+    problem.choices.forEach((choice, index) => {
+      if (!isRecord(choice) || !hasText(choice.id) || !hasText(choice.text) || !hasText(choice.explanation)) {
+        errors.push(`${label}.choices[${index}] needs id, text, and explanation`);
+      }
+    });
+  }
+  const choiceIds = new Set((problem.choices ?? []).map((choice) => choice?.id));
+  if (!hasText(problem.answerChoiceId)) errors.push(`${label}.answerChoiceId is required`);
+  else if (!choiceIds.has(problem.answerChoiceId)) errors.push(`${label}.answerChoiceId references an unknown choice: ${problem.answerChoiceId}`);
+  if (!difficulties.has(problem.difficulty)) errors.push(`${label}.difficulty is invalid: ${problem.difficulty}`);
+  if (!Array.isArray(problem.misconceptions) || problem.misconceptions.length === 0 || problem.misconceptions.some((item) => !hasText(item))) {
+    errors.push(`${label}.misconceptions must contain non-empty items`);
+  }
 }
 
 function validateSentenceComparison(problem, label, errors) {
@@ -293,7 +326,7 @@ function validateContextGrammar(problem, label, errors) {
   });
 }
 
-export function validateProblems(entries, { knownRequirementIds = new Set() } = {}) {
+export function validateProblems(entries, { knownRequirementIds = new Set(), knownLessonIds = new Set() } = {}) {
   const errors = [];
   if (!Array.isArray(entries)) return { valid: false, errors: ['Problems must be an array'] };
   duplicateIds(entries, 'Problems', errors);
@@ -307,7 +340,7 @@ export function validateProblems(entries, { knownRequirementIds = new Set() } = 
       errors.push(`${label}.type is unknown: ${problem.type}`);
       return;
     }
-    validateShared(problem, label, errors, knownRequirementIds);
+    validateShared(problem, label, errors, knownRequirementIds, knownLessonIds);
     if (problem.type === 'mark-parts') validateMarkParts(problem, label, errors);
     if (problem.type === 'modifier-connection-viewer') validateModifierConnection(problem, label, errors);
     if (problem.type === 'grammar-classifier') validateGrammarClassifier(problem, label, errors);
@@ -316,6 +349,7 @@ export function validateProblems(entries, { knownRequirementIds = new Set() } = 
     if (problem.type === 'error-corrector') validateErrorCorrector(problem, label, errors);
     if (problem.type === 'modifier-positioner') validateModifierPositioner(problem, label, errors);
     if (problem.type === 'context-grammar') validateContextGrammar(problem, label, errors);
+    if (problem.type === 'exam-multiple-choice') validateExamMultipleChoice(problem, label, errors);
   });
   return { valid: errors.length === 0, errors };
 }

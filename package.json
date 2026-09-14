@@ -7,6 +7,10 @@
     "test": "node tests/logic.test.js",
     "check": "node scripts/check.mjs",
     "build": "node scripts/build.mjs",
+    "test:runtime": "playwright test",
     "start": "py -m http.server 4173 -d dist"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
   }
 }
