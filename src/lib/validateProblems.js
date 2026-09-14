@@ -10,6 +10,7 @@ const problemTypes = new Set([
   'modifier-positioner',
   'context-grammar',
   'exam-multiple-choice',
+  'practice-multiple-choice',
 ]);
 const metadataTypes = new Set(['mark-parts', 'modifier-connection-viewer']);
 const voices = new Set(['active', 'passive']);
@@ -58,14 +59,14 @@ function validateShared(problem, label, errors, knownRequirementIds, knownLesson
     if (!hasText(problem[field])) errors.push(`${label}.${field} is required`);
   }
   validateContentRefs(problem, label, errors, explanationSectionLessons);
-  const strictEvidence = problem.type === 'exam-multiple-choice' || problem.assessmentKind === 'entrance';
+  const strictEvidence = problem.type === 'exam-multiple-choice' || problem.type === 'practice-multiple-choice' || problem.assessmentKind === 'entrance';
   const invalidEvidence = strictEvidence
     ? !isRecord(problem.sourceEvidence) || !hasText(problem.sourceEvidence.source) || !hasText(problem.sourceEvidence.heading) || !Number.isInteger(problem.sourceEvidence.lineStart) || !Number.isInteger(problem.sourceEvidence.lineEnd) || !hasText(problem.sourceEvidence.concept)
     : !isRecord(problem.sourceEvidence) || !hasText(problem.sourceEvidence.source) || !hasText(problem.sourceEvidence.section);
   if (invalidEvidence) {
     errors.push(`${label}.sourceEvidence needs ${strictEvidence ? 'source, heading, integer lineStart/lineEnd, and concept' : 'source, section, and concept'}`);
   }
-  if (!['chapter14-ocr.md', 'chapter14-ocr.json'].includes(problem.sourceEvidence?.source)) {
+  if (!['chapter14-ocr.md', 'chapter14-ocr.json', 'lesson21-22-ocr.md'].includes(problem.sourceEvidence?.source)) {
     errors.push(`${label}.sourceEvidence.source is not an allowed OCR source`);
   }
   if (!Array.isArray(problem.requirements) || problem.requirements.length === 0) {
@@ -227,6 +228,47 @@ function validateExamMultipleChoice(problem, label, errors) {
         if (review.choiceId === problem.answerChoiceId) errors.push(`${label}.distractorReview cannot map the correct choice`);
       });
     }
+  }
+}
+
+function validateSourceReconstruction(problem, label, errors) {
+  const metadata = problem.sourceReconstruction;
+  if (!isRecord(metadata) || typeof metadata.reconstructed !== 'boolean') {
+    errors.push(`${label}.sourceReconstruction must declare reconstructed as a boolean`);
+    return;
+  }
+  if (!metadata.reconstructed) return;
+  if (!['low', 'medium', 'high'].includes(metadata.confidence)) errors.push(`${label}.sourceReconstruction.confidence is invalid`);
+  if (!Array.isArray(metadata.basis) || metadata.basis.length === 0 || metadata.basis.some((item) => !hasText(item))) {
+    errors.push(`${label}.sourceReconstruction.basis must contain non-empty strings`);
+  }
+  if (!isRecord(problem.reconstructionEvidence) || !hasText(problem.reconstructionEvidence.source) || !Array.isArray(problem.reconstructionEvidence.survivingText) || problem.reconstructionEvidence.survivingText.length === 0 || problem.reconstructionEvidence.survivingText.some((item) => !hasText(item)) || !hasText(problem.reconstructionEvidence.answerSummary)) {
+    errors.push(`${label}.reconstructionEvidence needs source, survivingText, and answerSummary for reconstructed problems`);
+  }
+}
+
+function validatePracticeMultipleChoice(problem, label, errors) {
+  if (!['quick', 'form', 'structure'].includes(problem.practiceStage)) errors.push(`${label}.practiceStage is invalid: ${problem.practiceStage}`);
+  validateSourceReconstruction(problem, label, errors);
+  if (!Array.isArray(problem.choices) || problem.choices.length < 2) {
+    errors.push(`${label}.choices must contain at least two choices`);
+  } else {
+    duplicateIds(problem.choices, `${label}.choices`, errors);
+    problem.choices.forEach((choice, index) => {
+      if (!isRecord(choice) || !hasText(choice.id) || !hasText(choice.text) || !hasText(choice.explanation)) {
+        errors.push(`${label}.choices[${index}] needs id, text, and explanation`);
+      }
+      if (choice?.authoredDistractor !== undefined && typeof choice.authoredDistractor !== 'boolean') {
+        errors.push(`${label}.choices[${index}].authoredDistractor must be boolean when provided`);
+      }
+    });
+  }
+  const choiceIds = new Set((problem.choices ?? []).map((choice) => choice?.id));
+  if (!hasText(problem.answerChoiceId)) errors.push(`${label}.answerChoiceId is required`);
+  else if (!choiceIds.has(problem.answerChoiceId)) errors.push(`${label}.answerChoiceId references an unknown choice: ${problem.answerChoiceId}`);
+  if (!difficulties.has(problem.difficulty)) errors.push(`${label}.difficulty is invalid: ${problem.difficulty}`);
+  if (!Array.isArray(problem.misconceptions) || problem.misconceptions.length === 0 || problem.misconceptions.some((item) => !hasText(item))) {
+    errors.push(`${label}.misconceptions must contain non-empty items`);
   }
 }
 
@@ -395,6 +437,7 @@ export function validateProblems(entries, { knownRequirementIds = new Set(), kno
     if (problem.type === 'modifier-positioner') validateModifierPositioner(problem, label, errors);
     if (problem.type === 'context-grammar') validateContextGrammar(problem, label, errors);
     if (problem.type === 'exam-multiple-choice') validateExamMultipleChoice(problem, label, errors);
+    if (problem.type === 'practice-multiple-choice') validatePracticeMultipleChoice(problem, label, errors);
   });
   return { valid: errors.length === 0, errors };
 }

@@ -43,13 +43,18 @@ function setupAssessment({ section, type, problems, heading, counter, componentR
 
   let problemIndex = 0;
   let cleanup = null;
+  const headingLabels = {
+    'exam-multiple-choice': '4択問題',
+    'word-order': '語句整序問題',
+    'practice-multiple-choice': 'Lesson 6 Practical',
+  };
 
   function renderAssessment(shouldFocus = false) {
     cleanup?.();
     cleanup = null;
     const problem = problems[problemIndex];
     counter.textContent = `${problemIndex + 1} / ${problems.length}`;
-    heading.textContent = `${type === 'exam-multiple-choice' ? '4択問題' : '語句整序問題'} ${problemIndex + 1} / ${problems.length}`;
+    heading.textContent = `${headingLabels[type] ?? type} ${problemIndex + 1} / ${problems.length}`;
     previous.disabled = problemIndex === 0;
     next.disabled = problemIndex === problems.length - 1;
     cleanup = mountDemoProblem(type, componentRoot, problem, { onComplete() {} });
@@ -79,6 +84,7 @@ function renderLesson(lesson) {
   const nextLesson = lessons[lessonIndex + 1];
   const examProblems = getProblemsByType('exam-multiple-choice').filter((problem) => problem.lessonId === lesson.id);
   const wordOrderProblems = getProblemsByType('word-order').filter((problem) => problem.lessonId === lesson.id && problem.assessmentKind === 'entrance');
+  const practicalProblems = getProblemsByType('practice-multiple-choice').filter((problem) => problem.lessonId === lesson.id);
   let stepIndex = 0;
   let completedStepIds = new Set();
   let cleanup = null;
@@ -140,6 +146,20 @@ function renderLesson(lesson) {
           <nav class="assessment-navigation" aria-label="語句整序問題 navigation">
             <button class="button secondary" type="button" data-word-order-previous>← 前の問題</button>
             <button class="button" type="button" data-word-order-next>次の問題 →</button>
+          </nav>
+        </div>
+      </section>
+
+      <section class="lesson-assessment" data-assessment-section="practical" aria-labelledby="practical-heading">
+        <p class="eyebrow">PRACTICE · LESSON 6</p>
+        <h2 id="practical-heading">Lesson 6 Practical</h2>
+        <p class="assessment-introduction">OCRで確認できた問題と、欠落箇所を明示的に復元した問題で、形・構造の判断を仕上げます。</p>
+        <div class="assessment-player">
+          <div class="assessment-progress"><strong data-practical-heading tabindex="-1"></strong><span data-practical-counter></span></div>
+          <div data-practical-component></div>
+          <nav class="assessment-navigation" aria-label="Lesson 6 Practical navigation">
+            <button class="button secondary" type="button" data-practical-previous>← 前の問題</button>
+            <button class="button" type="button" data-practical-next>次の問題 →</button>
           </nav>
         </div>
       </section>
@@ -249,12 +269,23 @@ function renderLesson(lesson) {
     previous: app.querySelector('[data-word-order-previous]'),
     next: app.querySelector('[data-word-order-next]'),
   });
+  const practicalCleanup = setupAssessment({
+    section: app.querySelector('[data-assessment-section="practical"]'),
+    type: 'practice-multiple-choice',
+    problems: practicalProblems,
+    heading: app.querySelector('[data-practical-heading]'),
+    counter: app.querySelector('[data-practical-counter]'),
+    componentRoot: app.querySelector('[data-practical-component]'),
+    previous: app.querySelector('[data-practical-previous]'),
+    next: app.querySelector('[data-practical-next]'),
+  });
 
   renderStep(false);
   return () => {
     cleanup?.();
     examCleanup();
     wordOrderCleanup();
+    practicalCleanup();
   };
 }
 

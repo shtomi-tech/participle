@@ -923,6 +923,12 @@ Interactive Checkは24 Step（L1=3、L2=4、L3=3、L4=6、L5=4、L6=4）、Exam 
 
 全Practice Problemは`contentRefs`で同一Lessonの固定Explanation sectionへ結び付く。`validateProblems`は空配列、重複、未知ID、別Lessonの参照を拒否し、`scripts/check.mjs`はMatrixの数とLesson構成を検証する。
 
+## Phase 8 follow-up — Lesson 6 Practical and OCR reconstruction
+
+Lesson 6に、OCRで確認できた分詞問題を扱う`practice-multiple-choice`を追加する。構成はQuick 3問、Form 5問、Structure + Form 5問の計13問で、既存のInteractive Check 24 Step、Exam Multiple Choice 20問、Entrance Word Order 6問は変更しない。
+
+Problem 101と104は、OCRの残存断片・解答解説・文法関係から最小限に復元した`reconstructed exercise`である。`sourceReconstruction`と`reconstructionEvidence`をProblem Dataに保持し、`verified verbatim original university exam`とは扱わない。Q-A01とQ-A02のOCRにない比較選択肢は、choice単位の`authoredDistractor: true`で明示する。これらのtraceability metadataは開発用であり、生徒画面には表示しない。
+
 ## Deployment
 
 - GitHub Pagesは`.github/workflows/pages.yml`で`main`の`dist`を公開し、`.github/workflows/ci.yml`は検証専用とする。

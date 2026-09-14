@@ -13,9 +13,13 @@ import { validateLessonContents } from '../src/lib/validateLessonContent.js';
 import { validateFrozenLessonContent } from './frozen-content.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const ocrSourcePath = join(root, 'chapter14-ocr.md');
-const ocrText = readFileSync(ocrSourcePath, 'utf8');
-const ocrLines = ocrText.split(/\r?\n/);
+const ocrSources = new Map([
+  ['chapter14-ocr.md', join(root, 'chapter14-ocr.md')],
+  ['lesson21-22-ocr.md', join(root, 'lesson21-22-ocr.md')],
+].map(([source, path]) => {
+  const text = readFileSync(path, 'utf8');
+  return [source, { text, lines: text.split(/\r?\n/) }];
+}));
 const sourceFiles = [
   'src/app.js',
   'src/data/content/index.js',
@@ -33,6 +37,7 @@ const sourceFiles = [
   'src/data/problems/word-order.js',
   'src/data/problems/entrance-word-order.js',
   'src/data/problems/exam-multiple-choice.js',
+  'src/data/problems/lesson-6-practical.js',
   'src/data/problems/sentence-comparison.js',
   'src/data/problems/error-corrector.js',
   'src/data/problems/modifier-positioner.js',
@@ -62,6 +67,7 @@ const sourceFiles = [
   'src/components/demos/modifierPositioner.js',
   'src/components/demos/contextGrammar.js',
   'src/components/demos/examMultipleChoice.js',
+  'src/components/demos/practiceMultipleChoice.js',
   'src/components/demos/registry.js',
   'src/components/explanation/explanationRenderer.js',
   'scripts/build.mjs',
@@ -94,7 +100,7 @@ const expectedLessonIds = ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4', 'PART-L5'
 if (lessons.length !== expectedLessonIds.length || lessons.some((lesson, index) => lesson.id !== expectedLessonIds[index])) {
   throw new Error(`Phase 4 requires lessons in order: ${expectedLessonIds.join(', ')}.`);
 }
-if (Object.keys(demoRegistry).length !== 9 || !demoRegistry['context-grammar'] || !demoRegistry['exam-multiple-choice']) throw new Error('Phase 5 requires nine demo types including exam-multiple-choice.');
+if (Object.keys(demoRegistry).length !== 10 || !demoRegistry['context-grammar'] || !demoRegistry['exam-multiple-choice'] || !demoRegistry['practice-multiple-choice']) throw new Error('Phase 8 requires ten demo types including Lesson 6 Practical.');
 
 const expectedInteractiveStepCounts = { 'PART-L1': 3, 'PART-L2': 4, 'PART-L3': 3, 'PART-L4': 6, 'PART-L5': 4, 'PART-L6': 4 };
 const actualInteractiveStepCounts = Object.fromEntries(lessons.map((lesson) => [lesson.id, lesson.steps.length]));
@@ -110,6 +116,17 @@ for (const [lessonId, expectedCount] of Object.entries(expectedExamCounts)) {
 }
 const examDifficultyCounts = Object.fromEntries(['basic', 'standard', 'entrance'].map((difficulty) => [difficulty, examProblems.filter((problem) => problem.difficulty === difficulty).length]));
 if (JSON.stringify(examDifficultyCounts) !== JSON.stringify({ basic: 2, standard: 8, entrance: 10 })) throw new Error(`Unexpected exam difficulty distribution: ${JSON.stringify(examDifficultyCounts)}.`);
+const practicalProblems = problems.filter((problem) => problem.type === 'practice-multiple-choice');
+if (practicalProblems.length !== 13) throw new Error(`Lesson 6 Practical requires 13 problems, found ${practicalProblems.length}.`);
+const practicalStageCounts = Object.fromEntries(['quick', 'form', 'structure'].map((stage) => [stage, practicalProblems.filter((problem) => problem.practiceStage === stage).length]));
+if (JSON.stringify(practicalStageCounts) !== JSON.stringify({ quick: 3, form: 5, structure: 5 })) throw new Error(`Unexpected Lesson 6 Practical stage distribution: ${JSON.stringify(practicalStageCounts)}.`);
+if (practicalProblems.some((problem) => !problem.sourceReconstruction || typeof problem.sourceReconstruction.reconstructed !== 'boolean')) throw new Error('Every Lesson 6 Practical problem must declare sourceReconstruction.reconstructed.');
+const reconstructedProblemIds = practicalProblems.filter((problem) => problem.sourceReconstruction.reconstructed).map((problem) => problem.id);
+if (JSON.stringify(reconstructedProblemIds) !== JSON.stringify(['PART-L6-PRACTICE-101', 'PART-L6-PRACTICE-104'])) throw new Error(`Unexpected reconstructed Lesson 6 Practical problems: ${JSON.stringify(reconstructedProblemIds)}.`);
+if (problemRegistry['PART-L6-PRACTICE-101']?.answerChoiceId !== 'l6p101-c2' || problemRegistry['PART-L6-PRACTICE-101']?.choices.find((choice) => choice.id === 'l6p101-c2')?.text !== 'attached') throw new Error('Problem 101 must answer attached.');
+if (!problemRegistry['PART-L6-PRACTICE-104']?.choices.some((choice) => choice.text === 'drowned')) throw new Error('Problem 104 must include the reconstructed drowned choice.');
+const authoredDistractors = practicalProblems.flatMap((problem) => problem.choices.filter((choice) => choice.authoredDistractor === true));
+if (authoredDistractors.length === 0) throw new Error('Source-derived Practical choices must mark authored distractors.');
 const wordOrderCounts = Object.fromEntries(lessons.map((lesson) => [lesson.id, problems.filter((problem) => problem.type === 'word-order' && problem.lessonId === lesson.id).length]));
 if (JSON.stringify(wordOrderCounts) !== JSON.stringify({ 'PART-L1': 0, 'PART-L2': 0, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 0, 'PART-L6': 2 })) throw new Error(`Unexpected Phase 7 word-order distribution: ${JSON.stringify(wordOrderCounts)}.`);
 const entranceWordOrderProblems = problems.filter((problem) => problem.type === 'word-order' && problem.assessmentKind === 'entrance');
@@ -140,12 +157,13 @@ if (forbiddenDeploymentPatterns.some((pattern) => pattern.test(ciWorkflowText)))
 
 function validateSourceEvidence(evidence, label) {
   const errors = [];
-  if (!evidence || evidence.source !== 'chapter14-ocr.md') errors.push(`${label}.source must be chapter14-ocr.md`);
+  const ocrSource = evidence ? ocrSources.get(evidence.source) : null;
+  if (!ocrSource) errors.push(`${label}.source must reference a repository OCR source`);
   if (!evidence || typeof evidence.heading !== 'string' || !evidence.heading.trim()) errors.push(`${label}.heading is required`);
-  else if (!ocrText.includes(evidence.heading)) errors.push(`${label}.heading does not exist in chapter14-ocr.md: ${evidence.heading}`);
+  else if (ocrSource && !ocrSource.text.includes(evidence.heading)) errors.push(`${label}.heading does not exist in ${evidence.source}: ${evidence.heading}`);
   if (!Number.isInteger(evidence?.lineStart) || evidence.lineStart < 1) errors.push(`${label}.lineStart must be an integer >= 1`);
   if (!Number.isInteger(evidence?.lineEnd) || evidence.lineEnd < evidence.lineStart) errors.push(`${label}.lineEnd must be an integer >= lineStart`);
-  if (Number.isInteger(evidence?.lineEnd) && evidence.lineEnd > ocrLines.length) errors.push(`${label}.lineEnd exceeds chapter14-ocr.md line count`);
+  if (ocrSource && Number.isInteger(evidence?.lineEnd) && evidence.lineEnd > ocrSource.lines.length) errors.push(`${label}.lineEnd exceeds ${evidence.source} line count`);
   if (!evidence || typeof evidence.concept !== 'string' || !evidence.concept.trim()) errors.push(`${label}.concept is required`);
   return errors;
 }
@@ -156,7 +174,7 @@ const traceableEvidence = [
     { label: `${content.lessonId}.lesson`, evidence: content.sourceEvidence },
   ]),
   ...problems
-    .filter((problem) => problem.type === 'exam-multiple-choice' || problem.assessmentKind === 'entrance')
+    .filter((problem) => problem.type === 'exam-multiple-choice' || problem.type === 'practice-multiple-choice' || problem.assessmentKind === 'entrance')
     .map((problem) => ({ label: problem.id, evidence: [problem.sourceEvidence] })),
 ];
 const traceabilityErrors = traceableEvidence.flatMap(({ label, evidence }) => (evidence ?? []).flatMap((item, index) => validateSourceEvidence(item, `${label}.sourceEvidence[${index}]`)));

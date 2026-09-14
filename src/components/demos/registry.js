@@ -7,6 +7,7 @@ import { mountErrorCorrector } from './errorCorrector.js';
 import { mountModifierPositioner } from './modifierPositioner.js';
 import { mountContextGrammar } from './contextGrammar.js';
 import { mountExamMultipleChoice } from './examMultipleChoice.js';
+import { mountPracticeMultipleChoice } from './practiceMultipleChoice.js';
 import { getProblemById } from '../../data/problems/index.js';
 
 export const demoRegistry = {
@@ -19,6 +20,7 @@ export const demoRegistry = {
   'modifier-positioner': { mount: mountModifierPositioner, demoProblemId: 'PART-L3-P001-POSITION' },
   'context-grammar': { mount: mountContextGrammar, demoProblemId: 'PART-L5-P004-CONTEXT' },
   'exam-multiple-choice': { mount: mountExamMultipleChoice, demoProblemId: 'PART-L1-EXAM-001' },
+  'practice-multiple-choice': { mount: mountPracticeMultipleChoice, demoProblemId: 'PART-L6-PRACTICE-Q001' },
 };
 
 export function getDemoProblem(type, problemId) {

@@ -8,6 +8,7 @@ import { modifierPositionerProblems } from './modifier-positioner.js';
 import { contextGrammarProblems } from './context-grammar.js';
 import { examMultipleChoiceProblems } from './exam-multiple-choice.js';
 import { entranceWordOrderProblems } from './entrance-word-order.js';
+import { lesson6PracticalProblems } from './lesson-6-practical.js';
 
 export const problemSets = {
   'mark-parts': markPartsProblems,
@@ -19,6 +20,7 @@ export const problemSets = {
   'modifier-positioner': modifierPositionerProblems,
   'context-grammar': contextGrammarProblems,
   'exam-multiple-choice': examMultipleChoiceProblems,
+  'practice-multiple-choice': lesson6PracticalProblems,
 };
 
 export const problems = Object.values(problemSets).flat();
@@ -43,4 +45,5 @@ export {
   contextGrammarProblems,
   examMultipleChoiceProblems,
   entranceWordOrderProblems,
+  lesson6PracticalProblems,
 };

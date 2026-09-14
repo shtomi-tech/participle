@@ -88,9 +88,9 @@ test('Lesson 2 and Lesson 3 pure logic use their declared answers', () => {
 test('Phase 7 data has frozen content traceability, full LR coverage, and target counts', () => {
   const result = validateProblems(problems, problemValidationOptions);
   assert.equal(result.valid, true, result.errors.join('\n'));
-  assert.equal(problems.length, 50);
+  assert.equal(problems.length, 63);
   assert.deepEqual(lessons.map((lesson) => lesson.id), ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4', 'PART-L5', 'PART-L6']);
-  assert.ok(problems.every((problem) => problem.contentRefs.length > 0 && problem.sourceEvidence.source === 'chapter14-ocr.md'));
+  assert.ok(problems.every((problem) => problem.contentRefs.length > 0 && ['chapter14-ocr.md', 'lesson21-22-ocr.md'].includes(problem.sourceEvidence.source)));
   assert.ok(problems.filter((problem) => problem.type === 'exam-multiple-choice' || problem.assessmentKind === 'entrance').every((problem) => problem.contentRefs.every((ref) => explanationSectionLessons.get(ref) === problem.lessonId)));
   assert.deepEqual(lessons.map((lesson) => lesson.steps.length), [3, 4, 3, 6, 4, 4]);
   assert.equal(lessons.reduce((total, lesson) => total + lesson.steps.length, 0), 24);
@@ -99,6 +99,12 @@ test('Phase 7 data has frozen content traceability, full LR coverage, and target
   ]);
   assert.ok(lessons.at(-1).steps.every((step) => problemRegistry[step.problemId].requirements.includes('LR-PART-013')));
   assert.equal(getProblemsByType('exam-multiple-choice').length, 20);
+  const practical = getProblemsByType('practice-multiple-choice');
+  assert.equal(practical.length, 13);
+  assert.deepEqual(
+    Object.fromEntries(['quick', 'form', 'structure'].map((stage) => [stage, practical.filter((problem) => problem.practiceStage === stage).length])),
+    { quick: 3, form: 5, structure: 5 },
+  );
   assert.deepEqual(
     Object.fromEntries(lessons.map((lesson) => [lesson.id, getProblemsByType('exam-multiple-choice').filter((problem) => problem.lessonId === lesson.id).length])),
     { 'PART-L1': 2, 'PART-L2': 3, 'PART-L3': 2, 'PART-L4': 4, 'PART-L5': 4, 'PART-L6': 5 },
@@ -168,6 +174,30 @@ test('exam multiple choice keeps the registry contract and tests Lesson 1 role o
   assert.equal(isCorrectExamChoice(exam, 'l1e1-c2'), true);
   assert.equal(isCorrectExamChoice(exam, 'l1e1-c1'), false);
   assert.deepEqual(evaluateExamChoice(exam, 'l1e1-c1'), { correct: false, selectedChoiceId: 'l1e1-c1', answerChoiceId: 'l1e1-c2' });
+});
+
+test('Lesson 6 Practical records reconstructed OCR questions and authored distractors', () => {
+  const p101 = problemRegistry['PART-L6-PRACTICE-101'];
+  assert.equal(p101.sourceReconstruction.reconstructed, true);
+  assert.equal(p101.sourceReconstruction.confidence, 'high');
+  assert.equal(p101.answerChoiceId, 'l6p101-c2');
+  assert.equal(p101.choices.find((choice) => choice.id === p101.answerChoiceId).text, 'attached');
+
+  const p104 = problemRegistry['PART-L6-PRACTICE-104'];
+  assert.equal(p104.sourceReconstruction.reconstructed, true);
+  assert.equal(p104.sourceReconstruction.confidence, 'medium');
+  assert.ok(p104.choices.some((choice) => choice.text === 'drowned'));
+
+  const q001 = problemRegistry['PART-L6-PRACTICE-Q001'];
+  const q002 = problemRegistry['PART-L6-PRACTICE-Q002'];
+  assert.equal(q001.choices.find((choice) => choice.text === 'a breaking window').authoredDistractor, true);
+  assert.equal(q002.choices.find((choice) => choice.text === 'a died tree').authoredDistractor, true);
+  assert.ok(getProblemsByType('practice-multiple-choice').every((problem) => typeof problem.sourceReconstruction.reconstructed === 'boolean'));
+
+  const unmarkedReconstruction = structuredClone(p101);
+  delete unmarkedReconstruction.sourceReconstruction;
+  const invalid = validateProblems([unmarkedReconstruction], problemValidationOptions);
+  assert.ok(invalid.errors.some((error) => error.includes('sourceReconstruction')));
 });
 
 test('entrance word order has only the six syntax-construction problems', () => {
