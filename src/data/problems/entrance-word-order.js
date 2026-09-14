@@ -158,14 +158,14 @@ export const entranceWordOrderProblems = [
       { id: 'l5w1-excited', text: 'students' },
     ],
     acceptedAnswers: [['l5w1-the', 'l5w1-students', 'l5w1-excited']],
-    explanation: 'excited が students を前から説明します。announcement が students を excite したと考えると、students は感情を受ける側なので excited です。知覚動詞の目的語補語ではなく、主語名詞句の修飾として読めます。',
+    explanation: 'excited が students を前から説明します。students は何かによって excite された感情の受け手として表されているため、excited です。知覚動詞の目的語補語ではなく、主語名詞句の修飾として読めます。',
     explanationSteps: [
       { label: 'Target', text: 'the students' },
       { label: 'Direction', text: 'students receive excitement' },
       { label: 'Form', text: 'receiver → excited' },
     ],
     difficulty: 'standard',
-    misconceptions: ['人なら-ingとする', '感情を与える側と受ける側を逆にする'],
+    misconceptions: ['感情を受ける側なのに exciting を選ぶ', '-ing / -ed を語尾だけで判断する'],
   },
   {
     id: 'PART-L6-EXAM-WORD-001',
@@ -179,11 +179,11 @@ export const entranceWordOrderProblems = [
     fixedPrefix: 'The',
     fixedSuffix: 'helped the new students.',
     words: [
-      { id: 'l6w1-a', text: 'teacher' },
-      { id: 'l6w1-teacher', text: 'teaching' },
-      { id: 'l6w1-experienced', text: 'science' },
+      { id: 'l6w1-teacher', text: 'teacher' },
+      { id: 'l6w1-teaching', text: 'teaching' },
+      { id: 'l6w1-science', text: 'science' },
     ],
-    acceptedAnswers: [['l6w1-a', 'l6w1-teacher', 'l6w1-experienced']],
+    acceptedAnswers: [['l6w1-teacher', 'l6w1-teaching', 'l6w1-science']],
     explanation: 'teaching science が teacher を後ろから説明します。teacher が teach science する能動のHidden S-Vなので teaching です。',
     explanationSteps: [
       { label: 'Target noun', text: 'the teacher' },
@@ -191,7 +191,7 @@ export const entranceWordOrderProblems = [
       { label: 'Position', text: 'まとまりを名詞の後ろに置く' },
     ],
     difficulty: 'entrance',
-    misconceptions: ['in science を名詞句の外へ置く', '分詞句を語数だけで前置にする'],
+    misconceptions: ['teaching science を名詞句の外へ置く', 'teacher が science を teach する能動関係を見落とす'],
   },
   {
     id: 'PART-L6-EXAM-WORD-002',
