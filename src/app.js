@@ -5,6 +5,9 @@ import { getProblemById, getProblemsByType } from './data/problems/index.js';
 import { mountDemoProblem } from './components/demos/registry.js';
 import { mountExplanation, renderExplanationClosing } from './components/explanation/explanationRenderer.js';
 import { getLessonProgress, isLessonStepComplete, markLessonStepComplete } from './lib/lesson-progress.js';
+import { getParticipleLesson } from './data/participle-course.js';
+import { loadParticipleProgress } from './lib/participle-progress.js';
+import { mountParticipleLesson } from './components/participleLessonPlayer.js';
 
 const app = document.querySelector('#app');
 
@@ -16,11 +19,13 @@ function getRoute() {
 
 function renderHome() {
   document.title = '分詞インタラクティブ教材';
+  const participleProgress = loadParticipleProgress();
   const lessonCards = lessons.map((lesson, index) => `
     <article class="lesson-card">
       <p class="step-label">${escapeHtml(lesson.label)}</p>
       <h2>${escapeHtml(lesson.title)}</h2>
       <p>${escapeHtml(lesson.description)}</p>
+      ${index < 5 && participleProgress[`lesson${index + 1}`]?.completed ? '<p class="lesson-card-status">仕様フロー完了</p>' : ''}
       <a class="button" href="#lessons/${escapeHtml(lesson.slug)}">${index === 0 ? 'Lesson 1を始める' : `${escapeHtml(lesson.label)}へ進む`} →</a>
     </article>`).join('');
   app.innerHTML = `
@@ -195,6 +200,7 @@ function renderLesson(lesson) {
         <div class="goal"><span>Learning goal</span><p>${escapeHtml(lesson.learningGoal)}</p></div>
       </header>
 
+      ${getParticipleLesson(lesson.id) ? '<section class="participle-spec-section" data-participle-spec aria-labelledby="participle-spec-heading"><div data-participle-spec-root></div></section>' : ''}
       ${standardSections}
       ${practiceSections}
 
@@ -214,6 +220,8 @@ function renderLesson(lesson) {
     mountExplanation(explanationRoot, content, { includeClosingSections: false });
   }
   app.querySelector('[data-closing-root]').innerHTML = renderExplanationClosing(content);
+  const participleLesson = getParticipleLesson(lesson.id);
+  if (participleLesson) mountParticipleLesson(app.querySelector('[data-participle-spec-root]'), participleLesson);
 
   if (!isPracticeLesson) {
     const stepLabel = app.querySelector('[data-step-label]');
