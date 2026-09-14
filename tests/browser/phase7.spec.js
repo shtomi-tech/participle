@@ -102,6 +102,7 @@ test('keeps the reordered existing interactions usable', async ({ page }) => {
   await expect(interactive.locator('[data-positioner-feedback]')).toHaveText('Goal matched.');
   await page.locator('[data-next]').click();
   await interactive.locator('[data-comparison-chunk-id="l3c-a-modifier"]').click();
+  await expect(interactive.locator('[data-comparison-selection]')).toContainText('Meaning A: 踊っている女の子。 Meaning B: 踊っている女の子。');
   await expect(interactive.locator('[data-comparison-progress]')).toHaveText('You explored all sentence differences.');
 });
 

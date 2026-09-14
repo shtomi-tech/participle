@@ -59,6 +59,9 @@ test('modifier relation and sentence comparison completion use stable IDs', () =
   const comparison = problemRegistry['PART-L3-P004-COMPARE'];
   const difference = getDifferenceByChunkId(comparison.differences, 'l3c-a-modifier');
   assert.equal(difference.id, 'one-word-position');
+  assert.equal(difference.meaningLeft, '踊っている女の子。');
+  assert.equal(difference.meaningRight, '踊っている女の子。');
+  assert.equal(difference.meaningRight.includes('その女の子は踊っている'), false);
   assert.deepEqual(getChunkIdsForDifference(comparison.differences, difference.id), ['l3c-a-modifier', 'l3c-b-modifier']);
   assert.equal(hasExploredAllDifferences(comparison.differences, new Set()), false);
   assert.equal(hasExploredAllDifferences(comparison.differences, new Set(['one-word-position'])), true);

@@ -63,7 +63,7 @@ export const sentenceComparisonProblems = [
       { id: 'b', text: 'the girl dancing', chunks: [{ id: 'l3c-b-article', text: 'the', matchKey: 'article' }, { id: 'l3c-b-noun', text: 'girl', matchKey: 'noun' }, { id: 'l3c-b-modifier', text: 'dancing', differenceId: 'one-word-position' }] },
     ],
     differences: [
-      { id: 'one-word-position', leftChunkId: 'l3c-a-modifier', rightChunkId: 'l3c-b-modifier', label: 'the dancing girl / the girl dancing', explanation: 'どちらも可能です。1語の分詞は前置が基本ですが、後置には文脈や焦点が関係します。「1語なら必ず前」とは限りません。', meaningLeft: '踊っている女の子。', meaningRight: 'その女の子は踊っている。' },
+      { id: 'one-word-position', leftChunkId: 'l3c-a-modifier', rightChunkId: 'l3c-b-modifier', label: 'the dancing girl / the girl dancing', explanation: 'どちらも可能です。1語の分詞は前置が基本ですが、後置には文脈や焦点が関係します。「1語なら必ず前」とは限りません。', meaningLeft: '踊っている女の子。', meaningRight: '踊っている女の子。' },
     ],
     explanation: '基本配置は前置ですが、1語後置もあります。語数だけでなく、どの名詞を説明するかと文脈を見ます。',
   },
