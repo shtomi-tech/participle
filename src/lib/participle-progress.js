@@ -1,11 +1,11 @@
 import { PARTICIPLE_PROGRESS_KEY } from '../data/participle-course.js';
 
 function emptyLesson() {
-  return { completed: false, currentStep: 0, completedSteps: [], quizScore: 0, quizResults: {} };
+  return { completed: false, currentStep: 0, completedSteps: [], quizScore: 0, quizResults: {}, rapidAnswers: {} };
 }
 
 export function defaultParticipleProgress() {
-  return { lesson1: emptyLesson(), lesson2: emptyLesson(), lesson3: emptyLesson(), lesson4: emptyLesson(), lesson5: { ...emptyLesson(), answerScore: 0, reasoningScore: 0, finalPassed: false }, currentLesson: 1 };
+  return { lesson1: emptyLesson(), lesson2: emptyLesson(), lesson3: emptyLesson(), lesson4: emptyLesson(), lesson5: { ...emptyLesson(), answerScore: 0, reasoningScore: 0, firstAttemptAnswerScore: 0, firstAttemptReasoningScore: 0, firstAttemptRecorded: false, finalPassed: false }, currentLesson: 1 };
 }
 
 const stageIds = new Set(['look', 'notice', 'try', 'check', 'summary']);
@@ -29,9 +29,13 @@ export function normalizeParticipleProgress(value) {
     if (result[key].completed && result[key].completedSteps.length === 0) result[key].completedSteps = [...stageIds];
     result[key].quizScore = Number.isFinite(source.quizScore) ? Math.max(0, Math.floor(source.quizScore)) : 0;
     result[key].quizResults = isRecord(source.quizResults) ? structuredClone(source.quizResults) : {};
+    result[key].rapidAnswers = isRecord(source.rapidAnswers) ? structuredClone(source.rapidAnswers) : {};
     if (index === 5) {
       result[key].answerScore = Number.isFinite(source.answerScore) ? Math.max(0, Math.floor(source.answerScore)) : 0;
       result[key].reasoningScore = Number.isFinite(source.reasoningScore) ? Math.max(0, Math.floor(source.reasoningScore)) : 0;
+      result[key].firstAttemptAnswerScore = Number.isFinite(source.firstAttemptAnswerScore) ? Math.max(0, Math.floor(source.firstAttemptAnswerScore)) : 0;
+      result[key].firstAttemptReasoningScore = Number.isFinite(source.firstAttemptReasoningScore) ? Math.max(0, Math.floor(source.firstAttemptReasoningScore)) : 0;
+      result[key].firstAttemptRecorded = source.firstAttemptRecorded === true;
     }
     if (index === 5) result[key].finalPassed = source.finalPassed === true;
   }

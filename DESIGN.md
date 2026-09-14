@@ -12,7 +12,8 @@ Explanation is primary. Interaction is supportive. Assessment confirms transfer.
 
 | Responsibility | Source of truth |
 | --- | --- |
-| What to teach | `C:\Users\shtom\dev\participle\chapter14-ocr.md` / `chapter14-ocr.json` |
+| What to teach | supplied `C:\Users\shtom\dev\participle\chapter14-participle.pptx` |
+| PPT transcription for validation | `C:\Users\shtom\dev\participle\chapter14-ocr.md` / `chapter14-ocr.json` |
 | Project goal | `PROJECT_GOAL.md` |
 | Learning requirements | `LEARNING_REQUIREMENTS.md` |
 | How to teach | `C:\Users\shtom\dev\english-grammar-interactive-atlas` の既存Component、Problem、Lesson、validator、CSS |
@@ -942,3 +943,9 @@ Lesson 1〜5には、旧Interactionを壊さず、`src/data/participle-course.js
 - GitHub Pagesは`.github/workflows/pages.yml`で`main`の`dist`を公開し、`.github/workflows/ci.yml`は検証専用とする。
 - リポジトリの公開・非公開設定はこの実装では変更しない。
 - 既存の公開URLや過去の公開物は、現在のリリース操作や検証結果を示すものとして扱わない。
+
+## Final specification alignment
+
+Lesson 1〜5の仕様データは、教材内容をPPT由来として`source: 'ppt'`で識別する。PPTにない補足を追加するときは`source: 'supplemental'`として分離する。Lesson 2はPPT掲載の能動・受動例と13語のp.p.カード、Lesson 3はPPTの後置修飾比較と位置Builder、Lesson 4は3問の二段階Rapid Judge、Lesson 5は感情の与え手・受け手、初回スコアを保持するReview、両軸Masteryを実装する。
+
+`RelationDisplay`は`RelationArrow`を包む共通表示Componentとして、関係の意味を「する / される」「感情を与える / 与えられる」という日本語で表示する。`SVRelationJudge`は名詞・元動詞の選択後に関係、続いて分詞形を選ばせる。教材の正本はPPTであり、OCRはソース範囲の検証用転記として扱う。

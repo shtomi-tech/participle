@@ -13,7 +13,7 @@ test('Lesson 1 follows LOOK through SUMMARY and restores completion', async ({ p
 
   await spec.locator('[data-spec-action="change-tall"]').click();
   await spec.locator('[data-spec-action="change-cute"]').click();
-  await spec.locator('[data-spec-action="choose-notice"][data-spec-value="modify"]').click();
+  await spec.locator('[data-spec-action="choose-notice"][data-spec-value="baby"]').click();
   await spec.locator('[data-spec-action="complete-stage"]').click();
   await spec.locator('[data-spec-stage-next]').click();
   await expect(spec.locator('[data-spec-stage-content]')).toContainText('RULE');
@@ -22,7 +22,7 @@ test('Lesson 1 follows LOOK through SUMMARY and restores completion', async ({ p
   await spec.locator('[data-spec-stage-next]').click();
 
   await spec.locator('[data-spec-choice-question="l1-q1"][data-spec-choice-id="baby"]').click();
-  await spec.locator('[data-spec-choice-question="l1-q2"][data-spec-choice-id="window"]').click();
+  await spec.locator('[data-spec-choice-question="l1-q2"][data-spec-choice-id="noun"]').click();
   await spec.locator('[data-spec-stage-next]').click();
   await expect(spec.locator('[data-spec-stage-title]')).toHaveText('今日のまとめ');
   await spec.locator('[data-spec-action="complete-lesson"]').click();
@@ -96,8 +96,10 @@ test('Lesson 2 keeps the drag rule check usable with click fallback', async ({ p
   await spec.locator('[data-spec-action="complete-stage"]').click();
   await spec.locator('[data-spec-stage-next]').click();
 
-  await spec.locator('[data-spec-choice-question="l2-q1"][data-spec-choice-id="active"]').click();
-  await spec.locator('[data-spec-choice-question="l2-q2"][data-spec-choice-id="passive"]').click();
+  await spec.locator('[data-spec-relation-choice="l2-q1:active"]').click();
+  await spec.locator('[data-spec-form-choice="l2-q1:smiling"]').click();
+  await spec.locator('[data-spec-relation-choice="l2-q2:passive"]').click();
+  await spec.locator('[data-spec-form-choice="l2-q2:spoken"]').click();
   await expect(spec.locator('[data-spec-drag-item]')).toHaveCount(2);
   await spec.locator('[data-spec-drag-item="l2-q3:ing"]').click();
   await spec.locator('[data-spec-drag-target="l2-q3:active"]').click();
@@ -123,6 +125,95 @@ test('Lesson 3 builds a long participle phrase and keeps the rule as a principle
   await spec.locator('[data-spec-action="complete-stage"]').click();
   await spec.locator('[data-spec-stage-next]').click();
   await expect(spec.locator('[data-spec-stage-title]')).toHaveText('Lesson 3 確認問題');
+});
+
+test('Lesson 3 position checks and Lesson 4 Rapid Judge keep their two-step interactions', async ({ page }) => {
+  await page.goto('/#lessons/modifier-position');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  const lesson3 = page.locator('[data-participle-spec-root]');
+  await lesson3.locator('[data-spec-action="complete-stage"]').click();
+  await lesson3.locator('[data-spec-stage-next]').click();
+  await lesson3.locator('[data-spec-build-chip="extra"]').click();
+  await lesson3.locator('[data-spec-stage-next]').click();
+  await lesson3.locator('[data-spec-action="complete-stage"]').click();
+  await lesson3.locator('[data-spec-stage-next]').click();
+  for (const [id, position] of [['l3-q1', 'front'], ['l3-q2', 'back'], ['l3-q3-a', 'front'], ['l3-q3-b', 'back']]) {
+    await lesson3.locator(`[data-spec-position-choice="${id}:${position}"]`).click();
+  }
+  await expect(lesson3.locator('[data-spec-stage-status]')).toContainText('complete');
+
+  await page.goto('/#lessons/hidden-sv');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  const lesson4 = page.locator('[data-participle-spec-root]');
+  await lesson4.locator('[data-spec-stage="0"]').click();
+  await lesson4.locator('[data-spec-action="complete-stage"]').click();
+  await lesson4.locator('[data-spec-stage-next]').click();
+  for (const [index, relation, form] of [[0, 'active', 'smiling'], [1, 'passive', 'spoken']]) {
+    await lesson4.locator(`[data-spec-case-node="${index}:noun"]`).click();
+    await lesson4.locator(`[data-spec-case-node="${index}:verb"]`).click();
+    await lesson4.locator(`[data-spec-case-relation="${index}:${relation}"]`).click();
+    await lesson4.locator(`[data-spec-case-form="${index}:${form}"]`).click();
+  }
+  await lesson4.locator('[data-spec-stage-next]').click();
+  for (const [id, noun, verb, relation, form] of [
+    ['l4-rapid-1', 'noun', 'verb', 'active', 'running'],
+    ['l4-rapid-2', 'noun', 'verb', 'passive', 'spoken'],
+    ['l4-rapid-3', 'noun', 'verb', 'active', 'smiling'],
+  ]) {
+    await lesson4.locator(`[data-spec-sv-node="${id}:${noun}"]`).click();
+    await lesson4.locator(`[data-spec-sv-node="${id}:${verb}"]`).click();
+    await lesson4.locator(`[data-spec-sv-relation="${id}:${relation}"]`).click();
+    await lesson4.locator(`[data-spec-sv-form="${id}:${form}"]`).click();
+  }
+  await lesson4.locator('[data-spec-action="complete-stage"]').click();
+  await expect(lesson4.locator('[data-spec-stage-status]')).toContainText('complete');
+});
+
+test('Lesson 5 Review retries only missed questions and keeps first-attempt scores', async ({ page }) => {
+  await page.goto('/#lessons/emotion-verbs');
+  await page.evaluate(() => localStorage.clear());
+  await page.reload();
+  const spec = page.locator('[data-participle-spec-root]');
+  await spec.locator('[data-spec-choice-id="cause"]').click();
+  await spec.locator('[data-spec-stage-next]').click();
+  await spec.locator('[data-spec-action="myth-choice"][data-spec-value="no"]').click();
+  await spec.locator('[data-spec-action="complete-stage"]').click();
+  await spec.locator('[data-spec-stage-next]').click();
+  await spec.locator('[data-spec-action="complete-stage"]').click();
+  await spec.locator('[data-spec-stage-next]').click();
+
+  const answers = [
+    ['l5-q1', 'active', 'speaking'], ['l5-q2', 'passive', 'run'], ['l5-q3', 'passive', 'bored'],
+    ['l5-q4', 'active', 'exciting'], ['l5-q5', 'passive', 'interested'],
+  ];
+  const correctRelations = { 'l5-q1': 'passive', 'l5-q2': 'active', 'l5-q3': 'active', 'l5-q4': 'passive', 'l5-q5': 'active' };
+  const correctForms = { 'l5-q1': 'spoken', 'l5-q2': 'running', 'l5-q3': 'boring', 'l5-q4': 'excited', 'l5-q5': 'interesting' };
+  for (const [id, wrongRelation, wrongForm] of answers) {
+    await spec.locator(`[data-spec-final-relation="${id}:${wrongRelation}"]`).click();
+    await spec.locator(`[data-spec-final-relation="${id}:${correctRelations[id]}"]`).click();
+    await spec.locator(`[data-spec-final-form="${id}:${wrongForm}"]`).click();
+  }
+  await spec.locator('[data-spec-action="final-submit"]').click();
+  await expect(spec.locator('[data-spec-final-result]')).toContainText('REVIEW');
+  await expect(spec.locator('.spec-score-pair')).toContainText('ANSWERS 0 / 5');
+  await expect(spec.locator('.spec-score-pair')).toContainText('REASONING 5 / 5');
+  const firstSaved = await page.evaluate(() => JSON.parse(localStorage.getItem('participle.lesson-progress.v1')));
+  expect(firstSaved.lesson5.firstAttemptAnswerScore).toBe(0);
+  expect(firstSaved.lesson5.firstAttemptReasoningScore).toBe(0);
+
+  await spec.locator('[data-spec-action="final-retry"]').click();
+  for (const id of Object.keys(correctRelations)) {
+    await spec.locator(`[data-spec-final-relation="${id}:${correctRelations[id]}"]`).click();
+    await spec.locator(`[data-spec-final-form="${id}:${correctForms[id]}"]`).click();
+  }
+  await spec.locator('[data-spec-action="final-submit"]').click();
+  await expect(spec.locator('[data-spec-final-result]')).toContainText('COMPLETE');
+  const completedSaved = await page.evaluate(() => JSON.parse(localStorage.getItem('participle.lesson-progress.v1')));
+  expect(completedSaved.lesson5.firstAttemptAnswerScore).toBe(0);
+  expect(completedSaved.lesson5.firstAttemptReasoningScore).toBe(0);
+  expect(completedSaved.lesson5.finalPassed).toBe(true);
 });
 
 test('spec flow has no horizontal overflow on mobile and honors reduced motion', async ({ page }) => {

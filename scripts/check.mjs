@@ -76,6 +76,7 @@ const sourceFiles = [
   'src/components/participle/WordCard.js',
   'src/components/participle/SentenceBuilder.js',
   'src/components/participle/RelationArrow.js',
+  'src/components/participle/RelationDisplay.js',
   'src/components/participle/SVRelationJudge.js',
   'src/components/participle/ChoiceQuestion.js',
   'src/components/participle/FeedbackPanel.js',
@@ -109,6 +110,14 @@ for (const lesson of participleLessons) {
   if (lesson.stages.length !== specStageIds.length) throw new Error(`${lesson.id} must have five spec stages.`);
   if (lesson.stages.some((stage, index) => stage.id !== specStageIds[index])) throw new Error(`${lesson.id} spec stages are out of order.`);
 }
+if (participleLessons.slice(0, 5).some((lesson) => lesson.source !== 'ppt')) throw new Error('Lesson 1-5 spec data must identify the PPT as its source.');
+const lesson2Cards = participleLessons.find((lesson) => lesson.id === 'PART-L2')?.stages.find((stage) => stage.kind === 'word-cards')?.cards ?? [];
+const requiredLesson2Cards = ['used', 'crowded', 'frozen', 'lost', 'experienced', 'qualified', 'scheduled', 'complicated', 'sophisticated', 'civilized', 'organized', 'noted', 'marked'];
+if (requiredLesson2Cards.some((word) => !lesson2Cards.some((card) => card.id === word))) throw new Error('Lesson 2 word cards are incomplete.');
+const lesson4Rapid = participleLessons.find((lesson) => lesson.id === 'PART-L4')?.stages.find((stage) => stage.kind === 'rapid-judge')?.rapid ?? [];
+if (!Array.isArray(lesson4Rapid) || lesson4Rapid.length < 3) throw new Error('Lesson 4 Rapid Judge requires at least three two-stage questions.');
+const lesson3Check = participleLessons.find((lesson) => lesson.id === 'PART-L3')?.stages.find((stage) => stage.kind === 'position-quiz');
+if (!lesson3Check || JSON.stringify(lesson3Check.questions.map((question) => question.id)) !== JSON.stringify(['l3-q1', 'l3-q2', 'l3-q3-a', 'l3-q3-b'])) throw new Error('Lesson 3 position checks must include Q1, Q2, Q3-A, and Q3-B.');
 const lesson5Final = participleLessons.find((lesson) => lesson.id === 'PART-L5')?.stages.find((stage) => stage.kind === 'final-quiz');
 if (!lesson5Final || lesson5Final.questions.length !== 5 || lesson5Final.questions.some((question) => !question.noun || !question.verb || !question.relationAnswer)) {
   throw new Error('Lesson 5 Final Check must contain five two-stage relation questions.');

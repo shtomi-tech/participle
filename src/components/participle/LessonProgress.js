@@ -8,7 +8,8 @@ export function renderLessonProgress(lessons, progress, currentLessonId) {
         ${lessons.map((lesson, index) => {
           const lessonProgress = progress[`lesson${index + 1}`];
           const state = lessonProgress?.completed ? 'complete' : lesson.id === currentLessonId ? 'current' : 'upcoming';
-          return `<li class="spec-progress-item is-${state}" data-spec-progress-lesson="${escapeHtml(lesson.id)}" aria-label="${escapeHtml(`${lesson.label}: ${state}`)}"><span>${index + 1}</span><small>${escapeHtml(lesson.label)}</small></li>`;
+          const marker = state === 'upcoming' ? '○' : '●';
+          return `<li class="spec-progress-item is-${state}" data-spec-progress-lesson="${escapeHtml(lesson.id)}" aria-label="${escapeHtml(`${lesson.label}: ${state}`)}"><span aria-hidden="true">${marker}</span><small>${escapeHtml(lesson.label)}</small></li>`;
         }).join('')}
       </ol>
     </div>`;
