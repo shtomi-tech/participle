@@ -42,28 +42,6 @@ export const modifierPositionerProblems = [
     punctuation: '.',
     explanation: '分詞句は名詞の後ろに置いて、直前の名詞を説明するのが基本です。',
   },
-  {
-    id: 'PART-L6-IC-004-POSITION',
-    type: 'modifier-positioner',
-    lessonId: 'PART-L6',
-    contentRefs: ['PART-L6-EXPLAIN-01', 'PART-L6-EXPLAIN-03'],
-    requirements: ['LR-PART-004', 'LR-PART-006', 'LR-PART-013'],
-    sourceEvidence: { source: 'chapter14-ocr.md', section: '14-1-2 分詞の位置（分詞の前置修飾・後置修飾）' },
-    prompt: '同じ英文で、prepared for new staff を report の後ろに置いてください。',
-    goal: { description: 'prepared for new staff は分詞句なので report の後ろから説明することを確認する。' },
-    chunks: [
-      { id: 'l6ic-pos-the', text: 'The' },
-      { id: 'l6ic-pos-report', text: 'report' },
-      { id: 'l6ic-pos-explains', text: 'explains the safety rules' },
-    ],
-    modifier: { id: 'l6ic-pos-prepared', text: 'prepared for new staff' },
-    placements: [
-      { id: 'l6ic-pos-after-report', position: 2, label: 'After “report” · phrase', modifierText: 'prepared for new staff', grammatical: true, matchesGoal: true, relation: { modifierId: 'l6ic-pos-prepared', targetId: 'l6ic-pos-report', relationType: 'modifies', label: 'prepared for new staff → report', explanation: 'prepared for new staff は分詞句なので report の後ろから説明します。' }, meaning: '新しい職員向けに用意されたレポートは安全規則を説明する。' },
-      { id: 'l6ic-pos-before-report', position: 1, label: 'Before “report” · phrase', modifierText: 'prepared for new staff', grammatical: false, matchesGoal: false, relation: { modifierId: 'l6ic-pos-prepared', targetId: 'l6ic-pos-report', relationType: 'modifies', label: 'prepared for new staff → report', explanation: 'この長い分詞句は、今回の基本配置では report の後ろに置きます。' }, meaning: 'この問題では自然な基本配置になりません。' },
-    ],
-    punctuation: '.',
-    explanation: 'prepared for new staff は分詞を中心とする語句です。report の後ろに置き、同じIntegrated Caseを最後まで完成させます。',
-  },
 ];
 
 export const modifierPositionerProblem = modifierPositionerProblems[0];

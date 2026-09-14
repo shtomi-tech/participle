@@ -6,7 +6,6 @@ const lessons = [
   { slug: 'modifier-position', steps: 3, wordOrder: 2 },
   { slug: 'hidden-sv', steps: 6, wordOrder: 2 },
   { slug: 'emotion-verbs', steps: 4, wordOrder: 0 },
-  { slug: 'integrated-judgment', steps: 4, wordOrder: 2 },
 ];
 
 test('renders explanation, interactive check, exam, optional word order, and review in order', async ({ page }) => {
@@ -148,31 +147,6 @@ test('keeps Lesson 5 focused on emotion direction', async ({ page }) => {
     await interactive.locator('[data-context-continue]').click();
   }
   await expect(interactive.locator('[data-context-progress]')).toHaveText('You completed the scenario.');
-});
-
-test('builds the Lesson 6 integrated case from target noun to position', async ({ page }) => {
-  await page.goto('/#lessons/integrated-judgment');
-  const interactive = page.locator('[data-lesson-component]');
-  const sentence = 'The report prepared for new staff explains the safety rules.';
-
-  await interactive.locator('[data-token-id="l6ic-report"]').click();
-  await interactive.locator('[data-parts-check]').click();
-  await expect(interactive.locator('[data-parts-feedback]')).toHaveText(/Correct/);
-  await page.locator('[data-next]').click();
-
-  await interactive.locator('[data-sentence-chunk-id="l6ic-rel-prepared"]').click();
-  await expect(interactive.locator('[data-modifier-progress]')).toHaveText('Relation complete.');
-  await page.locator('[data-next]').click();
-
-  await interactive.locator('[data-error-correction-id="l6ic-form-choice"]').click();
-  await interactive.locator('[data-error-option-id="l6ic-opt-prepared"]').click();
-  await expect(interactive.locator('[data-error-feedback]')).toHaveText(/Correct/);
-  await page.locator('[data-next]').click();
-
-  await interactive.locator('[data-modifier]').click();
-  await interactive.locator('[data-placement-id="l6ic-pos-after-report"]').click();
-  await expect(interactive.locator('[data-positioner-feedback]')).toHaveText('Goal matched.');
-  await expect(interactive.locator('[data-positioner-sentence]')).toHaveText(sentence);
 });
 
 test('keeps exam keyboard focus and optional word-order sections accessible', async ({ page }) => {

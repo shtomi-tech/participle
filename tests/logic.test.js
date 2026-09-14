@@ -85,20 +85,50 @@ test('Lesson 2 and Lesson 3 pure logic use their declared answers', () => {
   assert.equal(getPlacementRelation(positionProblem, 'l3p1-before-noun').targetId, 'l3p1-lamp');
 });
 
-test('Phase 7 data has frozen content traceability, full LR coverage, and target counts', () => {
+test('Phase 8 data keeps Lessons 1-5 frozen in order and moves Lesson 6 to practical mode', () => {
   const result = validateProblems(problems, problemValidationOptions);
   assert.equal(result.valid, true, result.errors.join('\n'));
-  assert.equal(problems.length, 63);
+  assert.equal(problems.length, 52);
   assert.deepEqual(lessons.map((lesson) => lesson.id), ['PART-L1', 'PART-L2', 'PART-L3', 'PART-L4', 'PART-L5', 'PART-L6']);
+  assert.deepEqual(lessons.map((lesson) => lesson.mode), ['standard', 'standard', 'standard', 'standard', 'standard', 'practice']);
   assert.ok(problems.every((problem) => problem.contentRefs.length > 0 && ['chapter14-ocr.md', 'lesson21-22-ocr.md'].includes(problem.sourceEvidence.source)));
   assert.ok(problems.filter((problem) => problem.type === 'exam-multiple-choice' || problem.assessmentKind === 'entrance').every((problem) => problem.contentRefs.every((ref) => explanationSectionLessons.get(ref) === problem.lessonId)));
-  assert.deepEqual(lessons.map((lesson) => lesson.steps.length), [3, 4, 3, 6, 4, 4]);
-  assert.equal(lessons.reduce((total, lesson) => total + lesson.steps.length, 0), 24);
-  assert.deepEqual(lessons.at(-1).steps.map((step) => step.problemId), [
-    'PART-L6-IC-001-MARK', 'PART-L6-IC-002-REL', 'PART-L6-IC-003-FORM', 'PART-L6-IC-004-POSITION',
+  assert.deepEqual(lessons.map((lesson) => lesson.steps.length), [3, 4, 3, 6, 4, 0]);
+  assert.equal(lessons.reduce((total, lesson) => total + lesson.steps.length, 0), 20);
+  assert.equal(lessons.at(-1).title, '実践演習 — 入試問題で分詞を見抜く');
+  assert.deepEqual(lessons.slice(0, 5).map((lesson) => lesson.steps.map(({ id, interactionType, problemId }) => [id, interactionType, problemId])), [
+    [
+      ['PART-L1-STEP-01', 'sentence-comparison', 'PART-L1-P004-COMPARE'],
+      ['PART-L1-STEP-02', 'mark-parts', 'PART-L1-P001-MARK'],
+      ['PART-L1-STEP-03', 'grammar-classifier', 'PART-L1-P002-CLASS'],
+    ],
+    [
+      ['PART-L2-STEP-01', 'sentence-comparison', 'PART-L2-P001-COMPARE'],
+      ['PART-L2-STEP-02', 'grammar-classifier', 'PART-L2-P002-CLASS'],
+      ['PART-L2-STEP-03', 'error-corrector', 'PART-L2-P003-ERROR'],
+      ['PART-L2-STEP-04', 'sentence-comparison', 'PART-L2-P004-COMPARE'],
+    ],
+    [
+      ['PART-L3-STEP-01', 'modifier-positioner', 'PART-L3-P001-POSITION'],
+      ['PART-L3-STEP-02', 'modifier-positioner', 'PART-L3-P002-POSITION'],
+      ['PART-L3-STEP-03', 'sentence-comparison', 'PART-L3-P004-COMPARE'],
+    ],
+    [
+      ['PART-L4-STEP-01', 'mark-parts', 'PART-L4-P001-MARK'],
+      ['PART-L4-STEP-02', 'modifier-connection-viewer', 'PART-L4-P001-REL'],
+      ['PART-L4-STEP-03', 'mark-parts', 'PART-L4-P002-MARK'],
+      ['PART-L4-STEP-04', 'modifier-connection-viewer', 'PART-L4-P002-REL'],
+      ['PART-L4-STEP-05', 'mark-parts', 'PART-L4-P003-MARK'],
+      ['PART-L4-STEP-06', 'modifier-connection-viewer', 'PART-L4-P003-REL'],
+    ],
+    [
+      ['PART-L5-STEP-01', 'sentence-comparison', 'PART-L5-P002-COMPARE'],
+      ['PART-L5-STEP-02', 'grammar-classifier', 'PART-L5-P001-GIVER-RECEIVER'],
+      ['PART-L5-STEP-03', 'sentence-comparison', 'PART-L5-P003-COMPARE-BORING'],
+      ['PART-L5-STEP-04', 'context-grammar', 'PART-L5-P004-CONTEXT'],
+    ],
   ]);
-  assert.ok(lessons.at(-1).steps.every((step) => problemRegistry[step.problemId].requirements.includes('LR-PART-013')));
-  assert.equal(getProblemsByType('exam-multiple-choice').length, 20);
+  assert.equal(getProblemsByType('exam-multiple-choice').length, 15);
   const practical = getProblemsByType('practice-multiple-choice');
   assert.equal(practical.length, 13);
   assert.deepEqual(
@@ -107,12 +137,22 @@ test('Phase 7 data has frozen content traceability, full LR coverage, and target
   );
   assert.deepEqual(
     Object.fromEntries(lessons.map((lesson) => [lesson.id, getProblemsByType('exam-multiple-choice').filter((problem) => problem.lessonId === lesson.id).length])),
-    { 'PART-L1': 2, 'PART-L2': 3, 'PART-L3': 2, 'PART-L4': 4, 'PART-L5': 4, 'PART-L6': 5 },
+    { 'PART-L1': 2, 'PART-L2': 3, 'PART-L3': 2, 'PART-L4': 4, 'PART-L5': 4, 'PART-L6': 0 },
   );
   assert.deepEqual(
     Object.fromEntries(lessons.map((lesson) => [lesson.id, getProblemsByType('word-order').filter((problem) => problem.lessonId === lesson.id).length])),
-    { 'PART-L1': 0, 'PART-L2': 0, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 0, 'PART-L6': 2 },
+    { 'PART-L1': 0, 'PART-L2': 0, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 0, 'PART-L6': 0 },
   );
+  assert.deepEqual(getProblemsByType('exam-multiple-choice').map((problem) => problem.id), [
+    'PART-L1-EXAM-001', 'PART-L1-EXAM-002',
+    'PART-L2-EXAM-001', 'PART-L2-EXAM-002', 'PART-L2-EXAM-003',
+    'PART-L3-EXAM-001', 'PART-L3-EXAM-002',
+    'PART-L4-EXAM-001', 'PART-L4-EXAM-002', 'PART-L4-EXAM-003', 'PART-L4-EXAM-004',
+    'PART-L5-EXAM-001', 'PART-L5-EXAM-002', 'PART-L5-EXAM-003', 'PART-L5-EXAM-004',
+  ]);
+  assert.deepEqual(getProblemsByType('word-order').map((problem) => problem.id), [
+    'PART-L3-EXAM-WORD-001', 'PART-L3-EXAM-WORD-002', 'PART-L4-EXAM-WORD-001', 'PART-L4-EXAM-WORD-002',
+  ]);
   const referencedRequirementIds = new Set(problems.flatMap((problem) => problem.requirements));
   assert.deepEqual(learningRequirementIds.filter((id) => !referencedRequirementIds.has(id)), []);
 });
@@ -176,7 +216,7 @@ test('exam multiple choice keeps the registry contract and tests Lesson 1 role o
   assert.deepEqual(evaluateExamChoice(exam, 'l1e1-c1'), { correct: false, selectedChoiceId: 'l1e1-c1', answerChoiceId: 'l1e1-c2' });
 });
 
-test('Lesson 6 Practical records reconstructed OCR questions and authored distractors', () => {
+test('Lesson 6 Practical keeps source reconstruction, stages, and analysis order explicit', () => {
   const p101 = problemRegistry['PART-L6-PRACTICE-101'];
   assert.equal(p101.sourceReconstruction.reconstructed, true);
   assert.equal(p101.sourceReconstruction.confidence, 'high');
@@ -193,6 +233,25 @@ test('Lesson 6 Practical records reconstructed OCR questions and authored distra
   assert.equal(q001.choices.find((choice) => choice.text === 'a breaking window').authoredDistractor, true);
   assert.equal(q002.choices.find((choice) => choice.text === 'a died tree').authoredDistractor, true);
   assert.ok(getProblemsByType('practice-multiple-choice').every((problem) => typeof problem.sourceReconstruction.reconstructed === 'boolean'));
+  assert.deepEqual(getProblemsByType('practice-multiple-choice').map((problem) => problem.id), [
+    'PART-L6-PRACTICE-Q001', 'PART-L6-PRACTICE-Q002', 'PART-L6-PRACTICE-Q003',
+    'PART-L6-PRACTICE-101', 'PART-L6-PRACTICE-102', 'PART-L6-PRACTICE-103', 'PART-L6-PRACTICE-104', 'PART-L6-PRACTICE-105',
+    'PART-L6-PRACTICE-106', 'PART-L6-PRACTICE-107', 'PART-L6-PRACTICE-108', 'PART-L6-PRACTICE-109', 'PART-L6-PRACTICE-110',
+  ]);
+  assert.deepEqual(problemRegistry['PART-L6-PRACTICE-106'].choices.map((choice) => choice.text), ['describing', 'described']);
+  assert.equal(problemRegistry['PART-L6-PRACTICE-106'].predicate, 'seem');
+  assert.equal(problemRegistry['PART-L6-PRACTICE-107'].predicate, 'are');
+  assert.equal(problemRegistry['PART-L6-PRACTICE-108'].predicate, 'won');
+  assert.equal(problemRegistry['PART-L6-PRACTICE-109'].predicate, 'has');
+  assert.equal(problemRegistry['PART-L6-PRACTICE-110'].predicate, 'increased');
+  for (const problem of getProblemsByType('practice-multiple-choice').filter((entry) => entry.practiceStage === 'structure')) {
+    assert.deepEqual(problem.analysisSteps.map((step) => step.id), ['predicate', 'modifier', 'target', 'base', 'relation', 'answer']);
+  }
+  assert.equal(problemRegistry['PART-L6-PRACTICE-109'].analysisSteps[0].value, 'has');
+  const missingAnalysis = structuredClone(problemRegistry['PART-L6-PRACTICE-106']);
+  delete missingAnalysis.analysisSteps;
+  const invalidAnalysis = validateProblems([missingAnalysis], problemValidationOptions);
+  assert.ok(invalidAnalysis.errors.some((error) => error.includes('analysisSteps')));
 
   const unmarkedReconstruction = structuredClone(p101);
   delete unmarkedReconstruction.sourceReconstruction;
@@ -200,35 +259,17 @@ test('Lesson 6 Practical records reconstructed OCR questions and authored distra
   assert.ok(invalid.errors.some((error) => error.includes('sourceReconstruction')));
 });
 
-test('entrance word order has only the six syntax-construction problems', () => {
+test('entrance word order has only the four foundation syntax-construction problems', () => {
   const entrance = getProblemsByType('word-order');
-  assert.equal(entrance.length, 6);
+  assert.equal(entrance.length, 4);
   assert.deepEqual(entrance.map((problem) => problem.id), [
-    'PART-L3-EXAM-WORD-001', 'PART-L3-EXAM-WORD-002', 'PART-L4-EXAM-WORD-001', 'PART-L4-EXAM-WORD-002', 'PART-L6-EXAM-WORD-001', 'PART-L6-EXAM-WORD-002',
+    'PART-L3-EXAM-WORD-001', 'PART-L3-EXAM-WORD-002', 'PART-L4-EXAM-WORD-001', 'PART-L4-EXAM-WORD-002',
   ]);
   const problem = problemRegistry['PART-L4-EXAM-WORD-002'];
   assert.equal(checkWordOrder(problem.acceptedAnswers[0], problem.acceptedAnswers), true);
   assert.equal(checkWordOrder([...problem.acceptedAnswers[0]].reverse(), problem.acceptedAnswers), false);
   assert.equal(problem.explanationSteps.at(-1).text, 'passive → written');
   assert.equal(problem.fixedPrefix, 'The museum displayed');
-});
-
-test('Lesson 6 integrated problems share one sentence and one target noun', () => {
-  const sentence = 'The report prepared for new staff explains the safety rules.';
-  const mark = problemRegistry['PART-L6-IC-001-MARK'];
-  const relation = problemRegistry['PART-L6-IC-002-REL'];
-  const error = problemRegistry['PART-L6-IC-003-FORM'];
-  const position = problemRegistry['PART-L6-IC-004-POSITION'];
-  assert.equal(mark.tokens.map((token) => token.text).join(' '), sentence);
-  assert.equal(relation.sentence, sentence);
-  assert.equal(error.tokens.map((token) => token.text).join(' ').replace('preparing', 'prepared'), sentence);
-  assert.equal(buildModifierPlacementSentence(position, 'l6ic-pos-after-report'), sentence);
-  assert.equal(checkTokenSelection(mark.answer, ['l6ic-report']), true);
-  assert.equal(getRelationsForChunk(relation.relations, 'l6ic-rel-report')[0].id, 'l6ic-rel-1');
-  const correction = getCorrectionByTokenId(error.corrections, 'l6ic-form-preparing');
-  assert.equal(isAcceptedCorrection(correction, 'l6ic-opt-prepared'), true);
-  assert.equal(isGoalMatchingPlacement(position, 'l6ic-pos-after-report'), true);
-  assert.equal(getPlacementRelation(position, 'l6ic-pos-after-report').targetId, 'l6ic-pos-report');
 });
 
 test('context grammar logic resolves the Lesson 5 scenario', () => {
@@ -283,7 +324,7 @@ test('context grammar validator rejects broken scenario contracts', () => {
   }
 });
 
-test('lesson validator rejects unknown interaction types and missing problems', () => {
+test('lesson validator rejects unknown interaction types, missing problems, and invalid modes', () => {
   const invalidLesson = structuredClone(lessons[0]);
   invalidLesson.steps[0].interactionType = 'unknown-interaction';
   invalidLesson.steps[0].problemId = 'missing-problem';
@@ -291,6 +332,10 @@ test('lesson validator rejects unknown interaction types and missing problems', 
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((error) => error.includes('unknown')));
   assert.ok(result.errors.some((error) => error.includes('missing-problem')));
+  const invalidPractice = structuredClone(lessons.at(-1));
+  invalidPractice.steps = [{ id: 'unexpected', interactionType: 'mark-parts', problemId: 'PART-L1-P001-MARK' }];
+  const practiceResult = validateLessons([invalidPractice], { problemRegistry, problemTypes: new Set(['mark-parts']) });
+  assert.ok(practiceResult.errors.some((error) => error.includes('must not contain Interactive steps')));
 });
 
 test('lesson progress unlocks the next step only after completion', () => {

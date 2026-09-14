@@ -839,13 +839,13 @@ LEARN（解説・例文）
 | 3 | 3 | 5 | 分詞1語の前置修飾 / 分詞句の後置修飾 / 「1語なら必ず前」ではない |
 | 4 | 3 | 5 | 名詞と分詞の間にあるHidden S-V / 能動なら-ing、受動ならp.p. / Hidden S-Vの6ステップ |
 | 5 | 3 | 7 | 感情動詞は「〜させる」 / 感情を与える側・受ける側 / 語彙を広げても同じ判断 |
-| 6 | 3 | 6 | 8段階の最終判断 / 構造と文脈をつなぐ / 初見英文で理由まで答える |
+| 6 | 3 | 7 | 6ステップの実践判断 / -ing・p.p. / 述語動詞と修飾部分の分離 |
 
 各Lessonは、本文・4〜7例文・Key Rules・よくある間違い・入試POINT・Detailed Review・Summary・Source evidenceを持ちます。説明を読んだだけでも中心概念を理解できる量を確保し、Interactionは確認と再利用のために置きます。
 
 ### Assessment inventory
 
-Atlasの`exam-multiple-choice` R0 Componentとpure evaluationを再利用し、分詞固有の4択Componentは新設していません。`src/data/problems/exam-multiple-choice.js`に20問を追加しました。
+Atlasの`exam-multiple-choice` R0 Componentとpure evaluationを再利用し、分詞固有の4択Componentは新設していません。`src/data/problems/exam-multiple-choice.js`にはLesson 1〜5の15問を保持し、Lesson 6は共通Componentを使う`practice-multiple-choice`へ分離しています。
 
 | Lesson | Exam MC | difficulty内訳 |
 | --- | ---: | --- |
@@ -854,20 +854,20 @@ Atlasの`exam-multiple-choice` R0 Componentとpure evaluationを再利用し、�
 | 3 | 2 | standard 2 |
 | 4 | 4 | standard 2 / entrance 2 |
 | 5 | 4 | standard 2 / entrance 2 |
-| 6 | 5 | entrance 5 |
-| **Total** | **20** | **basic 2 / standard 8 / entrance 10** |
+| 6 | — | — |
+| **Total** | **15** | **basic 2 / standard 7 / entrance 6** |
 
 Exam IDs:
 
-`PART-L1-EXAM-001`, `PART-L1-EXAM-002`, `PART-L2-EXAM-001`, `PART-L2-EXAM-002`, `PART-L2-EXAM-003`, `PART-L3-EXAM-001`, `PART-L3-EXAM-002`, `PART-L4-EXAM-001`, `PART-L4-EXAM-002`, `PART-L4-EXAM-003`, `PART-L4-EXAM-004`, `PART-L5-EXAM-001`, `PART-L5-EXAM-002`, `PART-L5-EXAM-003`, `PART-L5-EXAM-004`, `PART-L6-EXAM-001`, `PART-L6-EXAM-002`, `PART-L6-EXAM-003`, `PART-L6-EXAM-004`, `PART-L6-EXAM-005`。
+`PART-L1-EXAM-001`, `PART-L1-EXAM-002`, `PART-L2-EXAM-001`, `PART-L2-EXAM-002`, `PART-L2-EXAM-003`, `PART-L3-EXAM-001`, `PART-L3-EXAM-002`, `PART-L4-EXAM-001`, `PART-L4-EXAM-002`, `PART-L4-EXAM-003`, `PART-L4-EXAM-004`, `PART-L5-EXAM-001`, `PART-L5-EXAM-002`, `PART-L5-EXAM-003`, `PART-L5-EXAM-004`。
 
 全問が4選択肢、正答、全選択肢の説明、全体説明、difficulty、misconceptions、Learning Requirement、OCR source evidenceを持ちます。誤答時も正答と4選択肢の理由を表示し、Resetできます。Assessment navigationは一問ずつ前後へ移動でき、正誤で次の問題をロックしません。
 
-Word Orderは既存`WordOrderBuilder`をそのまま再利用し、既存Problem APIに`translation`、`fixedPrefix`、`fixedSuffix`、`explanationSteps`、difficulty、misconceptionsをoptional dataとして追加しました。追加IDは次の8問です。
+Word Orderは既存`WordOrderBuilder`をそのまま再利用し、既存Problem APIに`translation`、`fixedPrefix`、`fixedSuffix`、`explanationSteps`、difficulty、misconceptionsをoptional dataとして追加しました。Lesson 3〜4のEntrance Word Order 4問を保持します。
 
-`PART-L2-EXAM-WORD-001`, `PART-L3-EXAM-WORD-001`, `PART-L3-EXAM-WORD-002`, `PART-L4-EXAM-WORD-001`, `PART-L4-EXAM-WORD-002`, `PART-L5-EXAM-WORD-001`, `PART-L6-EXAM-WORD-001`, `PART-L6-EXAM-WORD-002`。
+`PART-L3-EXAM-WORD-001`, `PART-L3-EXAM-WORD-002`, `PART-L4-EXAM-WORD-001`, `PART-L4-EXAM-WORD-002`。
 
-既存Lesson 1の語句整序1問を含む分布は、L1=1、L2=1、L3=2、L4=2、L5=1、L6=2です。
+分布は、L1=0、L2=0、L3=2、L4=2、L5=0、L6=0です。
 
 ### Traceability and reuse
 
@@ -908,7 +908,7 @@ Word Order is used only when syntax construction is itself instructional.
 
 日本語解説を正本として固定する。Interactive Checkは解説を理解するために置く。4択は初見英文への転移を確認する。語句整序は、語順・修飾構造の構築そのものに学習価値がある場合だけ使う。解説ファイルのhashは`scripts/frozen-lesson-content.json`に保存し、`npm run check`で変更を拒否する。
 
-Interactive Checkは24 Step（L1=3、L2=4、L3=3、L4=6、L5=4、L6=4）、Exam Multiple Choiceは20問、Entrance Word Orderは6問（L1=0、L2=0、L3=2、L4=2、L5=0、L6=2）とする。既存の9 Interaction ComponentとそのAPIは変更しない。
+Lessons 1–5 teach and rehearse the grammar. Lesson 6 is a source-grounded practical transfer lesson. Interactive Checkは20 Step（L1=3、L2=4、L3=3、L4=6、L5=4、L6=0）、Exam Multiple Choiceは15問、Entrance Word Orderは4問（L1=0、L2=0、L3=2、L4=2、L5=0、L6=0）とする。`分詞を見たら、名詞と動詞の関係を見る。`を全Lessonの判断軸にする。Lesson 1〜5は`mode: 'standard'`、Lesson 6は`mode: 'practice'`とし、Lesson 6の旧Interactive / Exam / Word Orderは退役させる。
 
 ### Practice Traceability Matrix
 
@@ -919,15 +919,17 @@ Interactive Checkは24 Step（L1=3、L2=4、L3=3、L4=6、L5=4、L6=4）、Exam 
 | 3 | `PART-L3-EXPLAIN-01`, `-02`, `-03` | `PART-L3-P001-POSITION`, `PART-L3-P002-POSITION`, `PART-L3-P004-COMPARE` | `PART-L3-EXAM-001`, `-002` | `PART-L3-EXAM-WORD-001`, `-002` | 1語の前置、分詞句の後置、1語後置の文脈 |
 | 4 | `PART-L4-EXPLAIN-01`, `-02`, `-03` | `PART-L4-P001-MARK`, `PART-L4-P001-REL`, `PART-L4-P002-MARK`, `PART-L4-P002-REL`, `PART-L4-P003-MARK`, `PART-L4-P003-REL` | `PART-L4-EXAM-001`〜`-004` | `PART-L4-EXAM-WORD-001`, `-002` | Hidden S-Vで対象名詞・元動詞・能動受動・形を判断 |
 | 5 | `PART-L5-EXPLAIN-01`, `-02` | `PART-L5-P002-COMPARE`, `PART-L5-P001-GIVER-RECEIVER`, `PART-L5-P003-COMPARE-BORING`, `PART-L5-P004-CONTEXT` | `PART-L5-EXAM-001`〜`-004` | — | 感情のgiver/causeとreceiver/experiencerから-ing/-edを選ぶ |
-| 6 | `PART-L6-EXPLAIN-01`, `-02`, `-03` | `PART-L6-IC-001-MARK`, `PART-L6-IC-002-REL`, `PART-L6-IC-003-FORM`, `PART-L6-IC-004-POSITION` | `PART-L6-EXAM-001`〜`-005` | `PART-L6-EXAM-WORD-001`, `-002` | 同じ英文をtarget noun、base verb、関係、形、位置まで処理する |
+| 6 | `PART-L6-EXPLAIN-01`, `-02`, `-03` | `PART-L6-PRACTICE-Q001`〜`Q003`, `PART-L6-PRACTICE-101`〜`110` | — | — | 初見英文を述語動詞、target noun、base verb、関係、形の順に処理する |
 
 全Practice Problemは`contentRefs`で同一Lessonの固定Explanation sectionへ結び付く。`validateProblems`は空配列、重複、未知ID、別Lessonの参照を拒否し、`scripts/check.mjs`はMatrixの数とLesson構成を検証する。
 
 ## Phase 8 follow-up — Lesson 6 Practical and OCR reconstruction
 
-Lesson 6に、OCRで確認できた分詞問題を扱う`practice-multiple-choice`を追加する。構成はQuick 3問、Form 5問、Structure + Form 5問の計13問で、既存のInteractive Check 24 Step、Exam Multiple Choice 20問、Entrance Word Order 6問は変更しない。
+Lesson 6は、OCRで確認できた分詞問題を扱う`mode: 'practice'`の`practice-multiple-choice` Lessonとする。構成はQuick 3問、Form 5問、Structure 5問の計13問である。Lesson 1〜5の標準経路は維持し、Lesson 6の旧Interactive Check、標準Exam Multiple Choice、Entrance Word Orderは退役させる。
 
 Problem 101と104は、OCRの残存断片・解答解説・文法関係から最小限に復元した`reconstructed exercise`である。`sourceReconstruction`と`reconstructionEvidence`をProblem Dataに保持し、`verified verbatim original university exam`とは扱わない。Q-A01とQ-A02のOCRにない比較選択肢は、choice単位の`authoredDistractor: true`で明示する。これらのtraceability metadataは開発用であり、生徒画面には表示しない。
+
+Lesson 6の実践UIは、既存の`ExamMultipleChoice`を共通実装として再利用し、`renderAfterExplanation`の拡張点からStructure問題の`analysisSteps`（predicate、modifier、target、base、relation、answer）を表示する。専用の選択・採点・Reset実装やComponent APIは増やさない。`PART-L6-PRACTICE-106`〜`110`は、述語動詞と名詞修飾を分ける6段階の分析を回帰テストで固定する。
 
 ## Deployment
 

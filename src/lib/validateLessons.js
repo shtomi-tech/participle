@@ -18,10 +18,19 @@ export function validateLessons(lessons, { problemRegistry = {}, problemTypes = 
     if (slugs.has(lesson.slug)) errors.push(`${label}.slug is duplicated: ${lesson.slug}`);
     slugs.add(lesson.slug);
     if (!hasText(lesson.description) || !hasText(lesson.learningGoal)) errors.push(`${label} needs description and learningGoal`);
-    if (!Array.isArray(lesson.steps) || lesson.steps.length === 0) {
+    if (!['standard', 'practice'].includes(lesson.mode)) errors.push(`${label}.mode must be standard or practice`);
+    if (!Array.isArray(lesson.steps)) {
+      errors.push(`${label}.steps must be an array`);
+      return;
+    }
+    if (lesson.mode === 'practice' && lesson.steps.length !== 0) {
+      errors.push(`${label}.practice lessons must not contain Interactive steps`);
+    }
+    if (lesson.mode === 'standard' && lesson.steps.length === 0) {
       errors.push(`${label}.steps must contain at least one step`);
       return;
     }
+    if (lesson.steps.length === 0) return;
     const stepIds = new Set();
     lesson.steps.forEach((step, stepIndex) => {
       const stepLabel = `${label}.steps[${stepIndex}]`;

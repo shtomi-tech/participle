@@ -9,7 +9,7 @@ const choice = (id, text, explanation, authoredDistractor = false) => ({
 const base = ({
   id, sourceProblemId, practiceStage, sourceEvidence, sourceReconstruction, reconstructionEvidence,
   prompt, stem, choices, answerChoiceId, explanation, difficulty, misconceptions,
-  sourceAdaptation = true, targetNoun, baseVerb, semanticVoice, participleForm,
+  sourceAdaptation = true, targetNoun, baseVerb, semanticVoice, participleForm, predicate, analysisSteps,
 }) => ({
   id,
   type: 'practice-multiple-choice',
@@ -17,7 +17,11 @@ const base = ({
   sourceProblemId,
   practiceStage,
   sourceAdaptation,
-  contentRefs: ['PART-L6-EXPLAIN-01', 'PART-L6-EXPLAIN-03'],
+  contentRefs: practiceStage === 'quick'
+    ? ['PART-L6-EXPLAIN-01']
+    : practiceStage === 'form'
+      ? ['PART-L6-EXPLAIN-01', 'PART-L6-EXPLAIN-02']
+      : ['PART-L6-EXPLAIN-01', 'PART-L6-EXPLAIN-03'],
   requirements: ['LR-PART-003', 'LR-PART-004', 'LR-PART-013'],
   sourceEvidence,
   sourceReconstruction,
@@ -33,6 +37,8 @@ const base = ({
   ...(baseVerb ? { baseVerb } : {}),
   ...(semanticVoice ? { semanticVoice } : {}),
   ...(participleForm ? { participleForm } : {}),
+  ...(predicate ? { predicate } : {}),
+  ...(analysisSteps ? { analysisSteps } : {}),
 });
 
 export const lesson6PracticalProblems = [
@@ -177,14 +183,21 @@ export const lesson6PracticalProblems = [
     prompt: '文の中心動詞を確認し、空所に入る形を選びなさい。',
     stem: 'The steps (     ) in this recipe seem difficult.',
     choices: [
-      choice('l6p106-c1', 'describe', 'describe は原形で、この位置の名詞修飾にはなりません.'),
-      choice('l6p106-c2', 'describing', 'steps が describe する能動関係になり、意味が逆です.'),
-      choice('l6p106-c3', 'described', 'the steps are described in this recipe という受動のHidden S-Vなので described です.'),
+      choice('l6p106-c1', 'describing', 'steps が describe する能動関係になり、意味が逆です.'),
+      choice('l6p106-c2', 'described', 'the steps are described in this recipe という受動のHidden S-Vなので described です.'),
     ],
-    answerChoiceId: 'l6p106-c3',
+    answerChoiceId: 'l6p106-c2',
     explanation: 'Target noun は the steps、文の述語動詞は seem です。steps が describe されるので described を選びます。',
     difficulty: 'entrance', misconceptions: ['後半の述語動詞を見ない', '名詞がされる関係を-ingにする'],
-    targetNoun: 'the steps', baseVerb: 'describe', semanticVoice: 'passive', participleForm: 'p.p.',
+    targetNoun: 'the steps', baseVerb: 'describe', semanticVoice: 'passive', participleForm: 'p.p.', predicate: 'seem',
+    analysisSteps: [
+      { id: 'predicate', label: '① 述語動詞', value: 'seem' },
+      { id: 'modifier', label: '② 修飾部分', value: 'described in this recipe' },
+      { id: 'target', label: '③ 説明される名詞', value: 'The steps' },
+      { id: 'base', label: '④ 元動詞', value: 'describe' },
+      { id: 'relation', label: '⑤ 関係', value: 'The steps are described. → passive' },
+      { id: 'answer', label: '⑥ 答え', value: 'described' },
+    ],
   }),
   base({
     id: 'PART-L6-PRACTICE-107', sourceProblemId: '107', practiceStage: 'structure',
@@ -200,7 +213,15 @@ export const lesson6PracticalProblems = [
     answerChoiceId: 'l6p107-c1',
     explanation: '文の述語動詞は are。Employees が overseas で work するので working を選びます。',
     difficulty: 'entrance', misconceptions: ['文の述語動詞を空所に入れる', '自動詞workを受動にする'],
-    targetNoun: 'Employees', baseVerb: 'work', semanticVoice: 'active', participleForm: '-ing',
+    targetNoun: 'Employees', baseVerb: 'work', semanticVoice: 'active', participleForm: '-ing', predicate: 'are',
+    analysisSteps: [
+      { id: 'predicate', label: '① 述語動詞', value: 'are' },
+      { id: 'modifier', label: '② 修飾部分', value: 'working overseas' },
+      { id: 'target', label: '③ 説明される名詞', value: 'Employees' },
+      { id: 'base', label: '④ 元動詞', value: 'work' },
+      { id: 'relation', label: '⑤ 関係', value: 'Employees work overseas. → active' },
+      { id: 'answer', label: '⑥ 答え', value: 'working' },
+    ],
   }),
   base({
     id: 'PART-L6-PRACTICE-108', sourceProblemId: '108', practiceStage: 'structure',
@@ -216,7 +237,15 @@ export const lesson6PracticalProblems = [
     answerChoiceId: 'l6p108-c3',
     explanation: '文の述語動詞は won。scientist が知られているので、known to be ... となります。',
     difficulty: 'entrance', misconceptions: ['最初の動詞を述語動詞にする', '過去形と過去分詞を混同する'],
-    targetNoun: 'the scientist', baseVerb: 'know', semanticVoice: 'passive', participleForm: 'p.p.',
+    targetNoun: 'the scientist', baseVerb: 'know', semanticVoice: 'passive', participleForm: 'p.p.', predicate: 'won',
+    analysisSteps: [
+      { id: 'predicate', label: '① 述語動詞', value: 'won' },
+      { id: 'modifier', label: '② 修飾部分', value: 'known to be the smartest person in our town' },
+      { id: 'target', label: '③ 説明される名詞', value: 'The scientist' },
+      { id: 'base', label: '④ 元動詞', value: 'know' },
+      { id: 'relation', label: '⑤ 関係', value: 'The scientist is known to be ... → passive' },
+      { id: 'answer', label: '⑥ 答え', value: 'known' },
+    ],
   }),
   base({
     id: 'PART-L6-PRACTICE-109', sourceProblemId: '109', practiceStage: 'structure',
@@ -232,7 +261,15 @@ export const lesson6PracticalProblems = [
     answerChoiceId: 'l6p109-c2',
     explanation: '文の述語動詞は has。consisting of five letters 全体が English words を説明します。',
     difficulty: 'entrance', misconceptions: ['consist ofのofを落とす', '分詞句のまとまりを作らない'],
-    targetNoun: 'English words', baseVerb: 'consist of', semanticVoice: 'active', participleForm: '-ing',
+    targetNoun: 'English words', baseVerb: 'consist of', semanticVoice: 'active', participleForm: '-ing', predicate: 'has',
+    analysisSteps: [
+      { id: 'predicate', label: '① 述語動詞', value: 'has' },
+      { id: 'modifier', label: '② 修飾部分', value: 'consisting of five letters' },
+      { id: 'target', label: '③ 説明される名詞', value: 'English words' },
+      { id: 'base', label: '④ 元動詞', value: 'consist of' },
+      { id: 'relation', label: '⑤ 関係', value: 'English words consist of five letters. → active' },
+      { id: 'answer', label: '⑥ 答え', value: 'consisting of' },
+    ],
   }),
   base({
     id: 'PART-L6-PRACTICE-110', sourceProblemId: '110', practiceStage: 'structure',
@@ -247,6 +284,14 @@ export const lesson6PracticalProblems = [
     answerChoiceId: 'l6p110-c1',
     explanation: '文の述語動詞は increased。loss が result from the pandemic するので resulting を選びます。',
     difficulty: 'entrance', misconceptions: ['resultedを過去分詞として置く', '文の述語動詞と修飾語を区別しない'],
-    targetNoun: 'the loss of income', baseVerb: 'result from', semanticVoice: 'active', participleForm: '-ing',
+    targetNoun: 'the loss of income', baseVerb: 'result from', semanticVoice: 'active', participleForm: '-ing', predicate: 'increased',
+    analysisSteps: [
+      { id: 'predicate', label: '① 述語動詞', value: 'increased' },
+      { id: 'modifier', label: '② 修飾部分', value: 'resulting from the COVID-19 pandemic' },
+      { id: 'target', label: '③ 説明される名詞', value: 'The loss of income' },
+      { id: 'base', label: '④ 元動詞', value: 'result from' },
+      { id: 'relation', label: '⑤ 関係', value: 'The loss of income results from the COVID-19 pandemic. → active' },
+      { id: 'answer', label: '⑥ 答え', value: 'resulting' },
+    ],
   }),
 ];

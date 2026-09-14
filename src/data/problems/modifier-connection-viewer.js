@@ -71,27 +71,4 @@ export const modifierConnectionProblems = [
     ],
     explanation: '分詞の直前の語をそのまま対象にせず、意味上のS-V関係を選びます。',
   },
-  {
-    id: 'PART-L6-IC-002-REL',
-    type: 'modifier-connection-viewer',
-    lessonId: 'PART-L6',
-    contentRefs: ['PART-L6-EXPLAIN-01', 'PART-L6-EXPLAIN-02'],
-    requirements: ['LR-PART-004', 'LR-PART-008', 'LR-PART-013'],
-    sourceEvidence: { source: 'chapter14-ocr.md', section: '14-1-3 -ingとp.p.の判別' },
-    sentence: 'The report prepared for new staff explains the safety rules.',
-    targetNoun: 'the report',
-    baseVerb: 'prepare',
-    semanticVoice: 'passive',
-    participleForm: 'p.p.',
-    prompt: '同じ英文で、report と prepare のHidden S-Vを確認してください。',
-    chunks: [
-      { id: 'l6ic-rel-report', text: 'the report', kind: 'core' },
-      { id: 'l6ic-rel-prepared', text: 'prepared for new staff', kind: 'modifier' },
-      { id: 'l6ic-rel-rest', text: 'explains the safety rules', kind: 'core' },
-    ],
-    relations: [
-      { id: 'l6ic-rel-1', modifierId: 'l6ic-rel-prepared', targetId: 'l6ic-rel-report', relationType: 'modifies', label: 'Hidden S-V: passive · the report ← prepare · result: prepared', explanation: 'The report is prepared for new staff. report が prepare される関係なので受動で、prepared になります。', },
-    ],
-    explanation: 'report が prepare されるというHidden S-Vを作り、同じ英文の次の形判断へつなげます。',
-  },
 ];

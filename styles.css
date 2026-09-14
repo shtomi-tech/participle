@@ -375,6 +375,18 @@ h3 { margin-bottom: 12px; font-size: 1rem; text-transform: uppercase; letter-spa
   color: var(--muted);
 }
 
+.practice-strategy {
+  margin-top: 40px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 24px 28px;
+  background: var(--canvas-raised);
+}
+
+.practice-strategy h2 { margin-bottom: 12px; }
+.practice-strategy ol { display: grid; gap: 8px; margin: 0; padding-left: 24px; color: var(--ink-soft); }
+.practice-strategy li::marker { color: var(--accent-strong); font-weight: 800; }
+
 .lesson-interactive .lesson-player {
   margin-top: 24px;
 }
@@ -517,6 +529,13 @@ h3 { margin-bottom: 12px; font-size: 1rem; text-transform: uppercase; letter-spa
 .exam-mc-review h3 { margin-bottom: 9px; }
 .exam-mc-overall p { margin: 0; color: var(--ink-soft); }
 .exam-mc-review-list { display: grid; gap: 10px; margin: 0; padding-left: 22px; }
+
+.practice-analysis { margin-top: 20px; border-top: 1px solid var(--paper-deep); padding-top: 18px; }
+.practice-analysis h3 { margin-bottom: 10px; }
+.practice-analysis-list { display: grid; gap: 10px; margin: 0; padding-left: 22px; }
+.practice-analysis-list li { display: grid; gap: 2px; }
+.practice-analysis-list strong { color: var(--ink); }
+.practice-analysis-list span { color: var(--ink-soft); }
 
 .exam-mc-option-review {
   border: 1px solid var(--paper-deep);

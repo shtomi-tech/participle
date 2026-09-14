@@ -102,20 +102,20 @@ if (lessons.length !== expectedLessonIds.length || lessons.some((lesson, index) 
 }
 if (Object.keys(demoRegistry).length !== 10 || !demoRegistry['context-grammar'] || !demoRegistry['exam-multiple-choice'] || !demoRegistry['practice-multiple-choice']) throw new Error('Phase 8 requires ten demo types including Lesson 6 Practical.');
 
-const expectedInteractiveStepCounts = { 'PART-L1': 3, 'PART-L2': 4, 'PART-L3': 3, 'PART-L4': 6, 'PART-L5': 4, 'PART-L6': 4 };
+const expectedInteractiveStepCounts = { 'PART-L1': 3, 'PART-L2': 4, 'PART-L3': 3, 'PART-L4': 6, 'PART-L5': 4, 'PART-L6': 0 };
 const actualInteractiveStepCounts = Object.fromEntries(lessons.map((lesson) => [lesson.id, lesson.steps.length]));
 if (JSON.stringify(actualInteractiveStepCounts) !== JSON.stringify(expectedInteractiveStepCounts)) throw new Error(`Unexpected Phase 7 interactive step distribution: ${JSON.stringify(actualInteractiveStepCounts)}.`);
-if (lessons.reduce((total, lesson) => total + lesson.steps.length, 0) !== 24) throw new Error('Phase 7 requires 24 Interactive Check steps.');
+if (lessons.reduce((total, lesson) => total + lesson.steps.length, 0) !== 20) throw new Error('Lessons 1-5 require 20 Interactive Check steps.');
 
 const examProblems = problems.filter((problem) => problem.type === 'exam-multiple-choice');
-if (examProblems.length !== 20) throw new Error(`Phase 5 requires 20 exam multiple-choice problems, found ${examProblems.length}.`);
-const expectedExamCounts = { 'PART-L1': 2, 'PART-L2': 3, 'PART-L3': 2, 'PART-L4': 4, 'PART-L5': 4, 'PART-L6': 5 };
+if (examProblems.length !== 15) throw new Error(`Lessons 1-5 require 15 exam multiple-choice problems, found ${examProblems.length}.`);
+const expectedExamCounts = { 'PART-L1': 2, 'PART-L2': 3, 'PART-L3': 2, 'PART-L4': 4, 'PART-L5': 4, 'PART-L6': 0 };
 for (const [lessonId, expectedCount] of Object.entries(expectedExamCounts)) {
   const count = examProblems.filter((problem) => problem.lessonId === lessonId).length;
   if (count !== expectedCount) throw new Error(`Phase 5 requires ${expectedCount} exam problems for ${lessonId}, found ${count}.`);
 }
 const examDifficultyCounts = Object.fromEntries(['basic', 'standard', 'entrance'].map((difficulty) => [difficulty, examProblems.filter((problem) => problem.difficulty === difficulty).length]));
-if (JSON.stringify(examDifficultyCounts) !== JSON.stringify({ basic: 2, standard: 8, entrance: 10 })) throw new Error(`Unexpected exam difficulty distribution: ${JSON.stringify(examDifficultyCounts)}.`);
+if (JSON.stringify(examDifficultyCounts) !== JSON.stringify({ basic: 2, standard: 7, entrance: 6 })) throw new Error(`Unexpected exam difficulty distribution: ${JSON.stringify(examDifficultyCounts)}.`);
 const practicalProblems = problems.filter((problem) => problem.type === 'practice-multiple-choice');
 if (practicalProblems.length !== 13) throw new Error(`Lesson 6 Practical requires 13 problems, found ${practicalProblems.length}.`);
 const practicalStageCounts = Object.fromEntries(['quick', 'form', 'structure'].map((stage) => [stage, practicalProblems.filter((problem) => problem.practiceStage === stage).length]));
@@ -128,19 +128,17 @@ if (!problemRegistry['PART-L6-PRACTICE-104']?.choices.some((choice) => choice.te
 const authoredDistractors = practicalProblems.flatMap((problem) => problem.choices.filter((choice) => choice.authoredDistractor === true));
 if (authoredDistractors.length === 0) throw new Error('Source-derived Practical choices must mark authored distractors.');
 const wordOrderCounts = Object.fromEntries(lessons.map((lesson) => [lesson.id, problems.filter((problem) => problem.type === 'word-order' && problem.lessonId === lesson.id).length]));
-if (JSON.stringify(wordOrderCounts) !== JSON.stringify({ 'PART-L1': 0, 'PART-L2': 0, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 0, 'PART-L6': 2 })) throw new Error(`Unexpected Phase 7 word-order distribution: ${JSON.stringify(wordOrderCounts)}.`);
+if (JSON.stringify(wordOrderCounts) !== JSON.stringify({ 'PART-L1': 0, 'PART-L2': 0, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 0, 'PART-L6': 0 })) throw new Error(`Unexpected word-order distribution: ${JSON.stringify(wordOrderCounts)}.`);
 const entranceWordOrderProblems = problems.filter((problem) => problem.type === 'word-order' && problem.assessmentKind === 'entrance');
-if (entranceWordOrderProblems.length !== 6 || entranceWordOrderProblems.some((problem) => problem.assessmentKind !== 'entrance')) throw new Error('Phase 7 requires exactly six entrance Word Order problems marked assessmentKind=entrance.');
+if (entranceWordOrderProblems.length !== 4 || entranceWordOrderProblems.some((problem) => problem.assessmentKind !== 'entrance')) throw new Error('Lessons 1-5 require exactly four entrance Word Order problems marked assessmentKind=entrance.');
 const practiceWordOrderCounts = Object.fromEntries(lessons.map((lesson) => [lesson.id, entranceWordOrderProblems.filter((problem) => problem.lessonId === lesson.id).length]));
-if (JSON.stringify(practiceWordOrderCounts) !== JSON.stringify({ 'PART-L1': 0, 'PART-L2': 0, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 0, 'PART-L6': 2 })) throw new Error(`Unexpected Phase 7 entrance word-order distribution: ${JSON.stringify(practiceWordOrderCounts)}.`);
+if (JSON.stringify(practiceWordOrderCounts) !== JSON.stringify({ 'PART-L1': 0, 'PART-L2': 0, 'PART-L3': 2, 'PART-L4': 2, 'PART-L5': 0, 'PART-L6': 0 })) throw new Error(`Unexpected entrance word-order distribution: ${JSON.stringify(practiceWordOrderCounts)}.`);
 
 const referencedRequirementIds = new Set(problems.flatMap((problem) => problem.requirements ?? []));
 const missingRequirementIds = learningRequirementIds.filter((id) => !referencedRequirementIds.has(id));
 if (missingRequirementIds.length > 0) throw new Error(`Learning requirements lack Problem coverage: ${missingRequirementIds.join(', ')}.`);
-const finalLessonProblems = lessons.at(-1).steps.map((step) => problemRegistry[step.problemId]);
-if (finalLessonProblems.length !== 4 || finalLessonProblems.some((problem) => !problem.requirements.includes('LR-PART-013'))) {
-  throw new Error('Every Lesson 6 integrated Problem must include LR-PART-013.');
-}
+const finalLesson = lessons.at(-1);
+if (finalLesson.mode !== 'practice' || finalLesson.steps.length !== 0) throw new Error('Lesson 6 must be a zero-step practice lesson.');
 
 const frozenManifest = JSON.parse(readFileSync(join(root, 'scripts/frozen-lesson-content.json'), 'utf8'));
 const frozenErrors = validateFrozenLessonContent(root, frozenManifest);

@@ -35,9 +35,21 @@ function renderHome() {
     </main>`;
 }
 
-function setupAssessment({ section, type, problems, heading, counter, componentRoot, previous, next }) {
+function renderPracticeStrategy(strategy) {
+  if (!strategy) return '';
+  return `
+    <section class="practice-strategy" data-practice-strategy aria-labelledby="practice-strategy-heading">
+      <p class="eyebrow">PRACTICAL APPLICATION</p>
+      <h2 id="practice-strategy-heading">${escapeHtml(strategy.title)}</h2>
+      <ol>
+        ${strategy.steps.map((step) => `<li>${escapeHtml(step.label)}</li>`).join('')}
+      </ol>
+    </section>`;
+}
+
+function setupAssessment({ section, type, problems, heading, counter, componentRoot, previous, next, stageHeading, stageTitle, stageIntroduction }) {
   if (problems.length === 0) {
-    section.hidden = true;
+    if (section) section.hidden = true;
     return () => {};
   }
 
@@ -46,7 +58,11 @@ function setupAssessment({ section, type, problems, heading, counter, componentR
   const headingLabels = {
     'exam-multiple-choice': '4択問題',
     'word-order': '語句整序問題',
-    'practice-multiple-choice': 'Lesson 6 Practical',
+  };
+  const stageMeta = {
+    quick: { heading: 'Stage 1 / 3', title: 'Quick Check', introduction: '基本ルールを短い問題で確認します。' },
+    form: { heading: 'Stage 2 / 3', title: '-ing / p.p. を判断する', introduction: '名詞と動詞の関係から適切な形を選びます。' },
+    structure: { heading: 'Stage 3 / 3', title: '文構造から判断する', introduction: 'まず述語動詞を見つけ、修飾部分と文の中心を区別します。' },
   };
 
   function renderAssessment(shouldFocus = false) {
@@ -54,11 +70,18 @@ function setupAssessment({ section, type, problems, heading, counter, componentR
     cleanup = null;
     const problem = problems[problemIndex];
     counter.textContent = `${problemIndex + 1} / ${problems.length}`;
-    heading.textContent = `${headingLabels[type] ?? type} ${problemIndex + 1} / ${problems.length}`;
+    if (type === 'practice-multiple-choice') {
+      const meta = stageMeta[problem.practiceStage];
+      stageHeading.textContent = meta.heading;
+      stageTitle.textContent = meta.title;
+      stageIntroduction.textContent = meta.introduction;
+    } else {
+      heading.textContent = `${headingLabels[type] ?? type} ${problemIndex + 1} / ${problems.length}`;
+    }
     previous.disabled = problemIndex === 0;
     next.disabled = problemIndex === problems.length - 1;
     cleanup = mountDemoProblem(type, componentRoot, problem, { onComplete() {} });
-    if (shouldFocus) heading.focus({ preventScroll: true });
+    if (shouldFocus) (type === 'practice-multiple-choice' ? stageHeading : heading).focus({ preventScroll: true });
   }
 
   previous.addEventListener('click', () => {
@@ -82,23 +105,18 @@ function renderLesson(lesson) {
   const lessonIndex = lessons.findIndex((entry) => entry.id === lesson.id);
   const previousLesson = lessons[lessonIndex - 1];
   const nextLesson = lessons[lessonIndex + 1];
-  const examProblems = getProblemsByType('exam-multiple-choice').filter((problem) => problem.lessonId === lesson.id);
-  const wordOrderProblems = getProblemsByType('word-order').filter((problem) => problem.lessonId === lesson.id && problem.assessmentKind === 'entrance');
-  const practicalProblems = getProblemsByType('practice-multiple-choice').filter((problem) => problem.lessonId === lesson.id);
+  const isPracticeLesson = lesson.mode === 'practice';
+  const examProblems = isPracticeLesson ? [] : getProblemsByType('exam-multiple-choice').filter((problem) => problem.lessonId === lesson.id);
+  const wordOrderProblems = isPracticeLesson ? [] : getProblemsByType('word-order').filter((problem) => problem.lessonId === lesson.id && problem.assessmentKind === 'entrance');
+  const practicalProblems = isPracticeLesson ? getProblemsByType('practice-multiple-choice').filter((problem) => problem.lessonId === lesson.id) : [];
   let stepIndex = 0;
   let completedStepIds = new Set();
-  let cleanup = null;
+  let interactiveCleanup = () => {};
+  let examCleanup = () => {};
+  let wordOrderCleanup = () => {};
+  let practicalCleanup = () => {};
 
-  app.innerHTML = `
-    <main class="lesson-page shell">
-      <div class="topline"><a href="#">← Lesson list</a><span>${escapeHtml(lesson.id)} · Lesson ${lessonIndex + 1} / ${lessons.length}</span></div>
-      <header class="lesson-header">
-        <p class="eyebrow">${escapeHtml(lesson.label)}</p>
-        <h1>${escapeHtml(lesson.title)}</h1>
-        <p>${escapeHtml(lesson.description)}</p>
-        <div class="goal"><span>Learning goal</span><p>${escapeHtml(lesson.learningGoal)}</p></div>
-      </header>
-
+  const standardSections = !isPracticeLesson ? `
       <section class="lesson-explanation-shell" data-lesson-explanation aria-labelledby="learn-heading">
         <p class="eyebrow">LEARN · SEE</p>
         <h2 id="learn-heading">このLessonで学ぶこと</h2>
@@ -148,21 +166,37 @@ function renderLesson(lesson) {
             <button class="button" type="button" data-word-order-next>次の問題 →</button>
           </nav>
         </div>
-      </section>
+      </section>` : '';
 
+  const practiceSections = isPracticeLesson ? `
+      ${renderPracticeStrategy(content.strategy)}
       <section class="lesson-assessment" data-assessment-section="practical" aria-labelledby="practical-heading">
         <p class="eyebrow">PRACTICE · LESSON 6</p>
         <h2 id="practical-heading">Lesson 6 Practical</h2>
-        <p class="assessment-introduction">OCRで確認できた問題と、欠落箇所を明示的に復元した問題で、形・構造の判断を仕上げます。</p>
         <div class="assessment-player">
-          <div class="assessment-progress"><strong data-practical-heading tabindex="-1"></strong><span data-practical-counter></span></div>
+          <div class="assessment-progress"><strong data-practical-stage tabindex="-1"></strong><span data-practical-counter></span></div>
+          <h3 data-practical-stage-title></h3>
+          <p class="assessment-introduction" data-practical-stage-introduction></p>
           <div data-practical-component></div>
           <nav class="assessment-navigation" aria-label="Lesson 6 Practical navigation">
             <button class="button secondary" type="button" data-practical-previous>← 前の問題</button>
             <button class="button" type="button" data-practical-next>次の問題 →</button>
           </nav>
         </div>
-      </section>
+      </section>` : '';
+
+  app.innerHTML = `
+    <main class="lesson-page shell">
+      <div class="topline"><a href="#">← Lesson list</a><span>${escapeHtml(lesson.id)} · Lesson ${lessonIndex + 1} / ${lessons.length}</span></div>
+      <header class="lesson-header">
+        <p class="eyebrow">${escapeHtml(lesson.label)}</p>
+        <h1>${escapeHtml(lesson.title)}</h1>
+        <p>${escapeHtml(lesson.description)}</p>
+        <div class="goal"><span>Learning goal</span><p>${escapeHtml(lesson.learningGoal)}</p></div>
+      </header>
+
+      ${standardSections}
+      ${practiceSections}
 
       <section class="lesson-closing" data-lesson-closing aria-label="Lesson review">
         <p class="eyebrow">REVIEW</p>
@@ -175,114 +209,121 @@ function renderLesson(lesson) {
       </nav>
     </main>`;
 
-  const explanationRoot = app.querySelector('[data-explanation-root]');
-  mountExplanation(explanationRoot, content, { includeClosingSections: false });
+  if (!isPracticeLesson) {
+    const explanationRoot = app.querySelector('[data-explanation-root]');
+    mountExplanation(explanationRoot, content, { includeClosingSections: false });
+  }
   app.querySelector('[data-closing-root]').innerHTML = renderExplanationClosing(content);
 
-  const stepLabel = app.querySelector('[data-step-label]');
-  const progressText = app.querySelector('[data-progress-text]');
-  const progressBar = app.querySelector('[data-progress-bar]');
-  const stepTitle = app.querySelector('[data-step-title]');
-  const instruction = app.querySelector('[data-step-instruction]');
-  const componentRoot = app.querySelector('[data-lesson-component]');
-  const completion = app.querySelector('[data-lesson-completion]');
-  const previous = app.querySelector('[data-previous]');
-  const next = app.querySelector('[data-next]');
+  if (!isPracticeLesson) {
+    const stepLabel = app.querySelector('[data-step-label]');
+    const progressText = app.querySelector('[data-progress-text]');
+    const progressBar = app.querySelector('[data-progress-bar]');
+    const stepTitle = app.querySelector('[data-step-title]');
+    const instruction = app.querySelector('[data-step-instruction]');
+    const componentRoot = app.querySelector('[data-lesson-component]');
+    const completion = app.querySelector('[data-lesson-completion]');
+    const previous = app.querySelector('[data-previous]');
+    const next = app.querySelector('[data-next]');
 
-  function updateProgress() {
-    const progress = getLessonProgress(lesson, completedStepIds);
-    progressText.textContent = `${progress.completedCount} / ${progress.totalCount} steps complete · ${progress.percentage}%`;
-    progressBar.style.width = `${progress.percentage}%`;
-    return progress;
-  }
+    function updateProgress() {
+      const progress = getLessonProgress(lesson, completedStepIds);
+      progressText.textContent = `${progress.completedCount} / ${progress.totalCount} steps complete · ${progress.percentage}%`;
+      progressBar.style.width = `${progress.percentage}%`;
+      return progress;
+    }
 
-  function getLessonCompletionMessage(progress) {
-    if (!progress.allComplete) return 'Step complete — 次の関係へ進めます。';
-    if (lessonIndex === lessons.length - 1) return 'All lessons complete — 分詞を見たら、名詞と動詞の関係を見る。';
-    return 'Lesson complete — このLessonを最後まで確認しました。';
-  }
+    function getLessonCompletionMessage(progress) {
+      if (!progress.allComplete) return 'Step complete — 次の関係へ進めます。';
+      if (lessonIndex === lessons.length - 1) return 'All lessons complete — 分詞を見たら、名詞と動詞の関係を見る。';
+      return 'Lesson complete — このLessonを最後まで確認しました。';
+    }
 
-  function renderStep(shouldFocus = true) {
-    const step = lesson.steps[stepIndex];
-    const stepComplete = isLessonStepComplete(completedStepIds, step.id);
-    cleanup?.();
-    stepLabel.textContent = `Step ${stepIndex + 1} / ${lesson.steps.length}`;
-    updateProgress();
-    stepTitle.textContent = step.title;
-    instruction.textContent = step.instruction;
-    completion.textContent = stepComplete ? 'Step complete — 次の関係へ進めます。' : '';
-    previous.disabled = stepIndex === 0;
-    next.disabled = stepIndex === lesson.steps.length - 1 || !stepComplete;
-    cleanup = mountDemoProblem(step.interactionType, componentRoot, getProblemForStep(step), {
-      onComplete(result) {
-        if (result.reset) {
-          completedStepIds = new Set([...completedStepIds].filter((id) => id !== step.id));
+    function getProblemForStep(step) {
+      const problem = getProblemById(step.problemId);
+      if (!problem) throw new Error(`Missing problem: ${step.problemId}`);
+      return problem;
+    }
+
+    function renderStep(shouldFocus = true) {
+      const step = lesson.steps[stepIndex];
+      const stepComplete = isLessonStepComplete(completedStepIds, step.id);
+      interactiveCleanup();
+      stepLabel.textContent = `Step ${stepIndex + 1} / ${lesson.steps.length}`;
+      updateProgress();
+      stepTitle.textContent = step.title;
+      instruction.textContent = step.instruction;
+      completion.textContent = stepComplete ? 'Step complete — 次の関係へ進めます。' : '';
+      previous.disabled = stepIndex === 0;
+      next.disabled = stepIndex === lesson.steps.length - 1 || !stepComplete;
+      interactiveCleanup = mountDemoProblem(step.interactionType, componentRoot, getProblemForStep(step), {
+        onComplete(result) {
+          if (result.reset) {
+            completedStepIds = new Set([...completedStepIds].filter((id) => id !== step.id));
+            const progress = updateProgress();
+            completion.textContent = progress.allComplete ? getLessonCompletionMessage(progress) : '';
+            next.disabled = true;
+            return;
+          }
+          if (!result.correct) return;
+          completedStepIds = markLessonStepComplete(completedStepIds, step.id);
           const progress = updateProgress();
-          completion.textContent = progress.allComplete ? getLessonCompletionMessage(progress) : '';
-          next.disabled = true;
-          return;
-        }
-        if (!result.correct) return;
-        completedStepIds = markLessonStepComplete(completedStepIds, step.id);
-        const progress = updateProgress();
-        completion.textContent = getLessonCompletionMessage(progress);
-        next.disabled = stepIndex === lesson.steps.length - 1;
-      },
+          completion.textContent = getLessonCompletionMessage(progress);
+          next.disabled = stepIndex === lesson.steps.length - 1;
+        },
+      });
+      if (shouldFocus) stepTitle.focus({ preventScroll: true });
+    }
+
+    previous.addEventListener('click', () => {
+      if (stepIndex === 0) return;
+      stepIndex -= 1;
+      renderStep();
     });
-    if (shouldFocus) stepTitle.focus({ preventScroll: true });
+    next.addEventListener('click', () => {
+      if (stepIndex >= lesson.steps.length - 1 || next.disabled) return;
+      stepIndex += 1;
+      renderStep();
+    });
+    renderStep(false);
+
+    examCleanup = setupAssessment({
+      section: app.querySelector('[data-assessment-section="exam"]'),
+      type: 'exam-multiple-choice',
+      problems: examProblems,
+      heading: app.querySelector('[data-exam-heading]'),
+      counter: app.querySelector('[data-exam-counter]'),
+      componentRoot: app.querySelector('[data-exam-component]'),
+      previous: app.querySelector('[data-exam-previous]'),
+      next: app.querySelector('[data-exam-next]'),
+    });
+    wordOrderCleanup = setupAssessment({
+      section: app.querySelector('[data-assessment-section="word-order"]'),
+      type: 'word-order',
+      problems: wordOrderProblems,
+      heading: app.querySelector('[data-word-order-heading]'),
+      counter: app.querySelector('[data-word-order-counter]'),
+      componentRoot: app.querySelector('[data-word-order-component]'),
+      previous: app.querySelector('[data-word-order-previous]'),
+      next: app.querySelector('[data-word-order-next]'),
+    });
+  } else {
+    practicalCleanup = setupAssessment({
+      section: app.querySelector('[data-assessment-section="practical"]'),
+      type: 'practice-multiple-choice',
+      problems: practicalProblems,
+      counter: app.querySelector('[data-practical-counter]'),
+      componentRoot: app.querySelector('[data-practical-component]'),
+      previous: app.querySelector('[data-practical-previous]'),
+      next: app.querySelector('[data-practical-next]'),
+      stageHeading: app.querySelector('[data-practical-stage]'),
+      stageTitle: app.querySelector('[data-practical-stage-title]'),
+      stageIntroduction: app.querySelector('[data-practical-stage-introduction]'),
+    });
   }
 
-  function getProblemForStep(step) {
-    const problem = getProblemById(step.problemId);
-    if (!problem) throw new Error(`Missing problem: ${step.problemId}`);
-    return problem;
-  }
-
-  previous.addEventListener('click', () => {
-    if (stepIndex === 0) return;
-    stepIndex -= 1;
-    renderStep();
-  });
-  next.addEventListener('click', () => {
-    if (stepIndex >= lesson.steps.length - 1 || next.disabled) return;
-    stepIndex += 1;
-    renderStep();
-  });
-
-  const examCleanup = setupAssessment({
-    section: app.querySelector('[data-assessment-section="exam"]'),
-    type: 'exam-multiple-choice',
-    problems: examProblems,
-    heading: app.querySelector('[data-exam-heading]'),
-    counter: app.querySelector('[data-exam-counter]'),
-    componentRoot: app.querySelector('[data-exam-component]'),
-    previous: app.querySelector('[data-exam-previous]'),
-    next: app.querySelector('[data-exam-next]'),
-  });
-  const wordOrderCleanup = setupAssessment({
-    section: app.querySelector('[data-assessment-section="word-order"]'),
-    type: 'word-order',
-    problems: wordOrderProblems,
-    heading: app.querySelector('[data-word-order-heading]'),
-    counter: app.querySelector('[data-word-order-counter]'),
-    componentRoot: app.querySelector('[data-word-order-component]'),
-    previous: app.querySelector('[data-word-order-previous]'),
-    next: app.querySelector('[data-word-order-next]'),
-  });
-  const practicalCleanup = setupAssessment({
-    section: app.querySelector('[data-assessment-section="practical"]'),
-    type: 'practice-multiple-choice',
-    problems: practicalProblems,
-    heading: app.querySelector('[data-practical-heading]'),
-    counter: app.querySelector('[data-practical-counter]'),
-    componentRoot: app.querySelector('[data-practical-component]'),
-    previous: app.querySelector('[data-practical-previous]'),
-    next: app.querySelector('[data-practical-next]'),
-  });
-
-  renderStep(false);
   return () => {
-    cleanup?.();
+    interactiveCleanup();
     examCleanup();
     wordOrderCleanup();
     practicalCleanup();

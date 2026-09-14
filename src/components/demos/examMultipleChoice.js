@@ -4,10 +4,11 @@ import { evaluateExamChoice } from '../../lib/grammar/exam-multiple-choice.js';
 
 export function mountExamMultipleChoice(root, problem, options = {}) {
   const { on, cleanup } = prepareMountRoot(root);
-  if (!problem || problem.type !== 'exam-multiple-choice') {
-    throw new TypeError('Exam Multiple Choice needs an exam-multiple-choice problem');
+  if (!problem || !['exam-multiple-choice', 'practice-multiple-choice'].includes(problem.type)) {
+    throw new TypeError('Multiple Choice needs an exam-multiple-choice or practice-multiple-choice problem');
   }
   const onComplete = typeof options.onComplete === 'function' ? options.onComplete : () => {};
+  const renderAfterExplanation = typeof options.renderAfterExplanation === 'function' ? options.renderAfterExplanation : null;
   let selectedChoiceId = null;
   let submitted = false;
 
@@ -29,6 +30,7 @@ export function mountExamMultipleChoice(root, problem, options = {}) {
         <h3>選択肢ごとの解説</h3>
         <ol class="exam-mc-review-list" data-exam-review-list></ol>
       </section>
+      <div data-exam-extension hidden></div>
       <div class="demo-actions">
         <button class="button secondary" type="button" data-exam-reset hidden>もう一度解く</button>
       </div>
@@ -41,6 +43,7 @@ export function mountExamMultipleChoice(root, problem, options = {}) {
   const overallText = root.querySelector('[data-exam-overall-text]');
   const review = root.querySelector('[data-exam-review]');
   const reviewList = root.querySelector('[data-exam-review-list]');
+  const extension = root.querySelector('[data-exam-extension]');
   const resetButton = root.querySelector('[data-exam-reset]');
 
   function focusChoice(choiceId) {
@@ -104,6 +107,9 @@ export function mountExamMultipleChoice(root, problem, options = {}) {
       })
       .join('');
     review.hidden = false;
+    extension.innerHTML = '';
+    if (renderAfterExplanation) renderAfterExplanation(extension, { problem, evaluation });
+    extension.hidden = extension.childElementCount === 0;
   }
 
   function submit() {
@@ -128,6 +134,8 @@ export function mountExamMultipleChoice(root, problem, options = {}) {
     overallText.textContent = '';
     review.hidden = true;
     reviewList.innerHTML = '';
+    extension.innerHTML = '';
+    extension.hidden = true;
     resetButton.hidden = true;
     renderChoices(problem.choices[0]?.id);
     onComplete({ correct: false, problemId: problem.id, reset: true });

@@ -270,6 +270,23 @@ function validatePracticeMultipleChoice(problem, label, errors) {
   if (!Array.isArray(problem.misconceptions) || problem.misconceptions.length === 0 || problem.misconceptions.some((item) => !hasText(item))) {
     errors.push(`${label}.misconceptions must contain non-empty items`);
   }
+  if (problem.practiceStage === 'structure') {
+    const expectedAnalysisStepIds = ['predicate', 'modifier', 'target', 'base', 'relation', 'answer'];
+    if (!Array.isArray(problem.analysisSteps) || problem.analysisSteps.length !== expectedAnalysisStepIds.length) {
+      errors.push(`${label}.analysisSteps must contain exactly six steps for structure practice`);
+    } else {
+      const analysisStepIds = new Set();
+      problem.analysisSteps.forEach((step, index) => {
+        if (!isRecord(step) || !hasText(step.id) || !hasText(step.label) || !hasText(step.value)) {
+          errors.push(`${label}.analysisSteps[${index}] needs non-empty id, label, and value`);
+          return;
+        }
+        if (analysisStepIds.has(step.id)) errors.push(`${label}.analysisSteps has duplicate id: ${step.id}`);
+        analysisStepIds.add(step.id);
+        if (step.id !== expectedAnalysisStepIds[index]) errors.push(`${label}.analysisSteps must use the ordered IDs: ${expectedAnalysisStepIds.join(', ')}`);
+      });
+    }
+  }
 }
 
 function validateSentenceComparison(problem, label, errors) {
